@@ -1,0 +1,1698 @@
+:root {
+    --petpay-orange: #ff8600;
+    --petpay-orange-2: #ff9f1c;
+    --petpay-orange-dark: #e87500;
+    --petpay-orange-soft: #fff1dc;
+
+    --petpay-black: #111827;
+    --petpay-black-2: #1f2937;
+    --petpay-cream: #fff7ec;
+    --petpay-white: #ffffff;
+    --petpay-muted: #6b7280;
+
+    --petpay-glass-light: rgba(255, 255, 255, .78);
+    --petpay-glass-strong: rgba(255, 255, 255, .92);
+    --petpay-glass-dark: rgba(17, 24, 39, .82);
+    --petpay-glass-dark-2: rgba(31, 41, 55, .72);
+
+    --petpay-border: rgba(17, 24, 39, .08);
+    --petpay-border-light: rgba(255, 255, 255, .38);
+
+    --petpay-shadow: 0 18px 44px rgba(17, 24, 39, .13);
+    --petpay-shadow-soft: 0 10px 28px rgba(17, 24, 39, .08);
+    --petpay-shadow-dark: 0 22px 48px rgba(17, 24, 39, .24);
+
+    --petpay-radius-xl: 26px;
+    --petpay-radius-lg: 20px;
+    --petpay-radius-md: 14px;
+    --petpay-radius-sm: 10px;
+
+    --petpay-topbar-height: 58px;
+    --petpay-sidebar-collapsed: 58px;
+    --petpay-sidebar-expanded: 214px;
+    --petpay-content-max: 1380px;
+
+    --petpay-font: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    min-height: 100%;
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: var(--petpay-font);
+    color: var(--petpay-black);
+    background:
+        radial-gradient(circle at 10px 10px, rgba(255, 255, 255, .34) 0 3px, transparent 4px),
+        radial-gradient(circle at 31px 10px, rgba(255, 255, 255, .26) 0 3px, transparent 4px),
+        radial-gradient(circle at 20px 22px, rgba(255, 255, 255, .24) 0 3px, transparent 4px),
+        linear-gradient(135deg, #ff8600 0%, #ff7a00 48%, #ff9f1c 100%);
+    background-size: 72px 72px, 72px 72px, 72px 72px, auto;
+}
+
+a {
+    color: inherit;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+.petpay-page {
+    min-height: 100vh;
+}
+
+.petpay-main {
+    width: 100%;
+    min-height: calc(100vh - var(--petpay-topbar-height));
+    padding: 22px clamp(14px, 2.5vw, 28px);
+}
+
+/* Topbar glass */
+
+.petpay-topbar,
+.petpay-glass-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 80;
+    min-height: var(--petpay-topbar-height);
+    padding: 8px clamp(14px, 2.4vw, 28px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, .86), rgba(255, 247, 236, .70)),
+        radial-gradient(circle at 20% 0%, rgba(255, 134, 0, .14), transparent 38%);
+    border-bottom: 1px solid rgba(255, 255, 255, .62);
+    box-shadow: 0 10px 30px rgba(17, 24, 39, .08);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+.petpay-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 38px;
+    color: var(--petpay-black);
+    text-decoration: none;
+    font-weight: 950;
+    font-size: 17px;
+    letter-spacing: -.035em;
+}
+
+.petpay-brand-mark {
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 13px;
+    background: linear-gradient(135deg, var(--petpay-orange), var(--petpay-orange-2));
+    color: var(--petpay-white);
+    box-shadow: 0 10px 24px rgba(255, 134, 0, .30);
+    font-size: 14px;
+    font-weight: 950;
+}
+
+.petpay-topbar-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.petpay-topbar-icon {
+    position: relative;
+    width: 38px;
+    height: 38px;
+    border: 1px solid rgba(17, 24, 39, .08);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .72);
+    color: var(--petpay-black);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 900;
+    box-shadow: 0 10px 22px rgba(17, 24, 39, .06);
+    transition: transform .16s ease, box-shadow .16s ease, background .16s ease;
+}
+
+.petpay-topbar-icon:hover {
+    transform: translateY(-1px);
+    background: rgba(255, 255, 255, .96);
+    box-shadow: 0 14px 28px rgba(17, 24, 39, .10);
+}
+
+.petpay-topbar-icon-dark {
+    border: 0;
+    background: var(--petpay-black);
+    color: #fff;
+}
+
+.petpay-topbar-icon span {
+    position: absolute;
+    top: calc(100% + 9px);
+    right: 0;
+    min-width: max-content;
+    padding: 8px 10px;
+    border-radius: 12px;
+    background: rgba(17, 24, 39, .94);
+    color: #fff;
+    font-size: 11px;
+    line-height: 1;
+    font-weight: 850;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px);
+    pointer-events: none;
+    box-shadow: 0 14px 28px rgba(0, 0, 0, .22);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: opacity .16s ease, transform .16s ease, visibility .16s ease;
+}
+
+.petpay-topbar-icon:hover span {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Layout */
+
+.petpay-dashboard,
+.petpay-shell {
+    width: min(100%, var(--petpay-content-max));
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: var(--petpay-sidebar-collapsed) minmax(0, 1fr);
+    gap: 14px;
+    align-items: start;
+}
+
+.petpay-content,
+.petpay-content-panel {
+    min-width: 0;
+    width: 100%;
+    min-height: calc(100vh - var(--petpay-topbar-height) - 44px);
+    padding: clamp(20px, 2.5vw, 30px);
+    border-radius: 26px;
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, .86), rgba(255, 247, 236, .78)),
+        radial-gradient(circle at 0% 0%, rgba(255, 134, 0, .12), transparent 42%),
+        radial-gradient(circle at 100% 0%, rgba(255, 255, 255, .36), transparent 34%);
+    border: 1px solid rgba(255, 255, 255, .68);
+    box-shadow: var(--petpay-shadow);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+/* Sidebar glass */
+
+.petpay-sidebar {
+    position: sticky;
+    top: calc(var(--petpay-topbar-height) + 16px);
+    z-index: 40;
+    width: var(--petpay-sidebar-collapsed);
+    transition: width .24s ease;
+}
+
+.petpay-sidebar:hover {
+    width: var(--petpay-sidebar-expanded);
+}
+
+.petpay-sidebar-card {
+    width: var(--petpay-sidebar-collapsed);
+    min-height: calc(100vh - var(--petpay-topbar-height) - 54px);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px 7px;
+    overflow: hidden;
+    border-radius: 24px;
+    background:
+        linear-gradient(150deg, rgba(17, 24, 39, .86), rgba(31, 41, 55, .70)),
+        radial-gradient(circle at 0% 0%, rgba(255, 134, 0, .38), transparent 42%),
+        radial-gradient(circle at 100% 100%, rgba(255, 159, 28, .20), transparent 38%);
+    border: 1px solid rgba(255, 255, 255, .18);
+    box-shadow: var(--petpay-shadow-dark);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    transition: width .24s ease, padding .24s ease, border-radius .24s ease;
+}
+
+.petpay-sidebar:hover .petpay-sidebar-card {
+    width: var(--petpay-sidebar-expanded);
+    padding: 12px 10px;
+}
+
+.petpay-sidebar-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 42px;
+    padding: 4px 5px 10px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid rgba(255, 255, 255, .14);
+}
+
+.petpay-sidebar-logo {
+    flex: 0 0 34px;
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 13px;
+    background: linear-gradient(135deg, var(--petpay-orange), var(--petpay-orange-2));
+    color: #fff;
+    font-size: 15px;
+    font-weight: 950;
+    box-shadow: 0 10px 24px rgba(255, 134, 0, .34);
+}
+
+.petpay-sidebar-user {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    transform: translateX(-6px);
+    transition: opacity .18s ease, transform .18s ease;
+}
+
+.petpay-sidebar:hover .petpay-sidebar-user {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.petpay-sidebar-user strong {
+    color: #fff;
+    font-size: 13px;
+    font-weight: 950;
+    line-height: 1.1;
+    white-space: nowrap;
+}
+
+.petpay-sidebar-user span {
+    color: rgba(255, 255, 255, .62);
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.petpay-sidebar-title {
+    display: none;
+}
+
+.petpay-sidebar-menu-label {
+    display: block;
+    height: 20px;
+    padding: 0 8px;
+    color: rgba(255, 255, 255, .48);
+    font-size: 9px;
+    font-weight: 900;
+    line-height: 20px;
+    letter-spacing: .12em;
+    opacity: 0;
+    white-space: nowrap;
+    transform: translateX(-6px);
+    transition: opacity .18s ease, transform .18s ease;
+}
+
+.petpay-sidebar:hover .petpay-sidebar-menu-label {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.petpay-sidebar-link {
+    position: relative;
+    min-width: 44px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 0 11px;
+    border-radius: 14px;
+    color: rgba(255, 255, 255, .84);
+    text-decoration: none;
+    overflow: visible;
+    transition: background .16s ease, color .16s ease, transform .16s ease;
+}
+
+.petpay-sidebar-link:hover {
+    background: rgba(255, 134, 0, .22);
+    color: #fff;
+    transform: translateX(2px);
+}
+
+.petpay-sidebar-icon {
+    flex: 0 0 20px;
+    width: 20px;
+    display: inline-flex;
+    justify-content: center;
+    font-size: 16px;
+    line-height: 1;
+}
+
+.petpay-sidebar-text {
+    opacity: 0;
+    transform: translateX(-6px);
+    white-space: nowrap;
+    color: inherit;
+    font-size: 12px;
+    font-weight: 820;
+    transition: opacity .18s ease, transform .18s ease;
+}
+
+.petpay-sidebar:hover .petpay-sidebar-text {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.petpay-sidebar:not(:hover) .petpay-sidebar-link::after {
+    content: attr(aria-label);
+    position: absolute;
+    left: calc(100% + 12px);
+    top: 50%;
+    transform: translateY(-50%) translateX(-6px);
+    min-width: max-content;
+    max-width: 230px;
+    padding: 9px 12px;
+    border-radius: 13px;
+    background: rgba(17, 24, 39, .94);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 850;
+    line-height: 1;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    box-shadow: 0 16px 32px rgba(0, 0, 0, .24);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    transition: opacity .16s ease, transform .16s ease, visibility .16s ease;
+}
+
+.petpay-sidebar:not(:hover) .petpay-sidebar-link:hover::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(-50%) translateX(0);
+}
+
+/* Buttons */
+
+.petpay-btn,
+.petpay-icon-btn {
+    border: 0;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    transition: transform .16s ease, box-shadow .16s ease, background .16s ease, opacity .16s ease;
+}
+
+.petpay-btn {
+    gap: 8px;
+    min-height: 38px;
+    padding: 9px 14px;
+    border-radius: 14px;
+    font-size: 13px;
+}
+
+.petpay-btn:hover,
+.petpay-icon-btn:hover {
+    transform: translateY(-1px);
+}
+
+.petpay-btn-black {
+    background: var(--petpay-black);
+    color: var(--petpay-white);
+    box-shadow: 0 10px 22px rgba(17, 24, 39, .18);
+}
+
+.petpay-btn-orange {
+    background: linear-gradient(135deg, var(--petpay-orange), var(--petpay-orange-2));
+    color: var(--petpay-white);
+    box-shadow: 0 10px 22px rgba(255, 134, 0, .24);
+}
+
+.petpay-btn-white {
+    background: rgba(255, 255, 255, .74);
+    color: var(--petpay-black);
+    border: 1px solid var(--petpay-border);
+}
+
+.petpay-icon-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 12px;
+    font-size: 17px;
+}
+
+.petpay-icon-btn-success {
+    background: #16a34a;
+    color: #fff;
+}
+
+.petpay-icon-btn-danger {
+    background: #ef4444;
+    color: #fff;
+}
+
+/* Content */
+
+.petpay-section-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.petpay-section-head h1,
+.petpay-section-head h2 {
+    margin: 0;
+    color: var(--petpay-black);
+    letter-spacing: -.055em;
+    line-height: .98;
+}
+
+.petpay-section-head h1 {
+    font-size: clamp(30px, 3vw, 44px);
+}
+
+.petpay-section-head h2 {
+    font-size: clamp(22px, 2.4vw, 30px);
+}
+
+.petpay-section-head p {
+    max-width: 760px;
+    margin: 8px 0 0;
+    color: var(--petpay-muted);
+    line-height: 1.45;
+    font-size: 14px;
+}
+
+.petpay-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+    font-size: 11px;
+    font-weight: 950;
+    color: var(--petpay-orange-dark);
+    text-transform: uppercase;
+    letter-spacing: .09em;
+}
+
+.petpay-panel {
+    width: 100%;
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, .82), rgba(255, 247, 236, .70));
+    border: 1px solid rgba(255, 255, 255, .62);
+    border-radius: 22px;
+    box-shadow: var(--petpay-shadow-soft);
+    padding: 22px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+.petpay-mt-18 {
+    margin-top: 18px;
+}
+
+/* Stats */
+
+.petpay-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.petpay-stat {
+    min-height: 78px;
+    padding: 13px 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    border-radius: 17px;
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, .76), rgba(255, 241, 220, .62));
+    border: 1px solid rgba(255, 255, 255, .70);
+    box-shadow: 0 10px 24px rgba(17, 24, 39, .055);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.petpay-stat strong {
+    display: block;
+    color: var(--petpay-black);
+    font-size: 24px;
+    line-height: 1;
+    font-weight: 950;
+    letter-spacing: -.04em;
+}
+
+.petpay-stat span {
+    color: var(--petpay-muted);
+    font-size: 12px;
+    font-weight: 850;
+    line-height: 1.25;
+}
+
+.petpay-stat-link {
+    text-decoration: none;
+    color: inherit;
+    transition: transform .16s ease, box-shadow .16s ease;
+}
+
+.petpay-stat-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 28px rgba(17, 24, 39, .10);
+}
+
+/* Action cards */
+
+.petpay-action-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.petpay-action-card {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-height: 78px;
+    padding: 13px 14px;
+    border-radius: 16px;
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, .66), rgba(255, 241, 220, .64));
+    border: 1px solid rgba(255, 255, 255, .70);
+    color: var(--petpay-black);
+    text-decoration: none;
+    box-shadow: 0 10px 24px rgba(17, 24, 39, .045);
+    transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+}
+
+.petpay-action-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 134, 0, .32);
+    box-shadow: 0 12px 26px rgba(17, 24, 39, .10);
+}
+
+.petpay-action-card strong {
+    font-size: 14px;
+    font-weight: 950;
+}
+
+.petpay-action-card span {
+    font-size: 12.5px;
+    color: var(--petpay-muted);
+    line-height: 1.35;
+}
+
+/* Tables */
+
+.petpay-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid rgba(255, 255, 255, .70);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, .76);
+    box-shadow: 0 10px 24px rgba(17, 24, 39, .055);
+}
+
+.petpay-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 760px;
+}
+
+.petpay-table th,
+.petpay-table td {
+    padding: 12px 13px;
+    text-align: left;
+    border-bottom: 1px solid rgba(17, 24, 39, .07);
+    vertical-align: middle;
+}
+
+.petpay-table th {
+    font-size: 11px;
+    color: var(--petpay-muted);
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    background: rgba(255, 241, 220, .80);
+}
+
+.petpay-table td {
+    font-size: 13px;
+    color: var(--petpay-black);
+}
+
+.petpay-table td span {
+    display: block;
+    margin-top: 3px;
+    font-size: 12px;
+    color: var(--petpay-muted);
+}
+
+.petpay-row-actions {
+    display: flex;
+    gap: 7px;
+    align-items: center;
+}
+
+.petpay-row-actions form {
+    margin: 0;
+}
+
+/* Alerts and states */
+
+.petpay-alert {
+    width: 100%;
+    padding: 11px 13px;
+    border-radius: 14px;
+    margin-bottom: 15px;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.petpay-alert-success {
+    background: rgba(220, 252, 231, .88);
+    color: #166534;
+    border: 1px solid rgba(22, 101, 52, .16);
+}
+
+.petpay-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 26px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 900;
+}
+
+.petpay-status-pending {
+    background: #fff3d6;
+    color: #92400e;
+}
+
+.petpay-empty {
+    padding: 24px;
+    text-align: center;
+    color: var(--petpay-muted);
+    font-weight: 800;
+}
+
+.petpay-pagination {
+    margin-top: 15px;
+}
+
+/* Auth forms */
+
+.petpay-auth-card,
+.petpay-card {
+    width: min(100%, 460px);
+    margin: 0 auto;
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, .88), rgba(255, 247, 236, .76));
+    border-radius: var(--petpay-radius-xl);
+    border: 1px solid rgba(255, 255, 255, .72);
+    box-shadow: var(--petpay-shadow);
+    padding: clamp(20px, 3vw, 30px);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+.petpay-form {
+    display: grid;
+    gap: 13px;
+}
+
+.petpay-field {
+    display: grid;
+    gap: 6px;
+}
+
+.petpay-field label {
+    color: var(--petpay-black);
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.petpay-field input,
+.petpay-field select,
+.petpay-field textarea {
+    width: 100%;
+    min-height: 42px;
+    border: 1px solid rgba(17, 24, 39, .08);
+    border-radius: 14px;
+    padding: 10px 12px;
+    outline: none;
+    background: rgba(255, 255, 255, .86);
+    color: var(--petpay-black);
+    font-size: 14px;
+}
+
+.petpay-field input:focus,
+.petpay-field select:focus,
+.petpay-field textarea:focus {
+    border-color: rgba(255, 134, 0, .70);
+    box-shadow: 0 0 0 4px rgba(255, 134, 0, .13);
+}
+
+/* Responsive */
+
+@media (max-width: 1100px) {
+    .petpay-stat-grid,
+    .petpay-action-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 820px) {
+    .petpay-main {
+        padding: 16px 12px 86px;
+    }
+
+    .petpay-dashboard,
+    .petpay-shell {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .petpay-sidebar {
+        position: fixed;
+        left: 50%;
+        bottom: 12px;
+        top: auto;
+        transform: translateX(-50%);
+        width: min(calc(100% - 24px), 520px);
+        z-index: 100;
+    }
+
+    .petpay-sidebar:hover {
+        width: min(calc(100% - 24px), 520px);
+    }
+
+    .petpay-sidebar-card,
+    .petpay-sidebar:hover .petpay-sidebar-card {
+        width: 100%;
+        min-height: auto;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        border-radius: 22px;
+        padding: 8px;
+    }
+
+    .petpay-sidebar-profile,
+    .petpay-sidebar-menu-label {
+        display: none;
+    }
+
+    .petpay-sidebar-link {
+        width: 42px;
+        min-width: 42px;
+        height: 42px;
+        justify-content: center;
+        padding: 0;
+        gap: 0;
+    }
+
+    .petpay-sidebar-text,
+    .petpay-sidebar:hover .petpay-sidebar-text,
+    .petpay-sidebar-link::after {
+        display: none;
+    }
+
+    .petpay-content,
+    .petpay-content-panel {
+        min-height: auto;
+        padding: 20px;
+        border-radius: 24px;
+    }
+
+    .petpay-section-head {
+        flex-direction: column;
+        margin-bottom: 16px;
+    }
+
+    .petpay-section-head h1 {
+        font-size: clamp(28px, 8vw, 38px);
+    }
+
+    .petpay-topbar,
+    .petpay-glass-topbar {
+        min-height: 56px;
+    }
+
+    .petpay-brand {
+        font-size: 16px;
+    }
+
+    .petpay-brand-mark {
+        width: 32px;
+        height: 32px;
+    }
+}
+
+@media (max-width: 620px) {
+    .petpay-topbar-actions {
+        gap: 6px;
+    }
+
+    .petpay-topbar-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 13px;
+    }
+
+    .petpay-btn {
+        min-height: 36px;
+        padding: 8px 11px;
+        font-size: 12px;
+    }
+
+    .petpay-stat-grid,
+    .petpay-action-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .petpay-stat {
+        min-height: 74px;
+    }
+
+    .petpay-sidebar-card,
+    .petpay-sidebar:hover .petpay-sidebar-card {
+        justify-content: space-around;
+    }
+
+    .petpay-sidebar-link {
+        width: 40px;
+        min-width: 40px;
+        height: 40px;
+        border-radius: 15px;
+    }
+}
+
+/* =========================================================
+   PETPAY-CARD layout full width + sidebar glass light
+   ========================================================= */
+
+:root {
+    --petpay-content-max: none;
+    --petpay-sidebar-collapsed: 58px;
+    --petpay-sidebar-expanded: 218px;
+}
+
+/* Layout ocupa más pantalla */
+
+.petpay-main {
+    padding: 20px clamp(14px, 1.6vw, 24px);
+}
+
+.petpay-dashboard,
+.petpay-shell {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    display: grid;
+    grid-template-columns: var(--petpay-sidebar-collapsed) minmax(0, 1fr);
+    gap: 14px;
+    align-items: start;
+}
+
+.petpay-content,
+.petpay-content-panel {
+    width: 100%;
+    max-width: none;
+    min-height: calc(100vh - var(--petpay-topbar-height) - 40px);
+    border-radius: 28px;
+}
+
+/* Sidebar claro tipo header */
+
+.petpay-sidebar {
+    position: sticky;
+    top: calc(var(--petpay-topbar-height) + 16px);
+    z-index: 40;
+    width: var(--petpay-sidebar-collapsed);
+    transition: width .24s ease;
+}
+
+.petpay-sidebar:hover {
+    width: var(--petpay-sidebar-expanded);
+}
+
+.petpay-sidebar-card {
+    width: var(--petpay-sidebar-collapsed);
+    min-height: calc(100vh - var(--petpay-topbar-height) - 54px);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 10px 7px;
+    overflow: hidden;
+    border-radius: 26px;
+    background:
+        linear-gradient(145deg, rgba(255, 255, 255, .78), rgba(255, 247, 236, .62)),
+        radial-gradient(circle at 0% 0%, rgba(255, 134, 0, .24), transparent 42%),
+        radial-gradient(circle at 100% 100%, rgba(255, 255, 255, .50), transparent 38%);
+    border: 1px solid rgba(255, 255, 255, .70);
+    box-shadow: 0 18px 40px rgba(17, 24, 39, .14);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    transition: width .24s ease, padding .24s ease, box-shadow .24s ease;
+}
+
+.petpay-sidebar:hover .petpay-sidebar-card {
+    width: var(--petpay-sidebar-expanded);
+    padding: 12px 10px;
+    box-shadow: 0 22px 52px rgba(17, 24, 39, .18);
+}
+
+/* Logo arriba, menú debajo */
+
+.petpay-sidebar-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 42px;
+    padding: 2px 4px 10px;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(17, 24, 39, .08);
+}
+
+.petpay-sidebar-logo {
+    flex: 0 0 36px;
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--petpay-orange), var(--petpay-orange-2));
+    color: #fff;
+    font-size: 15px;
+    font-weight: 950;
+    box-shadow: 0 10px 24px rgba(255, 134, 0, .34);
+}
+
+.petpay-sidebar-user {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    transform: translateX(-6px);
+    transition: opacity .18s ease, transform .18s ease;
+}
+
+.petpay-sidebar:hover .petpay-sidebar-user {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.petpay-sidebar-user strong {
+    color: var(--petpay-black);
+    font-size: 13px;
+    font-weight: 950;
+    line-height: 1.05;
+    white-space: nowrap;
+}
+
+.petpay-sidebar-user small {
+    color: var(--petpay-muted);
+    font-size: 11px;
+    font-weight: 750;
+    white-space: nowrap;
+}
+
+.petpay-sidebar-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* Ocultar cualquier título viejo del menú */
+
+.petpay-sidebar-title,
+.petpay-sidebar-menu-label {
+    display: none !important;
+}
+
+/* Links del menú */
+
+.petpay-sidebar-link {
+    position: relative;
+    min-width: 44px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 0 12px;
+    border-radius: 15px;
+    color: rgba(17, 24, 39, .72);
+    text-decoration: none;
+    overflow: visible;
+    background: transparent;
+    transition: background .16s ease, color .16s ease, transform .16s ease, box-shadow .16s ease;
+}
+
+.petpay-sidebar-link:hover {
+    background: rgba(255, 134, 0, .13);
+    color: var(--petpay-black);
+    transform: translateX(2px);
+    box-shadow: 0 10px 22px rgba(17, 24, 39, .08);
+}
+
+.petpay-sidebar-icon {
+    flex: 0 0 20px;
+    width: 20px;
+    display: inline-flex;
+    justify-content: center;
+    font-size: 16px;
+    line-height: 1;
+}
+
+.petpay-sidebar-text {
+    opacity: 0;
+    transform: translateX(-6px);
+    white-space: nowrap;
+    color: inherit;
+    font-size: 12px;
+    font-weight: 850;
+    transition: opacity .18s ease, transform .18s ease;
+}
+
+.petpay-sidebar:hover .petpay-sidebar-text {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Tooltip cuando sidebar está cerrado */
+
+.petpay-sidebar:not(:hover) .petpay-sidebar-link::after {
+    content: attr(aria-label);
+    position: absolute;
+    left: calc(100% + 12px);
+    top: 50%;
+    transform: translateY(-50%) translateX(-6px);
+    min-width: max-content;
+    max-width: 230px;
+    padding: 9px 12px;
+    border-radius: 13px;
+    background: rgba(17, 24, 39, .94);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 850;
+    line-height: 1;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    box-shadow: 0 16px 32px rgba(0, 0, 0, .24);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    transition: opacity .16s ease, transform .16s ease, visibility .16s ease;
+}
+
+.petpay-sidebar:not(:hover) .petpay-sidebar-link:hover::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(-50%) translateX(0);
+}
+
+/* Panel principal más ancho y mejor adaptado */
+
+.petpay-content-panel {
+    padding: clamp(22px, 2.1vw, 34px);
+}
+
+.petpay-stat-grid {
+    grid-template-columns: repeat(4, minmax(180px, 1fr));
+}
+
+.petpay-action-grid {
+    grid-template-columns: repeat(4, minmax(180px, 1fr));
+}
+
+/* Responsive */
+
+@media (max-width: 1180px) {
+    .petpay-stat-grid,
+    .petpay-action-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 820px) {
+    .petpay-main {
+        padding: 14px 12px 86px;
+    }
+
+    .petpay-dashboard,
+    .petpay-shell {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .petpay-sidebar {
+        position: fixed;
+        left: 50%;
+        bottom: 12px;
+        top: auto;
+        transform: translateX(-50%);
+        width: min(calc(100% - 24px), 560px);
+        z-index: 100;
+    }
+
+    .petpay-sidebar:hover {
+        width: min(calc(100% - 24px), 560px);
+    }
+
+    .petpay-sidebar-card,
+    .petpay-sidebar:hover .petpay-sidebar-card {
+        width: 100%;
+        min-height: auto;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        border-radius: 22px;
+        padding: 8px;
+    }
+
+    .petpay-sidebar-profile {
+        display: none;
+    }
+
+    .petpay-sidebar-menu {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-around;
+        gap: 4px;
+    }
+
+    .petpay-sidebar-link {
+        width: 42px;
+        min-width: 42px;
+        height: 42px;
+        justify-content: center;
+        padding: 0;
+        gap: 0;
+    }
+
+    .petpay-sidebar-text,
+    .petpay-sidebar:hover .petpay-sidebar-text,
+    .petpay-sidebar-link::after {
+        display: none;
+    }
+
+    .petpay-content,
+    .petpay-content-panel {
+        min-height: auto;
+        padding: 20px;
+        border-radius: 24px;
+    }
+}
+
+@media (max-width: 620px) {
+    .petpay-stat-grid,
+    .petpay-action-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .petpay-sidebar-link {
+        width: 39px;
+        min-width: 39px;
+        height: 39px;
+        border-radius: 14px;
+    }
+}
+
+/* Sidebar sin logo interno */
+
+.petpay-sidebar-card {
+    justify-content: flex-start;
+    padding-top: 14px;
+}
+
+.petpay-sidebar-menu {
+    margin-top: 0;
+}
+
+.petpay-sidebar-profile,
+.petpay-sidebar-logo,
+.petpay-sidebar-user {
+    display: none !important;
+}
+
+/* =========================================================
+   Sidebar flotante: no empuja ni encima mal el contenido
+   ========================================================= */
+
+.petpay-dashboard,
+.petpay-shell {
+    grid-template-columns: var(--petpay-sidebar-collapsed) minmax(0, 1fr);
+    gap: 16px;
+}
+
+.petpay-sidebar {
+    width: var(--petpay-sidebar-collapsed);
+    min-width: var(--petpay-sidebar-collapsed);
+    max-width: var(--petpay-sidebar-collapsed);
+}
+
+.petpay-sidebar:hover {
+    width: var(--petpay-sidebar-collapsed);
+    min-width: var(--petpay-sidebar-collapsed);
+    max-width: var(--petpay-sidebar-collapsed);
+}
+
+.petpay-sidebar-card {
+    position: relative;
+    z-index: 50;
+    width: var(--petpay-sidebar-collapsed);
+    max-width: var(--petpay-sidebar-collapsed);
+}
+
+.petpay-sidebar:hover .petpay-sidebar-card {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: var(--petpay-sidebar-expanded);
+    max-width: var(--petpay-sidebar-expanded);
+    z-index: 120;
+}
+
+.petpay-content,
+.petpay-content-panel {
+    position: relative;
+    z-index: 1;
+}
+
+/* Sombra/blur más claro cuando se abre */
+
+.petpay-sidebar:hover .petpay-sidebar-card {
+    background:
+        linear-gradient(145deg, rgba(255, 255, 255, .86), rgba(255, 247, 236, .74)),
+        radial-gradient(circle at 0% 0%, rgba(255, 134, 0, .26), transparent 42%),
+        radial-gradient(circle at 100% 100%, rgba(255, 255, 255, .62), transparent 38%);
+    box-shadow:
+        0 24px 58px rgba(17, 24, 39, .20),
+        0 0 0 1px rgba(255, 255, 255, .55) inset;
+}
+
+/* Evita que el texto del menú se vea antes de abrir */
+
+.petpay-sidebar:not(:hover) .petpay-sidebar-text {
+    display: none;
+}
+
+.petpay-sidebar:hover .petpay-sidebar-text {
+    display: inline-flex;
+}
+
+/* Ajuste para que el menú se lea bien abierto */
+
+.petpay-sidebar:hover .petpay-sidebar-link {
+    justify-content: flex-start;
+}
+
+/* En móvil sigue como barra inferior */
+
+@media (max-width: 820px) {
+    .petpay-sidebar,
+    .petpay-sidebar:hover {
+        width: min(calc(100% - 24px), 560px);
+        min-width: auto;
+        max-width: none;
+    }
+
+    .petpay-sidebar-card,
+    .petpay-sidebar:hover .petpay-sidebar-card {
+        position: relative;
+        width: 100%;
+        max-width: none;
+    }
+}
+
+/* =========================================================
+   PETPAY-CARD | Sidebar drawer moderno flotante
+   ========================================================= */
+
+:root {
+    --petpay-sidebar-collapsed: 56px;
+    --petpay-sidebar-expanded: 244px;
+}
+
+/* Mantiene el layout fijo, el sidebar abierto flota */
+.petpay-dashboard,
+.petpay-shell {
+    grid-template-columns: var(--petpay-sidebar-collapsed) minmax(0, 1fr) !important;
+    gap: 14px !important;
+}
+
+.petpay-sidebar {
+    width: var(--petpay-sidebar-collapsed) !important;
+    min-width: var(--petpay-sidebar-collapsed) !important;
+    max-width: var(--petpay-sidebar-collapsed) !important;
+    overflow: visible !important;
+}
+
+.petpay-sidebar:hover {
+    width: var(--petpay-sidebar-collapsed) !important;
+    min-width: var(--petpay-sidebar-collapsed) !important;
+    max-width: var(--petpay-sidebar-collapsed) !important;
+}
+
+/* Estado cerrado */
+.petpay-sidebar-card {
+    position: relative !important;
+    width: var(--petpay-sidebar-collapsed) !important;
+    max-width: var(--petpay-sidebar-collapsed) !important;
+    min-height: calc(100vh - var(--petpay-topbar-height) - 54px) !important;
+    padding: 14px 8px !important;
+    border-radius: 28px !important;
+    overflow: visible !important;
+    background:
+        linear-gradient(160deg, rgba(255, 255, 255, .76), rgba(255, 241, 220, .52)),
+        radial-gradient(circle at 50% 0%, rgba(255, 134, 0, .24), transparent 42%) !important;
+    border: 1px solid rgba(255, 255, 255, .74) !important;
+    box-shadow: 0 18px 42px rgba(17, 24, 39, .14) !important;
+    backdrop-filter: blur(22px) saturate(150%) !important;
+    -webkit-backdrop-filter: blur(22px) saturate(150%) !important;
+}
+
+/* Panel flotante abierto */
+.petpay-sidebar:hover .petpay-sidebar-card {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: var(--petpay-sidebar-expanded) !important;
+    max-width: var(--petpay-sidebar-expanded) !important;
+    padding: 16px 12px !important;
+    border-radius: 30px !important;
+    background:
+        linear-gradient(145deg, rgba(255, 255, 255, .82), rgba(255, 247, 236, .68)),
+        radial-gradient(circle at 12% 0%, rgba(255, 134, 0, .30), transparent 38%),
+        radial-gradient(circle at 100% 100%, rgba(255, 255, 255, .64), transparent 42%) !important;
+    border: 1px solid rgba(255, 255, 255, .82) !important;
+    box-shadow:
+        0 28px 70px rgba(17, 24, 39, .22),
+        0 0 0 1px rgba(255, 255, 255, .42) inset !important;
+    z-index: 999 !important;
+}
+
+/* Menú */
+.petpay-sidebar-menu {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Iconos cerrados */
+.petpay-sidebar-link {
+    width: 40px !important;
+    min-width: 40px !important;
+    height: 42px !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0 !important;
+    border-radius: 17px !important;
+    color: rgba(17, 24, 39, .72) !important;
+    background: rgba(255, 255, 255, .10) !important;
+    border: 1px solid transparent !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+/* Links abiertos */
+.petpay-sidebar:hover .petpay-sidebar-link {
+    width: 100% !important;
+    min-width: 100% !important;
+    height: 44px !important;
+    justify-content: flex-start !important;
+    gap: 12px !important;
+    padding: 0 13px !important;
+    border-radius: 18px !important;
+    background: rgba(255, 255, 255, .34) !important;
+    border: 1px solid rgba(255, 255, 255, .42) !important;
+}
+
+/* Hover más premium */
+.petpay-sidebar .petpay-sidebar-link:hover,
+.petpay-sidebar:hover .petpay-sidebar-link:hover {
+    background:
+        linear-gradient(135deg, rgba(255, 134, 0, .20), rgba(255, 255, 255, .44)) !important;
+    color: var(--petpay-black) !important;
+    box-shadow: 0 12px 26px rgba(17, 24, 39, .10) !important;
+    transform: translateX(3px) !important;
+}
+
+/* Icono */
+.petpay-sidebar-icon {
+    flex: 0 0 20px !important;
+    width: 20px !important;
+    height: 20px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 15px !important;
+    line-height: 1 !important;
+}
+
+/* Texto cerrado */
+.petpay-sidebar-text {
+    display: none !important;
+    opacity: 0 !important;
+    transform: translateX(-8px) !important;
+    white-space: nowrap !important;
+    color: inherit !important;
+    font-size: 13px !important;
+    font-weight: 900 !important;
+    letter-spacing: -.02em !important;
+}
+
+/* Texto abierto */
+.petpay-sidebar:hover .petpay-sidebar-text {
+    display: inline-flex !important;
+    opacity: 1 !important;
+    transform: translateX(0) !important;
+}
+
+/* Indicador sutil cuando está abierto */
+.petpay-sidebar:hover .petpay-sidebar-menu::before {
+    content: "MENÚ";
+    display: block;
+    padding: 0 12px 4px;
+    color: rgba(17, 24, 39, .46);
+    font-size: 10px;
+    font-weight: 950;
+    letter-spacing: .14em;
+}
+
+/* Tooltip solo cuando está cerrado */
+.petpay-sidebar:not(:hover) .petpay-sidebar-link::after {
+    content: attr(aria-label) !important;
+    position: absolute !important;
+    left: calc(100% + 13px) !important;
+    top: 50% !important;
+    transform: translateY(-50%) translateX(-6px) !important;
+    min-width: max-content !important;
+    padding: 9px 12px !important;
+    border-radius: 14px !important;
+    background: rgba(17, 24, 39, .94) !important;
+    color: #fff !important;
+    font-size: 12px !important;
+    font-weight: 850 !important;
+    line-height: 1 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    box-shadow: 0 16px 32px rgba(0, 0, 0, .24) !important;
+    backdrop-filter: blur(14px) !important;
+    -webkit-backdrop-filter: blur(14px) !important;
+    transition: opacity .16s ease, transform .16s ease, visibility .16s ease !important;
+}
+
+.petpay-sidebar:not(:hover) .petpay-sidebar-link:hover::after {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(-50%) translateX(0) !important;
+}
+
+/* Evita tooltip cuando está abierto */
+.petpay-sidebar:hover .petpay-sidebar-link::after {
+    display: none !important;
+}
+
+/* Contenido siempre debajo del drawer */
+.petpay-content,
+.petpay-content-panel {
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+/* En móvil sigue como menú inferior */
+@media (max-width: 820px) {
+    .petpay-sidebar,
+    .petpay-sidebar:hover {
+        width: min(calc(100% - 24px), 560px) !important;
+        min-width: auto !important;
+        max-width: none !important;
+    }
+
+    .petpay-sidebar-card,
+    .petpay-sidebar:hover .petpay-sidebar-card {
+        position: relative !important;
+        width: 100% !important;
+        max-width: none !important;
+        min-height: auto !important;
+        flex-direction: row !important;
+        padding: 8px !important;
+        border-radius: 22px !important;
+    }
+
+    .petpay-sidebar-menu,
+    .petpay-sidebar:hover .petpay-sidebar-menu {
+        flex-direction: row !important;
+        justify-content: space-around !important;
+        gap: 4px !important;
+    }
+
+    .petpay-sidebar:hover .petpay-sidebar-menu::before {
+        display: none !important;
+    }
+
+    .petpay-sidebar-link,
+    .petpay-sidebar:hover .petpay-sidebar-link {
+        width: 40px !important;
+        min-width: 40px !important;
+        height: 40px !important;
+        padding: 0 !important;
+        justify-content: center !important;
+        gap: 0 !important;
+    }
+
+    .petpay-sidebar-text,
+    .petpay-sidebar:hover .petpay-sidebar-text,
+    .petpay-sidebar-link::after {
+        display: none !important;
+    }
+}
+
+/* =========================================================
+   Sidebar expandido sin fondo: solo links/títulos flotantes
+   ========================================================= */
+
+.petpay-sidebar:hover .petpay-sidebar-card {
+    background: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+.petpay-sidebar:hover .petpay-sidebar-menu {
+    padding: 8px 0 !important;
+}
+
+.petpay-sidebar:hover .petpay-sidebar-menu::before {
+    color: rgba(255, 255, 255, .78) !important;
+    text-shadow: 0 2px 8px rgba(17, 24, 39, .18);
+}
+
+.petpay-sidebar:hover .petpay-sidebar-link {
+    background: rgba(255, 255, 255, .72) !important;
+    border: 1px solid rgba(255, 255, 255, .76) !important;
+    box-shadow: 0 10px 24px rgba(17, 24, 39, .10) !important;
+    backdrop-filter: blur(18px) saturate(145%) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(145%) !important;
+}
+
+.petpay-sidebar:hover .petpay-sidebar-link:hover {
+    background: rgba(255, 241, 220, .88) !important;
+    border-color: rgba(255, 134, 0, .26) !important;
+    box-shadow: 0 14px 30px rgba(17, 24, 39, .14) !important;
+}
+
+.petpay-sidebar:hover .petpay-sidebar-text {
+    color: var(--petpay-black) !important;
+}
+
+/* =========================================================
+   Sidebar etiqueta MENÚ visible en modo expandido
+   ========================================================= */
+
+.petpay-sidebar:hover .petpay-sidebar-menu::before {
+    content: "MENÚ" !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: fit-content !important;
+    margin: 0 0 4px 8px !important;
+    padding: 7px 11px !important;
+    border-radius: 999px !important;
+    background: rgba(255, 255, 255, .82) !important;
+    border: 1px solid rgba(255, 255, 255, .78) !important;
+    color: var(--petpay-orange-dark) !important;
+    font-size: 10px !important;
+    font-weight: 950 !important;
+    line-height: 1 !important;
+    letter-spacing: .12em !important;
+    box-shadow: 0 10px 24px rgba(17, 24, 39, .10) !important;
+    backdrop-filter: blur(16px) saturate(145%) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(145%) !important;
+    text-shadow: none !important;
+}
+
+/* =========================================================
+   Sidebar etiqueta MENÚ visible en modo expandido
+   ========================================================= */
+
+.petpay-sidebar:hover .petpay-sidebar-menu::before {
+    content: "MENÚ" !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: fit-content !important;
+    margin: 0 0 4px 8px !important;
+    padding: 7px 11px !important;
+    border-radius: 999px !important;
+    background: rgba(255, 255, 255, .82) !important;
+    border: 1px solid rgba(255, 255, 255, .78) !important;
+    color: var(--petpay-orange-dark) !important;
+    font-size: 10px !important;
+    font-weight: 950 !important;
+    line-height: 1 !important;
+    letter-spacing: .12em !important;
+    box-shadow: 0 10px 24px rgba(17, 24, 39, .10) !important;
+    backdrop-filter: blur(16px) saturate(145%) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(145%) !important;
+    text-shadow: none !important;
+}
