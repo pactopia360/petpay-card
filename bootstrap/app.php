@@ -29,6 +29,11 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->group(base_path('routes/proveedor.php'));
 
             Route::middleware('web')
+                ->prefix('comercio')
+                ->name('comercio.')
+                ->group(base_path('routes/comercio.php'));
+
+            Route::middleware('web')
                 ->prefix('repartidor')
                 ->name('repartidor.')
                 ->group(base_path('routes/repartidor.php'));

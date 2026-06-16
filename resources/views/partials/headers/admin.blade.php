@@ -1,26 +1,63 @@
-<header class="petpay-topbar petpay-glass-topbar">
-    <a href="{{ route('admin.dashboard') }}" class="petpay-brand">
-        <span class="petpay-brand-mark">P</span>
-        <span>Petpay Admin</span>
-    </a>
+<header class="admin-shell-header">
+    <div class="admin-shell-header__brand">
+        <a href="{{ route('admin.dashboard') }}" class="admin-shell-brand" title="Dashboard Admin">
+            <span class="admin-shell-brand__mark">P</span>
+            <span class="admin-shell-brand__text">Petpay Admin</span>
+        </a>
+    </div>
 
-    <nav class="petpay-topbar-actions">
-        <a href="#" class="petpay-topbar-icon" aria-label="Alertas">
+    <nav class="admin-shell-menu" aria-label="Menú Admin">
+        <a
+            href="{{ route('admin.dashboard') }}"
+            class="admin-shell-menu__link {{ request()->routeIs('admin.dashboard') ? 'is-active' : '' }}"
+            title="Dashboard"
+        >
+            <span>⌂</span>
+            <strong>Dashboard</strong>
+        </a>
+
+        <a
+            href="{{ route('admin.commerces.pending') }}"
+            class="admin-shell-menu__link {{ request()->routeIs('admin.commerces.*') ? 'is-active' : '' }}"
+            title="Comercios"
+        >
+            <span>🏪</span>
+            <strong>Comercios</strong>
+        </a>
+
+        <a
+            href="{{ route('admin.providers.pending') }}"
+            class="admin-shell-menu__link {{ request()->routeIs('admin.providers.*') ? 'is-active' : '' }}"
+            title="Proveedor reservado"
+        >
+            <span>📦</span>
+            <strong>Proveedor</strong>
+        </a>
+
+        <a
+            href="{{ route('admin.drivers.pending') }}"
+            class="admin-shell-menu__link {{ request()->routeIs('admin.drivers.*') ? 'is-active' : '' }}"
+            title="Repartidores pendientes"
+        >
+            <span>🛵</span>
+            <strong>Repartidores</strong>
+        </a>
+    </nav>
+
+    <div class="admin-shell-actions">
+        <a href="#" class="admin-shell-action" title="Alertas" aria-label="Alertas">
             🔔
-            <span>Alertas</span>
         </a>
 
-        <a href="#" class="petpay-topbar-icon" aria-label="Perfil">
+        <a href="#" class="admin-shell-action" title="Perfil" aria-label="Perfil">
             👤
-            <span>Perfil</span>
         </a>
 
-        <form method="POST" action="{{ route('admin.logout') }}" style="margin:0;">
+        <form method="POST" action="{{ route('admin.logout') }}" class="admin-shell-logout">
             @csrf
-            <button type="submit" class="petpay-topbar-icon petpay-topbar-icon-dark" aria-label="Salir">
+            <button type="submit" class="admin-shell-action admin-shell-action--dark" title="Salir" aria-label="Salir">
                 ⏻
-                <span>Salir</span>
             </button>
         </form>
-    </nav>
+    </div>
 </header>

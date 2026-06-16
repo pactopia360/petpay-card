@@ -1,70 +1,194 @@
-@php($portal = 'cliente')
+@extends('layouts.guest')
 
-@extends('layouts.app')
-
-@section('title', 'PETPAY-CARD | Registro Cliente')
+@section('title', 'PETPAY-CARD | Registro Usuario')
 
 @section('content')
-    <section class="petpay-auth-wrap">
-        <div class="petpay-auth-card petpay-auth-card-wide">
-            <div class="petpay-auth-icon">🐾</div>
+    <main class="petpay-auth petpay-auth--usuario">
+        <header class="petpay-auth__topbar">
+            <a href="{{ route('cliente.login') }}" class="petpay-auth__back" aria-label="Regresar">
+                ←
+            </a>
 
-            <h1 class="petpay-auth-title">Crea tu cuenta</h1>
-            <p class="petpay-auth-text">
-                Regístrate para comprar, guardar direcciones, registrar mascotas y acumular PawPoints.
-            </p>
+            <div class="petpay-auth__brand">
+                <span class="petpay-auth__brand-mark">P</span>
+                <span class="petpay-auth__brand-text">Petpay</span>
+            </div>
+        </header>
 
-            <form method="POST" action="{{ route('cliente.register.store') }}">
-                 @csrf
-                <div class="petpay-form-grid">
-                    <div class="petpay-form-group">
-                        <label class="petpay-label">Nombre</label>
-                        <input class="petpay-field" type="text" placeholder="Nombre">
-                    </div>
+        <section class="petpay-auth__screen">
+            <div class="petpay-auth__panel petpay-auth__panel--wide">
+                <div class="petpay-auth__intro">
+                    <p class="petpay-auth__eyebrow">Portal Usuario</p>
 
-                    <div class="petpay-form-group">
-                        <label class="petpay-label">Apellido</label>
-                        <input class="petpay-field" type="text" placeholder="Apellido">
-                    </div>
+                    <h1>Crea tu cuenta</h1>
+
+                    <p>
+                        Regístrate para comprar productos, servicios y beneficios para tu mascota.
+                    </p>
                 </div>
 
-                <div class="petpay-form-grid">
-                    <div class="petpay-form-group">
-                        <label class="petpay-label">Correo electrónico</label>
-                        <input class="petpay-field" type="email" placeholder="tu@email.com">
+                @if ($errors->any())
+                    <div class="petpay-auth__alert petpay-auth__alert--danger">
+                        {{ $errors->first() }}
                     </div>
+                @endif
 
-                    <div class="petpay-form-group">
-                        <label class="petpay-label">Teléfono</label>
-                        <input class="petpay-field" type="text" placeholder="55 0000 0000">
+                @if (session('status'))
+                    <div class="petpay-auth__alert petpay-auth__alert--success">
+                        {{ session('status') }}
                     </div>
+                @endif
+
+                <div class="petpay-auth__social" style="margin-bottom: 10px;">
+                    <a href="{{ route('cliente.google.redirect') }}" class="petpay-auth__social-button">
+                        <span>G</span>
+                        Registrarme con Google
+                    </a>
                 </div>
 
-                <div class="petpay-form-group">
-                    <label class="petpay-label">Dirección principal</label>
-                    <input class="petpay-field" type="text" placeholder="Dirección de entrega">
+                <div class="petpay-auth__divider">
+                    <span></span>
+                    <small>o</small>
+                    <span></span>
                 </div>
 
-                <div class="petpay-form-grid">
-                    <div class="petpay-form-group">
-                        <label class="petpay-label">Contraseña</label>
-                        <input class="petpay-field" type="password" placeholder="••••••••">
+                <form method="POST" action="{{ route('cliente.register.store') }}" class="petpay-auth__form">
+                    @csrf
+
+                    <div class="petpay-auth__form-grid">
+                        <div class="petpay-auth__group">
+                            <label class="petpay-auth__label" for="first_name">
+                                Nombre
+                            </label>
+
+                            <input
+                                id="first_name"
+                                class="petpay-auth__field"
+                                type="text"
+                                name="first_name"
+                                value="{{ old('first_name') }}"
+                                placeholder="Nombre"
+                                autocomplete="given-name"
+                                required
+                                autofocus
+                            >
+                        </div>
+
+                        <div class="petpay-auth__group">
+                            <label class="petpay-auth__label" for="last_name">
+                                Apellido
+                            </label>
+
+                            <input
+                                id="last_name"
+                                class="petpay-auth__field"
+                                type="text"
+                                name="last_name"
+                                value="{{ old('last_name') }}"
+                                placeholder="Apellido"
+                                autocomplete="family-name"
+                            >
+                        </div>
+
+                        <div class="petpay-auth__group">
+                            <label class="petpay-auth__label" for="email">
+                                Correo electrónico
+                            </label>
+
+                            <input
+                                id="email"
+                                class="petpay-auth__field"
+                                type="email"
+                                name="email"
+                                value="{{ old('email') }}"
+                                placeholder="tu@email.com"
+                                autocomplete="email"
+                                required
+                            >
+                        </div>
+
+                        <div class="petpay-auth__group">
+                            <label class="petpay-auth__label" for="phone">
+                                Teléfono
+                            </label>
+
+                            <input
+                                id="phone"
+                                class="petpay-auth__field"
+                                type="tel"
+                                name="phone"
+                                value="{{ old('phone') }}"
+                                placeholder="55 0000 0000"
+                                autocomplete="tel"
+                                required
+                            >
+                        </div>
+
+                        <div class="petpay-auth__group petpay-auth__group--full">
+                            <label class="petpay-auth__label" for="main_address">
+                                Dirección principal
+                            </label>
+
+                            <input
+                                id="main_address"
+                                class="petpay-auth__field"
+                                type="text"
+                                name="main_address"
+                                value="{{ old('main_address') }}"
+                                placeholder="Dirección de entrega"
+                                autocomplete="street-address"
+                            >
+                        </div>
+
+                        <div class="petpay-auth__group">
+                            <label class="petpay-auth__label" for="password">
+                                Contraseña
+                            </label>
+
+                            <input
+                                id="password"
+                                class="petpay-auth__field"
+                                type="password"
+                                name="password"
+                                placeholder="Mínimo 8 caracteres"
+                                autocomplete="new-password"
+                                required
+                            >
+                        </div>
+
+                        <div class="petpay-auth__group">
+                            <label class="petpay-auth__label" for="password_confirmation">
+                                Confirmar contraseña
+                            </label>
+
+                            <input
+                                id="password_confirmation"
+                                class="petpay-auth__field"
+                                type="password"
+                                name="password_confirmation"
+                                placeholder="Repite tu contraseña"
+                                autocomplete="new-password"
+                                required
+                            >
+                        </div>
                     </div>
 
-                    <div class="petpay-form-group">
-                        <label class="petpay-label">Confirmar contraseña</label>
-                        <input class="petpay-field" type="password" placeholder="••••••••">
-                    </div>
-                </div>
+                    <button type="submit" class="petpay-auth__primary">
+                        Crear cuenta
+                    </button>
+                </form>
 
-                <button type="submit" class="petpay-btn petpay-btn-black" style="width:100%;">
-                    Crear cuenta cliente
-                </button>
-
-                <p class="petpay-auth-note">
-                    ¿Ya tienes cuenta? <a href="{{ route('cliente.login') }}">Inicia sesión</a>
+                <p class="petpay-auth__legal">
+                    Al crear tu cuenta aceptas usar Petpay para gestionar compras, servicios,
+                    direcciones y beneficios relacionados con tu mascota.
                 </p>
-            </form>
-        </div>
-    </section>
+
+                <div class="petpay-auth__links">
+                    <a href="{{ route('cliente.login') }}">
+                        Ya tengo cuenta
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
 @endsection

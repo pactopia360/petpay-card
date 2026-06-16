@@ -3,6 +3,7 @@
 use App\Http\Controllers\Cliente\Auth\LoginController;
 use App\Http\Controllers\Cliente\Auth\RegisterController;
 use App\Http\Controllers\Cliente\HomeController;
+use App\Http\Controllers\Cliente\Auth\GoogleController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -34,6 +35,14 @@ Route::post('/registro', [RegisterController::class, 'register'])
 Route::get('/recuperar-password', function () {
     return view('auth.cliente.forgot-password');
 })->middleware('guest:cliente')->name('password.request');
+
+Route::get('/auth/google/redirect', [GoogleController::class, 'redirect'])
+    ->middleware('guest:cliente')
+    ->name('google.redirect');
+
+Route::get('/auth/google/callback', [GoogleController::class, 'callback'])
+    ->middleware('guest:cliente')
+    ->name('google.callback');
 
 Route::middleware(['auth:cliente', 'role:cliente,cliente'])->group(function () {
     Route::get('/dashboard', [HomeController::class, 'index'])

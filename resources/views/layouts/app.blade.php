@@ -12,6 +12,10 @@
     {{-- Base PETPAY-CARD --}}
     <link rel="stylesheet" href="{{ asset('assets/petpay-card/css/app.css') }}">
 
+    @if (($portal ?? null) === 'cliente')
+        <link rel="stylesheet" href="{{ asset('assets/petpay-card/css/portals/cliente.css') }}">
+    @endif
+
     {{-- CSS por portal --}}
     @if ($portal !== 'public')
         <link rel="stylesheet" href="{{ asset('assets/petpay-card/css/portals/' . $portal . '.css') }}">

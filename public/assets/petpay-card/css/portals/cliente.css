@@ -1,0 +1,911 @@
+/* =========================================================
+   PETPAY-CARD | CLIENTE MARKETPLACE
+   Dashboard tipo marketplace / Amazon inspirado en Petpay
+========================================================= */
+
+:root {
+    --petpay-client-orange: #ff7a00;
+    --petpay-client-orange-dark: #f05f00;
+    --petpay-client-coral: #ff4d61;
+    --petpay-client-cream: #fff8ef;
+    --petpay-client-cream-2: #fff1df;
+    --petpay-client-white: #ffffff;
+    --petpay-client-black: #111827;
+    --petpay-client-muted: #6b7280;
+    --petpay-client-line: rgba(17, 24, 39, 0.08);
+    --petpay-client-shadow: 0 18px 50px rgba(17, 24, 39, 0.08);
+    --petpay-client-shadow-soft: 0 10px 28px rgba(17, 24, 39, 0.06);
+}
+
+body {
+    background:
+        radial-gradient(circle at 16% 10%, rgba(255, 122, 0, 0.10), transparent 24%),
+        radial-gradient(circle at 88% 20%, rgba(255, 77, 97, 0.10), transparent 22%),
+        #fffaf4;
+}
+
+.petpay-client-market {
+    min-height: calc(100vh - 74px);
+    display: grid;
+    grid-template-columns: 84px minmax(0, 1fr);
+    gap: 0;
+    background:
+        linear-gradient(135deg, rgba(255, 122, 0, 0.06), transparent 36%),
+        linear-gradient(315deg, rgba(255, 77, 97, 0.055), transparent 34%),
+        #fffaf4;
+    color: var(--petpay-client-black);
+}
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+.petpay-client-market__main {
+    min-width: 0;
+    padding: 22px 24px 34px;
+}
+
+.petpay-client-market__hero-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 16px;
+}
+
+.petpay-client-market__hello {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.petpay-client-market__paw {
+    width: 48px;
+    height: 48px;
+    border-radius: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background:
+        radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.85), transparent 32%),
+        linear-gradient(135deg, #ff9f2f, #ff6b00);
+    color: #ffffff;
+    font-size: 28px;
+    box-shadow: 0 14px 30px rgba(255, 111, 0, 0.25);
+}
+
+.petpay-client-market__eyebrow {
+    margin: 0 0 3px;
+    font-size: 11px;
+    line-height: 1;
+    font-weight: 950;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--petpay-client-orange);
+}
+
+.petpay-client-market__hello h1 {
+    margin: 0;
+    font-size: 28px;
+    line-height: 1.05;
+    letter-spacing: -0.05em;
+    font-weight: 950;
+}
+
+.petpay-client-market__hello p {
+    margin: 5px 0 0;
+    font-size: 13px;
+    line-height: 1.35;
+    color: var(--petpay-client-muted);
+}
+
+.petpay-client-market__quick-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.petpay-client-market__quick-btn {
+    min-height: 42px;
+    padding: 0 15px;
+    border-radius: 15px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    background: rgba(255, 255, 255, 0.86);
+    border: 1px solid rgba(17, 24, 39, 0.07);
+    box-shadow: var(--petpay-client-shadow-soft);
+    color: #172033;
+    font-size: 13px;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.petpay-client-market__quick-btn span {
+    min-width: 22px;
+    height: 22px;
+    padding: 0 7px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--petpay-client-orange);
+    color: #ffffff;
+    font-size: 11px;
+}
+
+.petpay-client-market__quick-btn--orange {
+    background: linear-gradient(135deg, #ff8a18, #ff6b00);
+    color: #ffffff;
+    border-color: transparent;
+    box-shadow: 0 16px 34px rgba(255, 106, 0, 0.22);
+}
+
+.petpay-client-market__quick-btn--orange span {
+    background: rgba(255, 255, 255, 0.22);
+}
+
+/* =========================================================
+   LAYOUT
+========================================================= */
+
+.petpay-client-market__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 20px;
+    align-items: start;
+}
+
+.petpay-client-market__content {
+    min-width: 0;
+    display: grid;
+    gap: 16px;
+}
+
+.petpay-client-market__aside {
+    min-width: 0;
+    display: grid;
+    gap: 16px;
+}
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+.petpay-client-market__search {
+    padding: 13px;
+    border-radius: 22px;
+    display: grid;
+    grid-template-columns: 310px minmax(0, 1fr);
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(17, 24, 39, 0.07);
+    box-shadow: var(--petpay-client-shadow);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.petpay-client-market__search-box {
+    min-width: 0;
+}
+
+.petpay-client-market__search-box label {
+    display: block;
+    margin: 0 0 6px;
+    font-size: 11px;
+    line-height: 1;
+    font-weight: 950;
+    color: #172033;
+}
+
+.petpay-client-market__search-box select,
+.petpay-client-market__search-box input {
+    width: 100%;
+    height: 40px;
+    border: 1px solid rgba(17, 24, 39, 0.10);
+    outline: none;
+    border-radius: 13px;
+    padding: 0 13px;
+    background: #ffffff;
+    color: #172033;
+    font-size: 13px;
+}
+
+.petpay-client-market__search-box small {
+    display: inline-flex;
+    margin-top: 6px;
+    color: #16a34a;
+    font-size: 11px;
+    font-weight: 900;
+}
+
+.petpay-client-market__search-inline {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 94px;
+    gap: 0;
+}
+
+.petpay-client-market__search-inline input {
+    border-radius: 13px 0 0 13px;
+    border-right: 0;
+}
+
+.petpay-client-market__search-inline button {
+    border: 0;
+    border-radius: 0 13px 13px 0;
+    background: linear-gradient(135deg, #ff8a18, #ff6500);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 950;
+    cursor: pointer;
+}
+
+/* =========================================================
+   CATEGORIES
+========================================================= */
+
+.petpay-client-market__categories {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(110px, 1fr));
+    gap: 10px;
+}
+
+.petpay-client-market__category {
+    min-height: 62px;
+    padding: 10px 12px;
+    border-radius: 17px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(17, 24, 39, 0.07);
+    box-shadow: var(--petpay-client-shadow-soft);
+    color: #172033;
+    font-size: 13px;
+    font-weight: 950;
+}
+
+.petpay-client-market__category span {
+    width: 40px;
+    height: 40px;
+    border-radius: 15px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff1df;
+    font-size: 23px;
+}
+
+/* =========================================================
+   BANNER
+========================================================= */
+
+.petpay-client-market__banner {
+    min-height: 210px;
+    position: relative;
+    overflow: hidden;
+    padding: 24px 58px 24px 30px;
+    border-radius: 24px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    align-items: center;
+    gap: 18px;
+    background:
+        radial-gradient(circle at 82% 20%, rgba(255, 122, 0, 0.18), transparent 25%),
+        radial-gradient(circle at 18% 75%, rgba(255, 77, 97, 0.12), transparent 25%),
+        linear-gradient(135deg, #fff3df, #fffaf4);
+    border: 1px solid rgba(255, 122, 0, 0.12);
+    box-shadow: var(--petpay-client-shadow);
+}
+
+.petpay-client-market__banner::before {
+    content: "🐾";
+    position: absolute;
+    top: 22px;
+    right: 350px;
+    font-size: 58px;
+    opacity: 0.08;
+}
+
+.petpay-client-market__banner::after {
+    content: "🐾";
+    position: absolute;
+    bottom: 22px;
+    right: 86px;
+    font-size: 42px;
+    opacity: 0.10;
+}
+
+.petpay-client-market__banner-copy {
+    position: relative;
+    z-index: 2;
+}
+
+.petpay-client-market__banner-copy span {
+    display: inline-flex;
+    margin-bottom: 10px;
+    color: #172033;
+    font-size: 12px;
+    font-weight: 950;
+    letter-spacing: 0.08em;
+}
+
+.petpay-client-market__banner-copy h2 {
+    margin: 0;
+    max-width: 520px;
+    font-size: 34px;
+    line-height: 1.05;
+    letter-spacing: -0.055em;
+    font-weight: 950;
+    color: #141b2d;
+}
+
+.petpay-client-market__banner-copy h2 strong {
+    display: block;
+    color: var(--petpay-client-orange);
+}
+
+.petpay-client-market__banner-copy p {
+    margin: 10px 0 16px;
+    max-width: 520px;
+    color: #4b5563;
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.petpay-client-market__banner-copy a {
+    min-height: 40px;
+    padding: 0 18px;
+    border-radius: 13px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #ff8a18, #ff6500);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 950;
+    box-shadow: 0 14px 28px rgba(255, 106, 0, 0.20);
+}
+
+.petpay-client-market__banner-pets {
+    position: relative;
+    z-index: 2;
+    min-height: 150px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.petpay-client-market__pet {
+    width: 118px;
+    height: 118px;
+    border-radius: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background:
+        radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.82), transparent 30%),
+        linear-gradient(145deg, #ffffff, #fff0df);
+    box-shadow: 0 16px 40px rgba(17, 24, 39, 0.12);
+    font-size: 74px;
+}
+
+.petpay-client-market__pet--dog {
+    transform: translateX(18px) rotate(-4deg);
+}
+
+.petpay-client-market__pet--cat {
+    width: 92px;
+    height: 92px;
+    border-radius: 32px;
+    transform: translateX(-8px) translateY(12px) rotate(6deg);
+    font-size: 58px;
+}
+
+.petpay-client-market__banner-arrow {
+    position: absolute;
+    top: 50%;
+    z-index: 3;
+    width: 34px;
+    height: 34px;
+    border: 0;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    color: #172033;
+    font-size: 24px;
+    font-weight: 900;
+    box-shadow: var(--petpay-client-shadow-soft);
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+.petpay-client-market__banner-arrow:first-child {
+    left: 14px;
+}
+
+.petpay-client-market__banner-arrow:last-child {
+    right: 14px;
+}
+
+/* =========================================================
+   SECTIONS / PRODUCTS
+========================================================= */
+
+.petpay-client-market__section,
+.petpay-client-market__panel,
+.petpay-client-market__widget {
+    padding: 16px;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(17, 24, 39, 0.07);
+    box-shadow: var(--petpay-client-shadow-soft);
+}
+
+.petpay-client-market__section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.petpay-client-market__section-head h2 {
+    margin: 0;
+    color: #172033;
+    font-size: 17px;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    font-weight: 950;
+}
+
+.petpay-client-market__section-head a {
+    color: var(--petpay-client-orange-dark);
+    font-size: 12px;
+    font-weight: 950;
+}
+
+.petpay-client-market__product-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.petpay-client-market__product {
+    min-width: 0;
+    padding: 12px;
+    border-radius: 17px;
+    background: #ffffff;
+    border: 1px solid rgba(17, 24, 39, 0.06);
+    box-shadow: 0 10px 24px rgba(17, 24, 39, 0.04);
+}
+
+.petpay-client-market__product-img {
+    height: 74px;
+    margin-bottom: 10px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+        radial-gradient(circle at 50% 30%, rgba(255, 122, 0, 0.12), transparent 34%),
+        #fff7ef;
+    font-size: 42px;
+}
+
+.petpay-client-market__product h3 {
+    margin: 0;
+    color: #172033;
+    font-size: 13px;
+    line-height: 1.25;
+    font-weight: 950;
+}
+
+.petpay-client-market__product p {
+    min-height: 30px;
+    margin: 3px 0 8px;
+    color: var(--petpay-client-muted);
+    font-size: 11px;
+    line-height: 1.3;
+}
+
+.petpay-client-market__product div:not(.petpay-client-market__product-img) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.petpay-client-market__product strong {
+    color: #111827;
+    font-size: 14px;
+    font-weight: 950;
+}
+
+.petpay-client-market__product span {
+    color: #92400e;
+    font-size: 11px;
+    font-weight: 900;
+}
+
+.petpay-client-market__product button,
+.petpay-client-market__points button,
+.petpay-client-market__outline {
+    width: 100%;
+    min-height: 34px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 106, 0, 0.42);
+    background: #fff8f1;
+    color: var(--petpay-client-orange-dark);
+    font-size: 11px;
+    font-weight: 950;
+    cursor: pointer;
+}
+
+.petpay-client-market__product button:hover,
+.petpay-client-market__points button:hover,
+.petpay-client-market__outline:hover {
+    background: linear-gradient(135deg, #ff8a18, #ff6500);
+    color: #ffffff;
+    border-color: transparent;
+}
+
+/* =========================================================
+   BOTTOM
+========================================================= */
+
+.petpay-client-market__bottom-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr 1.1fr;
+    gap: 16px;
+}
+
+.petpay-client-market__store {
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 12px;
+    align-items: center;
+}
+
+.petpay-client-market__store-img {
+    width: 72px;
+    height: 72px;
+    border-radius: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff1df;
+    font-size: 36px;
+}
+
+.petpay-client-market__store h3 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 950;
+    color: #172033;
+}
+
+.petpay-client-market__store p {
+    margin: 5px 0 4px;
+    color: var(--petpay-client-muted);
+    font-size: 12px;
+}
+
+.petpay-client-market__store small {
+    color: #16a34a;
+    font-size: 11px;
+    font-weight: 950;
+}
+
+.petpay-client-market__mini-products {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 9px;
+}
+
+.petpay-client-market__mini-products span {
+    height: 78px;
+    border-radius: 17px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff7ef;
+    font-size: 38px;
+}
+
+.petpay-client-market__promo {
+    min-height: 132px;
+    background:
+        radial-gradient(circle at 85% 36%, rgba(255, 122, 0, 0.20), transparent 30%),
+        linear-gradient(135deg, #fff2df, #fff8f1);
+}
+
+.petpay-client-market__promo span {
+    color: var(--petpay-client-orange-dark);
+    font-size: 18px;
+    font-weight: 950;
+}
+
+.petpay-client-market__promo h2 {
+    margin: 6px 0 4px;
+    color: #172033;
+    font-size: 18px;
+}
+
+.petpay-client-market__promo p {
+    margin: 0;
+    color: var(--petpay-client-muted);
+    font-size: 12px;
+}
+
+/* =========================================================
+   ASIDE WIDGETS
+========================================================= */
+
+.petpay-client-market__widget {
+    position: relative;
+    overflow: hidden;
+}
+
+.petpay-client-market__order {
+    padding: 10px;
+    border-radius: 16px;
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr) auto;
+    gap: 10px;
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid rgba(17, 24, 39, 0.06);
+}
+
+.petpay-client-market__order>div:first-child {
+    width: 48px;
+    height: 48px;
+    border-radius: 15px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff1df;
+    font-size: 25px;
+}
+
+.petpay-client-market__order strong {
+    color: #16a34a;
+    font-size: 12px;
+    font-weight: 950;
+}
+
+.petpay-client-market__order p {
+    margin: 3px 0;
+    color: #374151;
+    font-size: 11px;
+    line-height: 1.25;
+}
+
+.petpay-client-market__order small {
+    color: var(--petpay-client-muted);
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.petpay-client-market__order>span {
+    color: #172033;
+    font-size: 22px;
+    font-weight: 900;
+}
+
+.petpay-client-market__muted {
+    display: inline-flex;
+    margin-top: 8px;
+    color: var(--petpay-client-muted);
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.petpay-client-market__points {
+    background:
+        radial-gradient(circle at 88% 32%, rgba(255, 122, 0, 0.14), transparent 30%),
+        rgba(255, 255, 255, 0.90);
+}
+
+.petpay-client-market__points::after {
+    content: "🎁";
+    position: absolute;
+    right: 22px;
+    top: 64px;
+    font-size: 60px;
+    opacity: 0.92;
+}
+
+.petpay-client-market__points>strong {
+    display: block;
+    margin-top: 4px;
+    color: #172033;
+    font-size: 36px;
+    line-height: 1;
+    font-weight: 950;
+}
+
+.petpay-client-market__points>p {
+    margin: 4px 0 10px;
+    color: var(--petpay-client-muted);
+    font-size: 12px;
+}
+
+.petpay-client-market__progress {
+    height: 8px;
+    margin: 12px 76px 8px 0;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #f1dfcb;
+}
+
+.petpay-client-market__progress span {
+    height: 100%;
+    display: block;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #ff8a18, #ff6500);
+}
+
+.petpay-client-market__points small {
+    display: block;
+    margin-bottom: 12px;
+    color: #6b7280;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.petpay-client-market__pet-row {
+    padding: 10px 0;
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 10px;
+    align-items: center;
+    border-bottom: 1px solid rgba(17, 24, 39, 0.07);
+}
+
+.petpay-client-market__pet-row span {
+    width: 42px;
+    height: 42px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff1df;
+    font-size: 23px;
+}
+
+.petpay-client-market__pet-row strong {
+    display: block;
+    color: #172033;
+    font-size: 13px;
+    font-weight: 950;
+}
+
+.petpay-client-market__pet-row p {
+    margin: 3px 0 0;
+    color: var(--petpay-client-muted);
+    font-size: 11px;
+}
+
+.petpay-client-market__outline {
+    margin-top: 12px;
+    background: #ffffff;
+}
+
+/* =========================================================
+   SIDEBAR OVERRIDE CLIENTE
+========================================================= */
+
+.petpay-client-market .petpay-sidebar,
+.petpay-client-market aside.petpay-sidebar,
+.petpay-client-market .portal-sidebar {
+    position: sticky;
+    top: 74px;
+    min-height: calc(100vh - 74px);
+    width: 84px;
+    padding: 16px 10px;
+    background: rgba(255, 255, 255, 0.72);
+    border-right: 1px solid rgba(17, 24, 39, 0.06);
+    box-shadow: 12px 0 34px rgba(17, 24, 39, 0.05);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1280px) {
+    .petpay-client-market__layout {
+        grid-template-columns: 1fr;
+    }
+
+    .petpay-client-market__aside {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .petpay-client-market__product-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 1100px) {
+    .petpay-client-market {
+        grid-template-columns: 1fr;
+    }
+
+    .petpay-client-market .petpay-sidebar,
+    .petpay-client-market aside.petpay-sidebar,
+    .petpay-client-market .portal-sidebar {
+        display: none;
+    }
+
+    .petpay-client-market__main {
+        padding: 18px 14px 28px;
+    }
+
+    .petpay-client-market__hero-head {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .petpay-client-market__quick-actions {
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 4px;
+    }
+
+    .petpay-client-market__search {
+        grid-template-columns: 1fr;
+    }
+
+    .petpay-client-market__categories {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .petpay-client-market__banner {
+        grid-template-columns: 1fr;
+    }
+
+    .petpay-client-market__banner-pets {
+        min-height: 100px;
+    }
+}
+
+@media (max-width: 760px) {
+
+    .petpay-client-market__aside,
+    .petpay-client-market__bottom-grid,
+    .petpay-client-market__product-grid,
+    .petpay-client-market__categories {
+        grid-template-columns: 1fr;
+    }
+
+    .petpay-client-market__search-inline {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .petpay-client-market__search-inline input,
+    .petpay-client-market__search-inline button {
+        border-radius: 13px;
+        border: 1px solid rgba(17, 24, 39, 0.10);
+    }
+
+    .petpay-client-market__banner {
+        padding: 20px;
+    }
+
+    .petpay-client-market__banner-copy h2 {
+        font-size: 28px;
+    }
+
+    .petpay-client-market__banner-arrow {
+        display: none;
+    }
+}

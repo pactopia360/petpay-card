@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DriverApprovalController;
 use App\Http\Controllers\Admin\ProviderApprovalController;
+use App\Http\Controllers\Admin\CommerceApprovalController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -31,6 +32,15 @@ Route::get('/recuperar-password', function () {
 Route::middleware(['auth:admin', 'role:admin,admin'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
+
+    Route::get('/comercios/pendientes', [CommerceApprovalController::class, 'index'])
+    ->name('commerces.pending');
+
+    Route::post('/comercios/{commerceUser}/aprobar', [CommerceApprovalController::class, 'approve'])
+        ->name('commerces.approve');
+
+    Route::post('/comercios/{commerceUser}/rechazar', [CommerceApprovalController::class, 'reject'])
+        ->name('commerces.reject');
 
     Route::get('/proveedores/pendientes', [ProviderApprovalController::class, 'index'])
         ->name('providers.pending');

@@ -2,6 +2,7 @@
 
 use App\Models\Admin\AdminUser;
 use App\Models\Cliente\CustomerUser;
+use App\Models\Comercio\CommerceUser;
 use App\Models\Proveedor\ProviderUser;
 use App\Models\Repartidor\DriverUser;
 use App\Models\User;
@@ -34,6 +35,11 @@ return [
             'provider' => 'provider_users',
         ],
 
+        'comercio' => [
+            'driver' => 'session',
+            'provider' => 'commerce_users',
+        ],
+
         'repartidor' => [
             'driver' => 'session',
             'provider' => 'driver_users',
@@ -59,6 +65,11 @@ return [
         'provider_users' => [
             'driver' => 'eloquent',
             'model' => ProviderUser::class,
+        ],
+
+        'commerce_users' => [
+            'driver' => 'eloquent',
+            'model' => CommerceUser::class,
         ],
 
         'driver_users' => [
@@ -92,6 +103,13 @@ return [
         'provider_users' => [
             'provider' => 'provider_users',
             'table' => 'provider_password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+
+        'commerce_users' => [
+            'provider' => 'commerce_users',
+            'table' => 'commerce_password_reset_tokens',
             'expire' => 60,
             'throttle' => 60,
         ],

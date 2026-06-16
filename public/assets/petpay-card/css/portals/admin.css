@@ -1,0 +1,331 @@
+/* =========================================================
+   PETPAY ADMIN SHELL - HEADER + MENU
+========================================================= */
+
+.admin-shell-header {
+    height: 64px;
+    padding: 0 18px;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 16px;
+    background: rgba(255, 248, 241, 0.92);
+    border-bottom: 1px solid rgba(255, 122, 24, 0.16);
+    box-shadow: 0 14px 42px rgba(17, 24, 39, 0.08);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    position: sticky;
+    top: 0;
+    z-index: 30;
+}
+
+.admin-shell-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: #111827;
+    text-decoration: none;
+    font-weight: 950;
+    letter-spacing: -0.04em;
+    white-space: nowrap;
+}
+
+.admin-shell-brand__mark {
+    width: 34px;
+    height: 34px;
+    border-radius: 12px;
+    display: inline-grid;
+    place-items: center;
+    background: linear-gradient(135deg, #ff8a1f, #ff4a57);
+    color: #fff;
+    font-size: 18px;
+    font-weight: 950;
+    box-shadow: 0 10px 24px rgba(255, 106, 38, 0.24);
+}
+
+.admin-shell-brand__text {
+    font-size: 18px;
+}
+
+.admin-shell-menu {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.admin-shell-menu::-webkit-scrollbar {
+    display: none;
+}
+
+.admin-shell-menu__link {
+    height: 38px;
+    padding: 0 12px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: #374151;
+    background: rgba(255, 255, 255, 0.62);
+    border: 1px solid rgba(255, 255, 255, 0.72);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 900;
+    white-space: nowrap;
+    transition: transform .18s ease, background .18s ease, color .18s ease, box-shadow .18s ease;
+}
+
+.admin-shell-menu__link span {
+    font-size: 15px;
+    line-height: 1;
+}
+
+.admin-shell-menu__link:hover,
+.admin-shell-menu__link.is-active {
+    color: #fff;
+    background: #111827;
+    box-shadow: 0 12px 28px rgba(17, 24, 39, 0.18);
+    transform: translateY(-1px);
+}
+
+.admin-shell-actions {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.admin-shell-action {
+    width: 38px;
+    height: 38px;
+    border: 0;
+    border-radius: 14px;
+    display: inline-grid;
+    place-items: center;
+    background: rgba(255, 255, 255, 0.78);
+    color: #111827;
+    text-decoration: none;
+    font-size: 15px;
+    cursor: pointer;
+    box-shadow: 0 10px 24px rgba(17, 24, 39, 0.08);
+}
+
+.admin-shell-action--dark {
+    background: #111827;
+    color: #fff;
+}
+
+.admin-shell-logout {
+    margin: 0;
+}
+
+@media (max-width: 860px) {
+    .admin-shell-header {
+        height: auto;
+        min-height: 64px;
+        grid-template-columns: 1fr auto;
+        grid-template-areas:
+            "brand actions"
+            "menu menu";
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .admin-shell-header__brand {
+        grid-area: brand;
+    }
+
+    .admin-shell-menu {
+        grid-area: menu;
+        justify-content: flex-start;
+        padding-bottom: 2px;
+    }
+
+    .admin-shell-actions {
+        grid-area: actions;
+    }
+
+    .admin-shell-brand__text {
+        font-size: 16px;
+    }
+
+    .admin-shell-menu__link {
+        height: 36px;
+        padding: 0 10px;
+        font-size: 11px;
+    }
+
+    .admin-shell-action {
+        width: 36px;
+        height: 36px;
+    }
+}
+
+/* =========================================================
+   PETPAY ADMIN SHELL - HEADER + MENU
+========================================================= */
+
+.admin-shell-header {
+    height: 64px;
+    padding: 0 18px;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 16px;
+    background: rgba(255, 248, 241, 0.92);
+    border-bottom: 1px solid rgba(255, 122, 24, 0.16);
+    box-shadow: 0 14px 42px rgba(17, 24, 39, 0.08);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    position: sticky;
+    top: 0;
+    z-index: 30;
+}
+
+.admin-shell-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: #111827;
+    text-decoration: none;
+    font-weight: 950;
+    letter-spacing: -0.04em;
+    white-space: nowrap;
+}
+
+.admin-shell-brand__mark {
+    width: 34px;
+    height: 34px;
+    border-radius: 12px;
+    display: inline-grid;
+    place-items: center;
+    background: linear-gradient(135deg, #ff8a1f, #ff4a57);
+    color: #fff;
+    font-size: 18px;
+    font-weight: 950;
+    box-shadow: 0 10px 24px rgba(255, 106, 38, 0.24);
+}
+
+.admin-shell-brand__text {
+    font-size: 18px;
+}
+
+.admin-shell-menu {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.admin-shell-menu::-webkit-scrollbar {
+    display: none;
+}
+
+.admin-shell-menu__link {
+    height: 38px;
+    padding: 0 12px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: #374151;
+    background: rgba(255, 255, 255, 0.62);
+    border: 1px solid rgba(255, 255, 255, 0.72);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 900;
+    white-space: nowrap;
+    transition: transform .18s ease, background .18s ease, color .18s ease, box-shadow .18s ease;
+}
+
+.admin-shell-menu__link span {
+    font-size: 15px;
+    line-height: 1;
+}
+
+.admin-shell-menu__link:hover,
+.admin-shell-menu__link.is-active {
+    color: #fff;
+    background: #111827;
+    box-shadow: 0 12px 28px rgba(17, 24, 39, 0.18);
+    transform: translateY(-1px);
+}
+
+.admin-shell-actions {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.admin-shell-action {
+    width: 38px;
+    height: 38px;
+    border: 0;
+    border-radius: 14px;
+    display: inline-grid;
+    place-items: center;
+    background: rgba(255, 255, 255, 0.78);
+    color: #111827;
+    text-decoration: none;
+    font-size: 15px;
+    cursor: pointer;
+    box-shadow: 0 10px 24px rgba(17, 24, 39, 0.08);
+}
+
+.admin-shell-action--dark {
+    background: #111827;
+    color: #fff;
+}
+
+.admin-shell-logout {
+    margin: 0;
+}
+
+@media (max-width: 860px) {
+    .admin-shell-header {
+        height: auto;
+        min-height: 64px;
+        grid-template-columns: 1fr auto;
+        grid-template-areas:
+            "brand actions"
+            "menu menu";
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .admin-shell-header__brand {
+        grid-area: brand;
+    }
+
+    .admin-shell-menu {
+        grid-area: menu;
+        justify-content: flex-start;
+        padding-bottom: 2px;
+    }
+
+    .admin-shell-actions {
+        grid-area: actions;
+    }
+
+    .admin-shell-brand__text {
+        font-size: 16px;
+    }
+
+    .admin-shell-menu__link {
+        height: 36px;
+        padding: 0 10px;
+        font-size: 11px;
+    }
+
+    .admin-shell-action {
+        width: 36px;
+        height: 36px;
+    }
+}

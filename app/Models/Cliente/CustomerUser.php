@@ -18,6 +18,9 @@ class CustomerUser extends Authenticatable
         'last_name',
         'name',
         'email',
+        'google_id',
+        'avatar',
+        'auth_provider',
         'phone',
         'password',
         'status',
@@ -51,5 +54,10 @@ class CustomerUser extends Authenticatable
     public function isActive(): bool
     {
         return $this->status === 'active';
+    }
+
+    public function registeredWithGoogle(): bool
+    {
+        return $this->auth_provider === 'google' && filled($this->google_id);
     }
 }
