@@ -1,16 +1,49 @@
-<aside class="petpay-sidebar">
-    <h2 class="petpay-sidebar-title">Cliente</h2>
+<aside class="petpay-client-sidebar">
+    <nav class="petpay-client-sidebar__nav" aria-label="Menú usuario">
+        <a class="petpay-client-sidebar__item is-active" href="{{ route('cliente.home') }}" title="Inicio">
+            <span class="petpay-client-sidebar__icon">🏠</span>
+            <span class="petpay-client-sidebar__label">Inicio</span>
+        </a>
 
-    <nav class="petpay-nav">
-        <a class="active" href="{{ route('cliente.home') }}">🏠 Inicio</a>
-        <a href="#">🔎 Buscar productos</a>
-        <a href="#">🏪 Tiendas cercanas</a>
-        <a href="#">🐶 Mis mascotas</a>
-        <a href="#">🧾 Mis pedidos</a>
-        <a href="#">📍 Direcciones</a>
-        <a href="#">🎁 PawPoints</a>
-        <a href="#">⭐ Petpay Plus</a>
-        <a href="#">💳 Métodos de pago</a>
-        <a href="#">👤 Mi cuenta</a>
+        <a class="petpay-client-sidebar__item" href="#" title="Buscar">
+            <span class="petpay-client-sidebar__icon">🔎</span>
+            <span class="petpay-client-sidebar__label">Buscar</span>
+        </a>
+
+        <a class="petpay-client-sidebar__item" href="#" title="Tiendas">
+            <span class="petpay-client-sidebar__icon">🏪</span>
+            <span class="petpay-client-sidebar__label">Tiendas</span>
+        </a>
+
+        <a class="petpay-client-sidebar__item" href="#" title="Mis mascotas">
+            <span class="petpay-client-sidebar__icon">🐾</span>
+            <span class="petpay-client-sidebar__label">Mascotas</span>
+        </a>
+
+        <a class="petpay-client-sidebar__item" href="#" title="Pedidos">
+            <span class="petpay-client-sidebar__icon">📦</span>
+            <span class="petpay-client-sidebar__label">Pedidos</span>
+        </a>
+
+        <a class="petpay-client-sidebar__item" href="#" title="Direcciones">
+            <span class="petpay-client-sidebar__icon">📍</span>
+            <span class="petpay-client-sidebar__label">Dirección</span>
+        </a>
+
+        <a class="petpay-client-sidebar__item" href="#" title="PawPoints">
+            <span class="petpay-client-sidebar__icon">🎁</span>
+            <span class="petpay-client-sidebar__label">Puntos</span>
+        </a>
+
+        <a class="petpay-client-sidebar__item" href="#" title="Mi cuenta">
+            <span class="petpay-client-sidebar__icon">👤</span>
+            <span class="petpay-client-sidebar__label">Cuenta</span>
+        </a>
     </nav>
+
+    <div class="petpay-client-sidebar__promo">
+        <span>🎁</span>
+        <strong>PawPoints</strong>
+        <small>Gana puntos en cada compra.</small>
+    </div>
 </aside>

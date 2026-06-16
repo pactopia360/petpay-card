@@ -909,3 +909,257 @@ body {
         display: none;
     }
 }
+
+/* =========================================================
+   CLIENTE SIDEBAR CLEAN MARKETPLACE
+========================================================= */
+
+.petpay-client-market {
+    grid-template-columns: 104px minmax(0, 1fr);
+}
+
+.petpay-client-sidebar {
+    position: sticky;
+    top: 74px;
+    min-height: calc(100vh - 74px);
+    width: 104px;
+    padding: 16px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(255, 248, 239, 0.78));
+    border-right: 1px solid rgba(17, 24, 39, 0.06);
+    box-shadow: 12px 0 34px rgba(17, 24, 39, 0.05);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+.petpay-client-sidebar__nav {
+    display: grid;
+    gap: 8px;
+}
+
+.petpay-client-sidebar__item {
+    min-height: 72px;
+    padding: 9px 6px;
+    border-radius: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    color: #5b6472;
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition:
+        background 0.18s ease,
+        color 0.18s ease,
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        border-color 0.18s ease;
+}
+
+.petpay-client-sidebar__item:hover {
+    transform: translateY(-1px);
+    color: #111827;
+    background: rgba(255, 255, 255, 0.82);
+    border-color: rgba(255, 122, 0, 0.12);
+    box-shadow: 0 12px 28px rgba(17, 24, 39, 0.07);
+}
+
+.petpay-client-sidebar__item.is-active {
+    color: #ff6900;
+    background:
+        radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.92), transparent 34%),
+        linear-gradient(135deg, rgba(255, 122, 0, 0.14), rgba(255, 77, 97, 0.08));
+    border-color: rgba(255, 122, 0, 0.16);
+    box-shadow: 0 14px 30px rgba(255, 106, 0, 0.13);
+}
+
+.petpay-client-sidebar__icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff1df;
+    font-size: 19px;
+    line-height: 1;
+}
+
+.petpay-client-sidebar__item.is-active .petpay-client-sidebar__icon {
+    background: linear-gradient(135deg, #ff8a18, #ff6500);
+    color: #ffffff;
+}
+
+.petpay-client-sidebar__label {
+    max-width: 78px;
+    display: block;
+    overflow: hidden;
+    color: inherit;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 11px;
+    line-height: 1.1;
+    font-weight: 950;
+    text-decoration: none;
+}
+
+.petpay-client-sidebar__promo {
+    margin-top: auto;
+    padding: 12px 8px;
+    border-radius: 20px;
+    text-align: center;
+    background:
+        radial-gradient(circle at 50% 28%, rgba(255, 122, 0, 0.16), transparent 38%),
+        rgba(255, 255, 255, 0.84);
+    border: 1px solid rgba(255, 122, 0, 0.12);
+    box-shadow: 0 14px 30px rgba(17, 24, 39, 0.06);
+}
+
+.petpay-client-sidebar__promo span {
+    width: 38px;
+    height: 38px;
+    margin: 0 auto 7px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff1df;
+    font-size: 22px;
+}
+
+.petpay-client-sidebar__promo strong {
+    display: block;
+    color: #ff6900;
+    font-size: 12px;
+    line-height: 1.1;
+    font-weight: 950;
+}
+
+.petpay-client-sidebar__promo small {
+    display: block;
+    margin-top: 5px;
+    color: #6b7280;
+    font-size: 9px;
+    line-height: 1.25;
+    font-weight: 800;
+}
+
+/* Apagar estilos viejos del sidebar anterior dentro de Cliente */
+.petpay-client-market .petpay-sidebar,
+.petpay-client-market aside.petpay-sidebar,
+.petpay-client-market .portal-sidebar {
+    display: none;
+}
+
+@media (max-width: 1100px) {
+    .petpay-client-market {
+        grid-template-columns: 1fr;
+    }
+
+    .petpay-client-sidebar {
+        display: none;
+    }
+}
+
+/* =========================================================
+   CLIENTE MARKETPLACE CLEANUP - SIN DUPLICADOS
+========================================================= */
+
+.petpay-client-market a {
+    text-decoration: none !important;
+}
+
+.petpay-client-market__hero-head--clean {
+    justify-content: flex-start;
+    margin-bottom: 18px;
+}
+
+.petpay-client-market__hero-head--clean .petpay-client-market__hello {
+    width: 100%;
+}
+
+.petpay-client-market__quick-actions {
+    display: none !important;
+}
+
+.petpay-client-market__main {
+    padding-top: 28px;
+}
+
+.petpay-client-market__search {
+    margin-top: 0;
+}
+
+.petpay-client-market__category {
+    text-decoration: none !important;
+}
+
+.petpay-client-market__category strong {
+    display: block;
+    min-width: 0;
+    overflow: hidden;
+    color: inherit;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 13px;
+    line-height: 1.1;
+    font-weight: 950;
+}
+
+.petpay-client-market__section-head a {
+    text-decoration: none !important;
+}
+
+.petpay-client-market__banner-copy a {
+    text-decoration: none !important;
+}
+
+.petpay-client-market__product button,
+.petpay-client-market__points button,
+.petpay-client-market__outline {
+    text-decoration: none !important;
+}
+
+/* Mejor balance visual: menos aire arriba, más estructura de tienda */
+.petpay-client-market__layout {
+    align-items: start;
+}
+
+.petpay-client-market__content {
+    gap: 14px;
+}
+
+.petpay-client-market__aside {
+    gap: 14px;
+}
+
+.petpay-client-market__search,
+.petpay-client-market__section,
+.petpay-client-market__panel,
+.petpay-client-market__widget {
+    border-color: rgba(17, 24, 39, 0.06);
+}
+
+.petpay-client-market__banner {
+    min-height: 195px;
+}
+
+.petpay-client-market__banner-copy h2 {
+    max-width: 480px;
+}
+
+/* Header superior ya maneja acciones globales, el contenido no debe repetirlas */
+.petpay-client-market__hero-head .petpay-client-market__quick-btn {
+    display: none !important;
+}
+
+@media (max-width: 1100px) {
+    .petpay-client-market__main {
+        padding-top: 20px;
+    }
+}
