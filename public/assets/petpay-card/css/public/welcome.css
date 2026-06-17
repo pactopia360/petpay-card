@@ -1,0 +1,476 @@
+:root {
+    --petpay-orange: #ff8a00;
+    --petpay-orange-dark: #f36a00;
+    --petpay-black: #050506;
+    --petpay-white: #ffffff;
+    --petpay-cream: #fff6ea;
+    --petpay-shadow: rgba(93, 39, 0, 0.18);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+    margin: 0;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--petpay-white);
+    background: var(--petpay-orange);
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button,
+input {
+    font: inherit;
+}
+
+.petpay-public {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--petpay-orange);
+}
+
+.petpay-public__header {
+    min-height: 54px;
+    padding: 0 7vw;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    background: var(--petpay-white);
+    color: #141414;
+    box-shadow: 0 7px 20px rgba(0, 0, 0, 0.08);
+    position: relative;
+    z-index: 5;
+}
+
+.petpay-public__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 950;
+    color: var(--petpay-orange);
+}
+
+.petpay-public__brand-mark {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--petpay-orange);
+    color: var(--petpay-white);
+    font-size: 17px;
+    box-shadow: 0 10px 22px rgba(255, 138, 0, 0.24);
+}
+
+.petpay-public__brand-text {
+    font-size: 23px;
+    line-height: 1;
+    letter-spacing: -0.06em;
+}
+
+.petpay-public__nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.petpay-public__nav-link {
+    min-height: 36px;
+    padding: 0 15px;
+    border-radius: 11px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    background: var(--petpay-orange);
+    font-size: 13px;
+    font-weight: 950;
+    box-shadow: 0 10px 22px rgba(255, 138, 0, 0.20);
+}
+
+.petpay-public__nav-link--dark {
+    background: var(--petpay-black);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.20);
+}
+
+.petpay-public__nav-link--light {
+    background: var(--petpay-cream);
+    color: #111827;
+    box-shadow: none;
+}
+
+.petpay-public__hero {
+    position: relative;
+    flex: 1;
+    min-height: calc(100vh - 54px);
+    padding: 18px 9vw 20px;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: minmax(220px, 0.78fr) minmax(310px, 0.82fr);
+    align-items: center;
+    gap: clamp(18px, 4vw, 42px);
+    background: linear-gradient(90deg, rgba(255, 138, 0, 0.98), rgba(255, 132, 0, 0.98));
+}
+
+.petpay-public__hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.26;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='118' height='118' viewBox='0 0 118 118'%3E%3Cg fill='none' stroke='rgba(255,222,180,0.78)' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cellipse cx='38' cy='31' rx='9' ry='14'/%3E%3Cellipse cx='59' cy='24' rx='9' ry='14'/%3E%3Cellipse cx='80' cy='31' rx='9' ry='14'/%3E%3Cellipse cx='26' cy='54' rx='9' ry='13' transform='rotate(-35 26 54)'/%3E%3Cpath d='M59 45c23 0 39 15 39 32 0 15-12 19-25 26-12 7-20 14-32 14-14 0-24-10-24-26 0-24 17-46 42-46Z'/%3E%3C/g%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 96px 96px;
+    background-position: -10px -14px;
+}
+
+.petpay-public__hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 22% 44%, rgba(255, 255, 255, 0.08), transparent 22%),
+        radial-gradient(circle at 78% 18%, rgba(255, 255, 255, 0.08), transparent 22%);
+}
+
+.petpay-public__visual,
+.petpay-public__content {
+    position: relative;
+    z-index: 2;
+}
+
+.petpay-public__visual {
+    min-height: 260px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.petpay-public__illustration {
+    width: min(100%, 285px);
+    aspect-ratio: 1.08 / 1;
+    position: relative;
+    border-radius: 58% 42% 50% 50%;
+    background:
+        radial-gradient(circle at 42% 26%, rgba(255, 255, 255, 0.95), transparent 17%),
+        linear-gradient(145deg, #ffe5cd, #ffd0b4);
+    box-shadow: 0 24px 60px rgba(111, 48, 0, 0.16);
+    overflow: hidden;
+}
+
+.petpay-public__plant {
+    position: absolute;
+    left: 24px;
+    bottom: 35px;
+    font-size: 52px;
+    line-height: 1;
+}
+
+.petpay-public__person {
+    position: absolute;
+    left: 104px;
+    bottom: 52px;
+    font-size: 54px;
+    line-height: 1;
+    filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.10));
+}
+
+.petpay-public__dog {
+    position: absolute;
+    right: 25px;
+    bottom: 48px;
+    font-size: 66px;
+    line-height: 1;
+    filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.12));
+}
+
+.petpay-public__bed {
+    position: absolute;
+    left: 50px;
+    bottom: 24px;
+    width: 110px;
+    height: 34px;
+    border-radius: 999px;
+    background:
+        radial-gradient(circle at 50% 45%, #243b62 0 42%, transparent 43%),
+        linear-gradient(180deg, #ef9450, #c95d2a);
+    box-shadow: 0 16px 24px rgba(105, 45, 0, 0.15);
+}
+
+.petpay-public__content {
+    max-width: 390px;
+}
+
+.petpay-public__kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0 0 9px;
+    color: rgba(255, 255, 255, 0.92);
+    font-size: 9px;
+    line-height: 1;
+    font-weight: 950;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+}
+
+.petpay-public__title {
+    margin: 0;
+    max-width: 390px;
+    color: var(--petpay-white);
+    font-size: clamp(28px, 3.2vw, 42px);
+    line-height: 0.96;
+    letter-spacing: -0.065em;
+    font-weight: 950;
+    text-shadow: 0 4px 0 rgba(154, 70, 0, 0.13);
+}
+
+.petpay-public__subtitle {
+    max-width: 380px;
+    margin: 12px 0 14px;
+    color: rgba(255, 255, 255, 0.94);
+    font-size: 12px;
+    line-height: 1.32;
+    font-weight: 800;
+}
+
+.petpay-public__search {
+    max-width: 380px;
+    display: grid;
+    gap: 8px;
+}
+
+.petpay-public__field-wrap {
+    position: relative;
+    display: block;
+}
+
+.petpay-public__field-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 15px;
+    z-index: 2;
+}
+
+.petpay-public__field-required {
+    position: absolute;
+    right: 12px;
+    top: 8px;
+    color: #ff1f3c;
+    font-size: 14px;
+    font-weight: 950;
+}
+
+.petpay-public__field {
+    width: 100%;
+    height: 42px;
+    border: 0;
+    outline: none;
+    border-radius: 8px;
+    padding: 0 38px 0 42px;
+    background: #ffffff;
+    color: #374151;
+    font-size: 13px;
+    font-weight: 800;
+    box-shadow: 0 12px 28px rgba(90, 42, 0, 0.13);
+}
+
+.petpay-public__field::placeholder {
+    color: #7c8492;
+}
+
+.petpay-public__gps {
+    min-height: 31px;
+    padding: 0 12px;
+    border: 1px solid rgba(255, 255, 255, 0.38);
+    border-radius: 8px;
+    justify-self: start;
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 950;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.petpay-public__gps:hover {
+    background: rgba(255, 255, 255, 0.24);
+}
+
+.petpay-public__location-status {
+    min-height: 15px;
+    margin-top: -2px;
+    color: rgba(255, 255, 255, 0.94);
+    font-size: 10px;
+    line-height: 1.25;
+    font-weight: 850;
+}
+
+.petpay-public__location-status[data-type="success"] {
+    color: #ecfdf5;
+}
+
+.petpay-public__location-status[data-type="error"] {
+    color: #fff1f2;
+}
+
+.petpay-public__cta {
+    width: 100%;
+    height: 46px;
+    border: 0;
+    border-radius: 9px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--petpay-black);
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 950;
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.22);
+    cursor: pointer;
+}
+
+.petpay-public__login {
+    margin-top: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 950;
+}
+
+.petpay-public__login span {
+    width: 21px;
+    height: 21px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    color: var(--petpay-orange);
+    font-size: 13px;
+}
+
+.petpay-public__mobile-links {
+    display: none;
+}
+
+@media (max-width: 1050px) {
+    .petpay-public__header {
+        padding: 0 22px;
+    }
+
+    .petpay-public__hero {
+        grid-template-columns: 1fr;
+        padding: 20px 22px;
+    }
+
+    .petpay-public__visual {
+        min-height: 200px;
+        order: 2;
+    }
+
+    .petpay-public__illustration {
+        width: min(100%, 245px);
+    }
+
+    .petpay-public__content {
+        max-width: 430px;
+    }
+
+    .petpay-public__title {
+        max-width: 430px;
+        font-size: 34px;
+    }
+
+    .petpay-public__search {
+        max-width: 430px;
+    }
+}
+
+@media (max-width: 760px) {
+    .petpay-public__header {
+        min-height: 52px;
+        padding: 0 14px;
+    }
+
+    .petpay-public__brand-mark {
+        width: 29px;
+        height: 29px;
+        border-radius: 9px;
+        font-size: 15px;
+    }
+
+    .petpay-public__brand-text {
+        font-size: 20px;
+    }
+
+    .petpay-public__nav {
+        display: none;
+    }
+
+    .petpay-public__mobile-links {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        margin-top: 16px;
+    }
+
+    .petpay-public__mobile-links a {
+        min-height: 39px;
+        border-radius: 11px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.18);
+        color: #ffffff;
+        font-size: 13px;
+        font-weight: 950;
+    }
+
+    .petpay-public__mobile-links a:first-child {
+        background: #050506;
+    }
+
+    .petpay-public__hero {
+        min-height: calc(100svh - 52px);
+        padding: 16px 14px 20px;
+    }
+
+    .petpay-public__title {
+        font-size: 31px;
+    }
+
+    .petpay-public__subtitle {
+        font-size: 12px;
+    }
+
+    .petpay-public__field {
+        height: 42px;
+        font-size: 13px;
+    }
+
+    .petpay-public__cta {
+        height: 44px;
+        font-size: 14px;
+    }
+}
