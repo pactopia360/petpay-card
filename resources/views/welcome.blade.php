@@ -30,10 +30,6 @@
                 <a href="{{ route('repartidor.login') }}" class="petpay-public__nav-link">
                     Repartir
                 </a>
-
-                <a href="{{ route('admin.login') }}" class="petpay-public__nav-link petpay-public__nav-link--light">
-                    Admin
-                </a>
             </nav>
         </header>
 
@@ -80,7 +76,8 @@
                         id="petpayUseLocation"
                         class="petpay-public__gps"
                     >
-                        📡 Usar mi ubicación actual
+                        <span class="petpay-public__gps-icon">📡</span>
+                        <span class="petpay-public__gps-text">Usar mi ubicación actual</span>
                     </button>
 
                     <label class="petpay-public__field-wrap" for="petpayDeliveryTime">
@@ -121,7 +118,6 @@
                     <a href="{{ route('cliente.login') }}">Comprar</a>
                     <a href="{{ route('comercio.login') }}">Vender</a>
                     <a href="{{ route('repartidor.login') }}">Repartir</a>
-                    <a href="{{ route('admin.login') }}">Admin</a>
                 </div>
             </div>
         </section>

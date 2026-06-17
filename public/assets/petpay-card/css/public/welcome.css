@@ -96,7 +96,7 @@ input {
 
 .petpay-public__nav-link {
     min-height: 36px;
-    padding: 0 16px;
+    padding: 0 17px;
     border-radius: 12px;
     display: inline-flex;
     align-items: center;
@@ -119,24 +119,18 @@ input {
     box-shadow: 0 10px 22px rgba(0, 0, 0, 0.22);
 }
 
-.petpay-public__nav-link--light {
-    background: var(--petpay-cream);
-    color: var(--petpay-text);
-    box-shadow: none;
-}
-
 /* HERO */
 .petpay-public__hero {
     position: relative;
     flex: 1;
     min-height: calc(100vh - 56px);
-    padding: 20px clamp(22px, 7vw, 118px) 24px;
+    padding: 18px clamp(22px, 7vw, 118px) 22px;
     overflow: hidden;
     display: grid;
     grid-template-columns: minmax(280px, 390px) minmax(340px, 430px);
     align-items: center;
     justify-content: center;
-    gap: clamp(34px, 5vw, 78px);
+    gap: clamp(34px, 5vw, 74px);
     background:
         radial-gradient(circle at 13% 22%, rgba(255, 255, 255, 0.10), transparent 26%),
         radial-gradient(circle at 84% 18%, rgba(255, 255, 255, 0.08), transparent 24%),
@@ -148,7 +142,7 @@ input {
     position: absolute;
     inset: 0;
     pointer-events: none;
-    opacity: 0.15;
+    opacity: 0.13;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='118' height='118' viewBox='0 0 118 118'%3E%3Cg fill='none' stroke='rgba(255,235,207,0.86)' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cellipse cx='38' cy='31' rx='9' ry='14'/%3E%3Cellipse cx='59' cy='24' rx='9' ry='14'/%3E%3Cellipse cx='80' cy='31' rx='9' ry='14'/%3E%3Cellipse cx='26' cy='54' rx='9' ry='13' transform='rotate(-35 26 54)'/%3E%3Cpath d='M59 45c23 0 39 15 39 32 0 15-12 19-25 26-12 7-20 14-32 14-14 0-24-10-24-26 0-24 17-46 42-46Z'/%3E%3C/g%3E%3C/svg%3E");
     background-repeat: repeat;
     background-size: 104px 104px;
@@ -161,7 +155,7 @@ input {
     inset: auto -12% -30% 36%;
     height: 52%;
     pointer-events: none;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.16), transparent 62%);
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.14), transparent 62%);
     filter: blur(16px);
 }
 
@@ -172,7 +166,7 @@ input {
 }
 
 .petpay-public__visual {
-    min-height: 300px;
+    min-height: 292px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -180,14 +174,14 @@ input {
 
 .petpay-public__hero-image {
     display: block;
-    width: min(100%, 385px);
-    max-width: 385px;
+    width: min(100%, 375px);
+    max-width: 375px;
     height: auto;
     object-fit: contain;
     filter: drop-shadow(0 22px 38px rgba(89, 40, 0, 0.19));
     user-select: none;
     -webkit-user-drag: none;
-    transform: translateY(4px);
+    transform: translateY(2px);
 }
 
 .petpay-public__content {
@@ -214,7 +208,7 @@ input {
     margin: 0;
     max-width: 430px;
     color: var(--petpay-white);
-    font-size: clamp(32px, 3.65vw, 48px);
+    font-size: clamp(32px, 3.55vw, 46px);
     line-height: 0.94;
     letter-spacing: -0.065em;
     font-weight: 950;
@@ -287,25 +281,42 @@ input {
 }
 
 .petpay-public__gps {
-    min-height: 34px;
-    padding: 0 13px;
-    border: 1px solid rgba(255, 255, 255, 0.42);
-    border-radius: 9px;
+    min-height: 36px;
+    width: fit-content;
+    max-width: 100%;
+    padding: 0 16px;
+    border: 1px solid rgba(255, 255, 255, 0.46);
+    border-radius: 10px;
     justify-self: start;
-    background: rgba(255, 255, 255, 0.14);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    background: rgba(255, 255, 255, 0.18);
     color: #ffffff;
-    font-size: 11px;
+    font-size: 12px;
+    line-height: 1;
     font-weight: 950;
+    white-space: nowrap;
     cursor: pointer;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.24),
+        0 10px 22px rgba(91, 40, 0, 0.10);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    transition: transform 0.18s ease, background 0.18s ease;
+    transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
 }
 
 .petpay-public__gps:hover {
-    background: rgba(255, 255, 255, 0.24);
+    background: rgba(255, 255, 255, 0.26);
+    border-color: rgba(255, 255, 255, 0.58);
     transform: translateY(-1px);
+}
+
+.petpay-public__gps-icon,
+.petpay-public__gps-text {
+    display: inline-flex;
+    align-items: center;
 }
 
 .petpay-public__location-status {
@@ -384,8 +395,8 @@ input {
     }
 
     .petpay-public__hero-image {
-        width: min(100%, 340px);
-        max-width: 340px;
+        width: min(100%, 335px);
+        max-width: 335px;
     }
 
     .petpay-public__title {
@@ -479,8 +490,8 @@ input {
     }
 
     .petpay-public__title {
-        font-size: 34px;
-        line-height: 0.93;
+        font-size: 30px;
+        line-height: 0.94;
     }
 
     .petpay-public__subtitle {
@@ -496,7 +507,7 @@ input {
     }
 
     .petpay-public__gps {
-        min-height: 35px;
+        min-height: 38px;
         width: 100%;
         justify-content: center;
         font-size: 12px;
@@ -515,7 +526,7 @@ input {
 
     .petpay-public__mobile-links {
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 8px;
         margin-top: 16px;
     }
@@ -540,7 +551,7 @@ input {
 
 @media (max-width: 430px) {
     .petpay-public__title {
-        font-size: 30px;
+        font-size: 29px;
         line-height: 0.94;
     }
 
@@ -549,7 +560,11 @@ input {
     }
 
     .petpay-public__hero-image {
-        width: min(100%, 235px);
-        max-width: 235px;
+        width: min(100%, 230px);
+        max-width: 230px;
+    }
+
+    .petpay-public__mobile-links {
+        grid-template-columns: 1fr;
     }
 }
