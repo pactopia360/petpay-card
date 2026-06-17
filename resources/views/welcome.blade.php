@@ -39,12 +39,11 @@
 
         <section class="petpay-public__hero">
             <div class="petpay-public__visual" aria-hidden="true">
-                <div class="petpay-public__illustration">
-                    <div class="petpay-public__plant">🪴</div>
-                    <div class="petpay-public__person">👨‍⚕️</div>
-                    <div class="petpay-public__dog">🐶</div>
-                    <div class="petpay-public__bed"></div>
-                </div>
+                <img
+                    src="{{ asset('assets/petpay-card/img/public/hero-petpay.png') }}"
+                    alt=""
+                    class="petpay-public__hero-image"
+                >
             </div>
 
             <div class="petpay-public__content">
