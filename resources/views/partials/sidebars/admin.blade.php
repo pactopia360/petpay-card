@@ -1,3 +1,28 @@
+<style>
+    .petpay-sidebar.petpay-glass-sidebar {
+        left: -10px !important;
+        right: auto !important;
+        margin-left: 0 !important;
+        transform: none !important;
+    }
+
+    .petpay-sidebar.petpay-glass-sidebar .petpay-sidebar-card {
+        margin-left: 0 !important;
+        transform: none !important;
+    }
+
+    .petpay-sidebar.petpay-glass-sidebar .petpay-sidebar-menu {
+        margin-left: 0 !important;
+        padding-left: 0 !important;
+    }
+
+    @media (max-width: 760px) {
+        .petpay-sidebar.petpay-glass-sidebar {
+            left: -6px !important;
+        }
+    }
+</style>
+
 <aside class="petpay-sidebar petpay-glass-sidebar">
     <nav class="petpay-sidebar-card" aria-label="Menú Admin">
         <div class="petpay-sidebar-menu">
@@ -6,9 +31,9 @@
                 <span class="petpay-sidebar-text">Dashboard</span>
             </a>
 
-            <a href="{{ route('admin.providers.pending') }}" class="petpay-sidebar-link" aria-label="Proveedores pendientes">
+            <a href="{{ route('admin.providers.pending') }}" class="petpay-sidebar-link" aria-label="Comercios pendientes">
                 <span class="petpay-sidebar-icon">🏪</span>
-                <span class="petpay-sidebar-text">Proveedores</span>
+                <span class="petpay-sidebar-text">Comercios</span>
             </a>
 
             <a href="{{ route('admin.drivers.pending') }}" class="petpay-sidebar-link" aria-label="Repartidores pendientes">
