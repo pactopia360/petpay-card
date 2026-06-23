@@ -4,13 +4,23 @@
 
 @section('title', 'PETPAY-CARD | Panel administrador de comercio')
 
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('assets/petpay-card/css/portals/comercio.css') }}">
+@endpush
+
 @section('content')
     <section class="commerce-admin" data-active-tab="{{ $activeTab ?? 'usuarios' }}">
-        <div class="commerce-admin__hero" aria-label="Imagen principal del panel administrador de comercio"></div>
+        <figure class="commerce-admin__hero" aria-label="Imagen principal del panel de administración de comercio">
+            <img
+                src="{{ asset('assets/petpay-card/img/comercio/comercio-hero.png') }}?v=20260622"
+                alt="Pasillo de productos para mascotas dentro de un comercio Petpay"
+                loading="eager"
+            >
+        </figure>
 
         <header class="commerce-admin__title">
-            <h1>Panel administrador de comercio</h1>
-            <p>Realiza el registro de tu comercio</p>
+            <h1>Panel de administración.</h1>
+            <p>Registro, administración y operación de tiendas.</p>
         </header>
 
         <nav class="commerce-admin__tabs" aria-label="Secciones del panel administrador de comercio">
@@ -610,140 +620,155 @@
                 </div>
             </form>
 
-            <div class="commerce-branches-list">
-                @forelse ($branches as $branch)
-                    @php
-                        $missingFields = $branch->missing_fields ?? [];
-                        $serviceDaysValue = $branch->service_days ?? [];
-                    @endphp
+                       <div class="commerce-branches-list">
+                <?php
+                    $branchItems = collect($branches ?? [])->values();
+                ?>
 
-                    <article class="commerce-branch-card {{ $branch->is_complete ? 'is-complete' : 'is-incomplete' }}">
-                        <div class="commerce-branch-card__flag">
-                            <span class="{{ $branch->is_complete ? 'is-green' : 'is-red' }}"></span>
-                        </div>
-
-                        <div class="commerce-branch-card__body">
-                            <h3>
-                                {{ $branch->branch_name }}
-                                <small>{{ $branch->chain_name }}</small>
-                            </h3>
-
-                            <p>
-                                <strong>Código:</strong>
-                                {{ $branch->branch_code ?: 'Pendiente' }}
-                            </p>
-
-                            <p>
-                                <strong>Dirección:</strong>
-                                {{ $branch->full_address ?: 'Pendiente' }}
-                            </p>
-
-                            <p>
-                                <strong>Contacto:</strong>
-                                {{ $branch->phone ?: 'Sin teléfono' }}
-                                ·
-                                {{ $branch->email ?: 'Sin correo' }}
-                            </p>
-
-                            <p>
-                                <strong>Web:</strong>
-                                {{ $branch->website ?: 'Pendiente' }}
-                            </p>
-
-                            <p>
-                                <strong>Horario:</strong>
-                                {{ $branch->service_schedule ?: 'Pendiente' }}
-                            </p>
-
-                            <p>
-                                <strong>Servicio:</strong>
-                                <span class="{{ $branch->is_open ? 'commerce-open' : 'commerce-closed' }}">
-                                    {{ $branch->is_open ? 'En servicio' : 'Apagado' }}
-                                </span>
-                            </p>
-
-                            @if (count($missingFields) > 0)
-                                <div class="commerce-branch-card__missing">
-                                    <strong>Faltan datos:</strong>
-                                    {{ implode(', ', $missingFields) }}
-                                </div>
-                            @else
-                                <div class="commerce-branch-card__complete">
-                                    Información completa. Bandera verde.
-                                </div>
-                            @endif
-                        </div>
-
-                        <div class="commerce-branch-card__actions">
-                            <button
-                                type="button"
-                                class="commerce-icon-button commerce-edit-branch"
-                                aria-label="Editar sucursal"
-                                data-update-action="{{ route('comercio.branches.update', $branch) }}"
-                                data-chain-name="{{ $branch->chain_name }}"
-                                data-branch-name="{{ $branch->branch_name }}"
-                                data-branch-code="{{ $branch->branch_code }}"
-                                data-google-coordinates="{{ $branch->google_coordinates }}"
-                                data-street="{{ $branch->street }}"
-                                data-neighborhood="{{ $branch->neighborhood }}"
-                                data-postal-code="{{ $branch->postal_code }}"
-                                data-state="{{ $branch->state }}"
-                                data-phone="{{ $branch->phone }}"
-                                data-email="{{ $branch->email }}"
-                                data-website="{{ $branch->website }}"
-                                data-whatsapp-phone="{{ $branch->whatsapp_phone }}"
-                                data-service-days="{{ e(json_encode($serviceDaysValue)) }}"
-                                data-service-open-time="{{ $branch->service_open_time ? $branch->service_open_time->format('H:i') : '' }}"
-                                data-service-close-time="{{ $branch->service_close_time ? $branch->service_close_time->format('H:i') : '' }}"
-                                data-phone-verified="{{ $branch->phone_verified ? '1' : '0' }}"
-                                data-email-verified="{{ $branch->email_verified ? '1' : '0' }}"
-                                data-is-open="{{ $branch->is_open ? '1' : '0' }}"
-                            >
-                                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-                                    <path d="M12 20h9"></path>
-                                    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4 11.5-11.5Z"></path>
-                                </svg>
-                            </button>
-
-                            <form method="POST" action="{{ route('comercio.branches.service', $branch) }}">
-                                @csrf
-                                @method('PATCH')
-
-                                <button
-                                    type="submit"
-                                    class="commerce-branch-service-button {{ $branch->is_open ? 'is-on' : 'is-off' }}"
-                                    aria-label="{{ $branch->is_open ? 'Apagar servicio' : 'Encender servicio' }}"
-                                >
-                                    {{ $branch->is_open ? 'Apagar' : 'Encender' }}
-                                </button>
-                            </form>
-
-                            <form
-                                method="POST"
-                                action="{{ route('comercio.branches.destroy', $branch) }}"
-                                onsubmit="return confirm('¿Seguro que deseas eliminar esta sucursal?');"
-                            >
-                                @csrf
-                                @method('DELETE')
-
-                                <button type="submit" class="commerce-icon-button" aria-label="Eliminar sucursal">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-                                        <path d="M4 7h16"></path>
-                                        <path d="M10 11v6"></path>
-                                        <path d="M14 11v6"></path>
-                                        <path d="M6 7l1 14h10l1-14"></path>
-                                        <path d="M9 7V4h6v3"></path>
-                                    </svg>
-                                </button>
-                            </form>
-                        </div>
-                    </article>
-                @empty
+                <?php if ($branchItems->isEmpty()): ?>
                     <article class="commerce-empty">
                         <h3>Aún no tienes sucursales registradas</h3>
                         <p>Agrega tu primera sucursal para comenzar a operar en Petpay.</p>
                     </article>
-                @endforelse
+                <?php else: ?>
+                    <?php foreach ($branchItems as $branch): ?>
+                        <?php
+                            $missingFields = $branch->missing_fields ?? [];
+                            $serviceDaysValue = $branch->service_days ?? [];
+
+                            if (is_string($serviceDaysValue)) {
+                                $decodedServiceDays = json_decode($serviceDaysValue, true);
+                                $serviceDaysValue = is_array($decodedServiceDays) ? $decodedServiceDays : [];
+                            }
+
+                            if (! is_array($serviceDaysValue)) {
+                                $serviceDaysValue = [];
+                            }
+                        ?>
+
+                        <article class="commerce-branch-card {{ $branch->is_complete ? 'is-complete' : 'is-incomplete' }}">
+                            <div class="commerce-branch-card__flag">
+                                <span class="{{ $branch->is_complete ? 'is-green' : 'is-red' }}"></span>
+                            </div>
+
+                            <div class="commerce-branch-card__body">
+                                <h3>
+                                    {{ $branch->branch_name }}
+                                    <small>{{ $branch->chain_name }}</small>
+                                </h3>
+
+                                <p>
+                                    <strong>Código:</strong>
+                                    {{ $branch->branch_code ?: 'Pendiente' }}
+                                </p>
+
+                                <p>
+                                    <strong>Dirección:</strong>
+                                    {{ $branch->full_address ?: 'Pendiente' }}
+                                </p>
+
+                                <p>
+                                    <strong>Contacto:</strong>
+                                    {{ $branch->phone ?: 'Sin teléfono' }}
+                                    ·
+                                    {{ $branch->email ?: 'Sin correo' }}
+                                </p>
+
+                                <p>
+                                    <strong>Web:</strong>
+                                    {{ $branch->website ?: 'Pendiente' }}
+                                </p>
+
+                                <p>
+                                    <strong>Horario:</strong>
+                                    {{ $branch->service_schedule ?: 'Pendiente' }}
+                                </p>
+
+                                <p>
+                                    <strong>Servicio:</strong>
+                                    <span class="{{ $branch->is_open ? 'commerce-open' : 'commerce-closed' }}">
+                                        {{ $branch->is_open ? 'En servicio' : 'Apagado' }}
+                                    </span>
+                                </p>
+
+                                <?php if (count($missingFields) > 0): ?>
+                                    <div class="commerce-branch-card__missing">
+                                        <strong>Faltan datos:</strong>
+                                        {{ implode(', ', $missingFields) }}
+                                    </div>
+                                <?php else: ?>
+                                    <div class="commerce-branch-card__complete">
+                                        Información completa. Bandera verde.
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+
+                            <div class="commerce-branch-card__actions">
+                                <button
+                                    type="button"
+                                    class="commerce-icon-button commerce-edit-branch"
+                                    aria-label="Editar sucursal"
+                                    data-update-action="{{ route('comercio.branches.update', $branch) }}"
+                                    data-chain-name="{{ $branch->chain_name }}"
+                                    data-branch-name="{{ $branch->branch_name }}"
+                                    data-branch-code="{{ $branch->branch_code }}"
+                                    data-google-coordinates="{{ $branch->google_coordinates }}"
+                                    data-street="{{ $branch->street }}"
+                                    data-neighborhood="{{ $branch->neighborhood }}"
+                                    data-postal-code="{{ $branch->postal_code }}"
+                                    data-state="{{ $branch->state }}"
+                                    data-phone="{{ $branch->phone }}"
+                                    data-email="{{ $branch->email }}"
+                                    data-website="{{ $branch->website }}"
+                                    data-whatsapp-phone="{{ $branch->whatsapp_phone }}"
+                                    data-service-days="{{ e(json_encode($serviceDaysValue)) }}"
+                                    data-service-open-time="{{ $branch->service_open_time ? $branch->service_open_time->format('H:i') : '' }}"
+                                    data-service-close-time="{{ $branch->service_close_time ? $branch->service_close_time->format('H:i') : '' }}"
+                                    data-phone-verified="{{ $branch->phone_verified ? '1' : '0' }}"
+                                    data-email-verified="{{ $branch->email_verified ? '1' : '0' }}"
+                                    data-is-open="{{ $branch->is_open ? '1' : '0' }}"
+                                >
+                                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                                        <path d="M12 20h9"></path>
+                                        <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4 11.5-11.5Z"></path>
+                                    </svg>
+                                </button>
+
+                                <form method="POST" action="{{ route('comercio.branches.service', $branch) }}">
+                                    <?php echo csrf_field(); ?>
+                                    <?php echo method_field('PATCH'); ?>
+
+                                    <button
+                                        type="submit"
+                                        class="commerce-branch-service-button {{ $branch->is_open ? 'is-on' : 'is-off' }}"
+                                        aria-label="{{ $branch->is_open ? 'Apagar servicio' : 'Encender servicio' }}"
+                                    >
+                                        {{ $branch->is_open ? 'Apagar' : 'Encender' }}
+                                    </button>
+                                </form>
+
+                                <form
+                                    method="POST"
+                                    action="{{ route('comercio.branches.destroy', $branch) }}"
+                                    onsubmit="return confirm('¿Seguro que deseas eliminar esta sucursal?');"
+                                >
+                                    <?php echo csrf_field(); ?>
+                                    <?php echo method_field('DELETE'); ?>
+
+                                    <button type="submit" class="commerce-icon-button" aria-label="Eliminar sucursal">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                                            <path d="M4 7h16"></path>
+                                            <path d="M10 11v6"></path>
+                                            <path d="M14 11v6"></path>
+                                            <path d="M6 7l1 14h10l1-14"></path>
+                                            <path d="M9 7V4h6v3"></path>
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </article>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </div>
         </div>
     </section>
