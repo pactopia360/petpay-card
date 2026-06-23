@@ -5,6 +5,10 @@ namespace App\Models\Comercio;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Comercio\CommerceContact;
+use App\Models\Comercio\CommerceBranch;
+
 
 class CommerceUser extends Authenticatable
 {
@@ -106,5 +110,15 @@ class CommerceUser extends Authenticatable
     public function canAccessPortal(): bool
     {
         return $this->isActive();
+    }
+
+    public function contacts(): HasMany
+    {
+        return $this->hasMany(CommerceContact::class, 'commerce_user_id');
+    }
+
+    public function branches(): HasMany
+    {
+        return $this->hasMany(CommerceBranch::class, 'commerce_user_id');
     }
 }

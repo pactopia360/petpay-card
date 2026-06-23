@@ -1,0 +1,425 @@
+:root {
+    --commerce-bg: #f4efe3;
+    --commerce-text: #061733;
+    --commerce-muted: #59616f;
+    --commerce-border: rgba(6, 23, 51, 0.14);
+    --commerce-dark: #555c66;
+    --commerce-blue: #98c8ef;
+    --commerce-pink: #ffd1ef;
+    --commerce-card: rgba(255, 255, 255, 0.22);
+    --commerce-shadow: 0 14px 34px rgba(6, 23, 51, 0.07);
+}
+
+body {
+    background: var(--commerce-bg);
+}
+
+.petpay-page-comercio {
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at 8% 0%, rgba(255, 128, 0, 0.08), transparent 30%),
+        radial-gradient(circle at 92% 0%, rgba(255, 128, 0, 0.07), transparent 30%),
+        var(--commerce-bg);
+    color: var(--commerce-text);
+}
+
+.petpay-page-comercio .petpay-main {
+    width: 100%;
+    max-width: none;
+    padding: 0;
+}
+
+.commerce-admin {
+    width: min(1060px, calc(100% - 34px));
+    margin: 0 auto;
+    padding: 22px 0 34px;
+}
+
+.commerce-admin__hero {
+    width: min(920px, 100%);
+    height: 118px;
+    margin: 0 auto 38px;
+    border-radius: 14px;
+    overflow: hidden;
+    background:
+        linear-gradient(90deg, rgba(255, 120, 0, 0.18), rgba(255, 255, 255, 0.05)),
+        url('/assets/petpay-card/img/comercio/comercio-hero.jpg');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    box-shadow: var(--commerce-shadow);
+}
+
+.commerce-admin__title {
+    margin-bottom: 28px;
+}
+
+.commerce-admin__title h1 {
+    margin: 0;
+    color: #4f5865;
+    font-size: clamp(2rem, 3.2vw, 2.75rem);
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: -0.06em;
+}
+
+.commerce-admin__title p {
+    margin: 6px 0 0;
+    color: #4f5865;
+    font-size: clamp(1.12rem, 1.8vw, 1.45rem);
+    line-height: 1.1;
+    font-weight: 400;
+    letter-spacing: -0.04em;
+}
+
+.commerce-admin__tabs {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(112px, 1fr));
+    gap: 14px;
+    width: min(800px, 100%);
+    margin-bottom: 26px;
+}
+
+.commerce-admin__tab {
+    min-height: 40px;
+    border: 1px solid var(--commerce-border);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.22);
+    color: var(--commerce-text);
+    font-size: 0.88rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 6px 14px rgba(6, 23, 51, 0.04);
+    transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+}
+
+.commerce-admin__tab:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 9px 20px rgba(6, 23, 51, 0.07);
+}
+
+.commerce-admin__tab.is-active {
+    background: var(--commerce-dark);
+    color: #fff;
+    border-color: var(--commerce-dark);
+}
+
+.commerce-admin__section-title {
+    margin: 0 0 28px;
+    padding-left: 20px;
+}
+
+.commerce-admin__section-title h2 {
+    margin: 0;
+    color: #4f5865;
+    font-size: 1rem;
+    line-height: 1.1;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+}
+
+.commerce-admin__section-title p {
+    margin: 3px 0 0;
+    color: #4f5865;
+    font-size: 0.88rem;
+    line-height: 1.1;
+    letter-spacing: -0.04em;
+}
+
+.commerce-admin__form {
+    padding: 0 20px;
+}
+
+.commerce-admin__grid {
+    display: grid;
+    gap: 20px 20px;
+}
+
+.commerce-admin__grid--three {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-bottom: 24px;
+}
+
+.commerce-admin__grid--address {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    margin-bottom: 22px;
+}
+
+.commerce-admin__grid--bottom {
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: end;
+    margin-bottom: 34px;
+}
+
+.commerce-field {
+    display: block;
+}
+
+.commerce-field>span,
+.commerce-fieldset__legend {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--commerce-text);
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: -0.03em;
+}
+
+.commerce-field input,
+.commerce-field select {
+    width: 100%;
+    height: 38px;
+    border: 1px solid rgba(6, 23, 51, 0.16);
+    border-radius: 7px;
+    background: rgba(255, 255, 255, 0.82);
+    color: var(--commerce-text);
+    padding: 0 11px;
+    font: inherit;
+    font-size: 0.88rem;
+    outline: none;
+    box-shadow: 0 4px 11px rgba(6, 23, 51, 0.045);
+    transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+}
+
+.commerce-field input::placeholder {
+    color: rgba(6, 23, 51, 0.44);
+    font-style: italic;
+}
+
+.commerce-field input:focus,
+.commerce-field select:focus {
+    border-color: rgba(255, 111, 0, 0.55);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(255, 111, 0, 0.11);
+}
+
+.commerce-fieldset {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.commerce-verify {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.commerce-verify input {
+    padding-right: 130px;
+}
+
+.commerce-verify__button {
+    position: absolute;
+    right: 8px;
+    height: 20px;
+    min-width: 104px;
+    padding: 0 11px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--commerce-pink);
+    color: rgba(6, 23, 51, 0.56);
+    font-size: 0.62rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.commerce-admin__save {
+    width: 100%;
+    height: 38px;
+    border: 0;
+    border-radius: 7px;
+    background: var(--commerce-blue);
+    color: #fff;
+    font-size: 0.96rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 7px 16px rgba(58, 141, 215, 0.15);
+    transition: transform 0.16s ease, filter 0.16s ease;
+}
+
+.commerce-admin__save:hover {
+    transform: translateY(-1px);
+    filter: brightness(0.98);
+}
+
+.commerce-contacts {
+    display: grid;
+    gap: 14px;
+    padding: 0 20px;
+}
+
+.commerce-contact-card {
+    position: relative;
+    min-height: 140px;
+    border: 1px solid var(--commerce-border);
+    border-radius: 11px;
+    background: rgba(255, 255, 255, 0.10);
+    padding: 16px 20px 38px;
+}
+
+.commerce-contact-card__title {
+    margin: 0 0 12px;
+    color: var(--commerce-text);
+    font-size: 0.92rem;
+    font-weight: 500;
+}
+
+.commerce-contact-card__body {
+    display: grid;
+    gap: 6px;
+    color: var(--commerce-text);
+    font-size: 0.82rem;
+    line-height: 1.18;
+}
+
+.commerce-contact-card__body p {
+    margin: 0;
+}
+
+.commerce-contact-card__body strong {
+    font-weight: 900;
+}
+
+.commerce-contact-card__actions {
+    position: absolute;
+    right: 18px;
+    top: 40px;
+    display: inline-flex;
+    gap: 12px;
+}
+
+.commerce-icon-button {
+    width: 24px;
+    height: 24px;
+    border: 0;
+    background: transparent;
+    color: rgba(6, 23, 51, 0.42);
+    cursor: pointer;
+}
+
+.commerce-icon-button svg {
+    display: block;
+    width: 22px;
+    height: 22px;
+    stroke: currentColor;
+}
+
+.commerce-contact-card__main {
+    position: absolute;
+    right: 18px;
+    bottom: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: rgba(6, 23, 51, 0.64);
+    font-size: 0.7rem;
+}
+
+.commerce-contact-card__main input {
+    width: 12px;
+    height: 12px;
+}
+
+@media (max-width: 1100px) {
+    .commerce-admin {
+        width: min(960px, calc(100% - 28px));
+    }
+
+    .commerce-admin__hero {
+        width: 100%;
+    }
+}
+
+@media (max-width: 860px) {
+    .commerce-admin {
+        width: min(100% - 24px, 720px);
+        padding-top: 18px;
+    }
+
+    .commerce-admin__hero {
+        height: 105px;
+        margin-bottom: 30px;
+    }
+
+    .commerce-admin__tabs {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        width: 100%;
+    }
+
+    .commerce-admin__grid--three,
+    .commerce-admin__grid--address,
+    .commerce-admin__grid--bottom {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .commerce-admin__form,
+    .commerce-contacts,
+    .commerce-admin__section-title {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .commerce-contact-card__actions {
+        top: 16px;
+    }
+}
+
+@media (max-width: 520px) {
+    .commerce-admin {
+        width: min(100% - 18px, 100%);
+        padding-bottom: 26px;
+    }
+
+    .commerce-admin__hero {
+        height: 92px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+    }
+
+    .commerce-admin__title {
+        margin-bottom: 22px;
+    }
+
+    .commerce-admin__title h1 {
+        font-size: 1.85rem;
+    }
+
+    .commerce-admin__title p {
+        font-size: 1.08rem;
+    }
+
+    .commerce-admin__tabs {
+        grid-template-columns: 1fr;
+    }
+
+    .commerce-admin__tab {
+        min-height: 38px;
+    }
+
+    .commerce-contact-card {
+        padding: 16px 14px 52px;
+    }
+
+    .commerce-contact-card__actions {
+        position: static;
+        margin-top: 12px;
+    }
+
+    .commerce-contact-card__main {
+        left: 14px;
+        right: auto;
+    }
+
+    .commerce-verify input {
+        padding-right: 118px;
+    }
+
+    .commerce-verify__button {
+        min-width: 94px;
+        padding-inline: 8px;
+        font-size: 0.58rem;
+    }
+}
