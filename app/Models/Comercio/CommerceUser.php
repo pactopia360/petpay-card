@@ -22,6 +22,10 @@ class CommerceUser extends Authenticatable
         'email',
         'phone',
         'password',
+        'google_id',
+        'google_avatar',
+        'auth_provider',
+        'email_verified_at',
 
         'business_name',
         'business_type',
