@@ -568,3 +568,142 @@ input {
         grid-template-columns: 1fr;
     }
 }
+
+/* ==========================================================================
+   PETPAY PUBLIC HEADER - SESSION ACCOUNT
+   ========================================================================== */
+
+.petpay-public-account {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    padding: 6px 13px 6px 7px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.96);
+    color: #141414;
+    text-decoration: none;
+    box-shadow: 0 12px 28px rgba(20, 20, 20, 0.14);
+}
+
+.petpay-public-account__avatar {
+    display: inline-grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    background: #ff6b00;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.petpay-public-account__meta {
+    display: grid;
+    gap: 2px;
+    line-height: 1;
+}
+
+.petpay-public-account__meta strong {
+    max-width: 180px;
+    overflow: hidden;
+    color: #141414;
+    font-size: 12px;
+    font-weight: 900;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.petpay-public-account__meta small {
+    color: #6b7280;
+    font-size: 10px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.petpay-public-account-menu {
+    position: relative;
+}
+
+.petpay-public-account-menu__trigger {
+    display: inline-grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    background: #141414;
+    cursor: pointer;
+    list-style: none;
+    box-shadow: 0 12px 28px rgba(20, 20, 20, 0.18);
+}
+
+.petpay-public-account-menu__trigger::-webkit-details-marker {
+    display: none;
+}
+
+.petpay-public-account-menu__trigger span {
+    display: block;
+    width: 4px;
+    height: 4px;
+    margin: 1px 0;
+    border-radius: 999px;
+    background: #ffffff;
+}
+
+.petpay-public-account-menu__panel {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    z-index: 100;
+    min-width: 190px;
+    padding: 8px;
+    border: 1px solid rgba(20, 20, 20, 0.10);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 22px 55px rgba(20, 20, 20, 0.22);
+}
+
+.petpay-public-account-menu__panel a,
+.petpay-public-account-menu__panel button {
+    display: block;
+    width: 100%;
+    padding: 11px 12px;
+    border: 0;
+    border-radius: 11px;
+    background: transparent;
+    color: #141414;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 850;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.petpay-public-account-menu__panel a:hover,
+.petpay-public-account-menu__panel button:hover {
+    background: #fff0e5;
+    color: #ff6b00;
+}
+
+.petpay-public-account-menu__panel form {
+    margin: 0;
+}
+
+@media (max-width: 720px) {
+    .petpay-public-account__meta strong {
+        max-width: 120px;
+    }
+}
+
+@media (max-width: 520px) {
+    .petpay-public-account {
+        padding-right: 8px;
+    }
+
+    .petpay-public-account__meta {
+        display: none;
+    }
+}

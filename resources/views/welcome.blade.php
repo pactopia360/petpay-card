@@ -12,6 +12,51 @@
         class="petpay-public"
         data-login-url="{{ route('cliente.login') }}"
     >
+                @php
+            $publicHeaderUser = null;
+            $publicHeaderAccountType = null;
+            $publicHeaderHomeRoute = null;
+            $publicHeaderLogoutRoute = null;
+
+            if (auth('admin')->check()) {
+                $publicHeaderUser = auth('admin')->user();
+                $publicHeaderAccountType = 'Admin';
+                $publicHeaderHomeRoute = route('admin.dashboard');
+                $publicHeaderLogoutRoute = route('admin.logout');
+            } elseif (auth('comercio')->check()) {
+                $publicHeaderUser = auth('comercio')->user();
+                $publicHeaderAccountType = 'Comercio';
+                $publicHeaderHomeRoute = route('comercio.dashboard');
+                $publicHeaderLogoutRoute = route('comercio.logout');
+            } elseif (auth('cliente')->check()) {
+                $publicHeaderUser = auth('cliente')->user();
+                $publicHeaderAccountType = 'Cliente';
+                $publicHeaderHomeRoute = route('cliente.home');
+                $publicHeaderLogoutRoute = route('cliente.logout');
+            } elseif (auth('repartidor')->check()) {
+                $publicHeaderUser = auth('repartidor')->user();
+                $publicHeaderAccountType = 'Repartidor';
+                $publicHeaderHomeRoute = route('repartidor.home');
+                $publicHeaderLogoutRoute = route('repartidor.logout');
+            }
+
+            $publicHeaderDisplayName = null;
+
+            if ($publicHeaderUser) {
+                $publicHeaderDisplayName = $publicHeaderUser->name
+                    ?? $publicHeaderUser->full_name
+                    ?? $publicHeaderUser->nombre
+                    ?? $publicHeaderUser->business_name
+                    ?? $publicHeaderUser->commerce_name
+                    ?? $publicHeaderUser->email
+                    ?? 'Mi cuenta';
+            }
+
+            $publicHeaderInitial = $publicHeaderDisplayName
+                ? mb_strtoupper(mb_substr($publicHeaderDisplayName, 0, 1))
+                : 'P';
+        @endphp
+
         <header class="petpay-public__header">
             <a href="{{ route('home') }}" class="petpay-public__brand" aria-label="PETPAY-CARD">
                 <span class="petpay-public__brand-mark">🐾</span>
@@ -19,17 +64,50 @@
             </a>
 
             <nav class="petpay-public__nav" aria-label="Accesos principales">
-                <a href="{{ route('cliente.login') }}" class="petpay-public__nav-link petpay-public__nav-link--dark">
-                    Comprar
-                </a>
+                @if ($publicHeaderUser)
+                    <a href="{{ $publicHeaderHomeRoute }}" class="petpay-public-account" title="Ir a mi panel">
+                        <span class="petpay-public-account__avatar">
+                            {{ $publicHeaderInitial }}
+                        </span>
 
-                <a href="{{ route('comercio.login') }}" class="petpay-public__nav-link">
-                    Vender
-                </a>
+                        <span class="petpay-public-account__meta">
+                            <strong>{{ $publicHeaderDisplayName }}</strong>
+                            <small>{{ $publicHeaderAccountType }}</small>
+                        </span>
+                    </a>
 
-                <a href="{{ route('repartidor.login') }}" class="petpay-public__nav-link">
-                    Repartir
-                </a>
+                    <details class="petpay-public-account-menu">
+                        <summary class="petpay-public-account-menu__trigger" aria-label="Opciones de cuenta">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </summary>
+
+                        <div class="petpay-public-account-menu__panel">
+                            <a href="{{ $publicHeaderHomeRoute }}">Mi panel</a>
+
+                            <form method="POST" action="{{ $publicHeaderLogoutRoute }}">
+                                @csrf
+
+                                <button type="submit">
+                                    Cerrar sesión
+                                </button>
+                            </form>
+                        </div>
+                    </details>
+                @else
+                    <a href="{{ route('cliente.login') }}" class="petpay-public__nav-link petpay-public__nav-link--dark">
+                        Comprar
+                    </a>
+
+                    <a href="{{ route('comercio.login') }}" class="petpay-public__nav-link">
+                        Vender
+                    </a>
+
+                    <a href="{{ route('repartidor.login') }}" class="petpay-public__nav-link">
+                        Repartir
+                    </a>
+                @endif
             </nav>
         </header>
 

@@ -128,15 +128,363 @@
                 </p>
 
                 <div class="petpay-auth__links">
-                    <a href="{{ route('comercio.password.request') }}">
+                    <button
+                        type="button"
+                        class="petpay-auth__link-button"
+                        data-auth-panel-open="forgot"
+                    >
                         ¿Olvidaste tu contraseña?
-                    </a>
+                    </button>
 
-                    <a href="{{ route('comercio.register') }}">
+                    <button
+                        type="button"
+                        class="petpay-auth__link-button"
+                        data-auth-panel-open="register"
+                    >
                         Registra tu comercio
-                    </a>
+                    </button>
                 </div>
+
+                <section class="petpay-auth-modal" data-auth-panel="forgot" hidden>
+                    <div class="petpay-auth-modal__backdrop" data-auth-panel-close></div>
+
+                    <article class="petpay-auth-modal__card" role="dialog" aria-modal="true" aria-label="Recuperar contraseña comercio">
+                        <button type="button" class="petpay-auth-modal__close" data-auth-panel-close aria-label="Cerrar">
+                            ×
+                        </button>
+
+                        <div class="petpay-auth__intro">
+                            <p class="petpay-auth__eyebrow">Portal Comercio</p>
+                            <h2>Recupera tu contraseña</h2>
+                            <p>
+                                Ingresa el correo de tu comercio. Te enviaremos instrucciones para recuperar tu acceso.
+                            </p>
+                        </div>
+
+                <form method="POST" action="#" class="petpay-auth__form">
+                    @csrf
+
+                    <label class="petpay-auth__label" for="commerce_forgot_email">
+                        Correo electrónico
+                    </label>
+
+                    <input
+                        id="commerce_forgot_email"
+                        class="petpay-auth__field"
+                        type="email"
+                        name="email"
+                        placeholder="correo@comercio.com"
+                        autocomplete="email"
+                        required
+                    >
+
+                    <button type="button" class="petpay-auth__primary">
+                        Enviar instrucciones
+                    </button>
+                </form>
+            </article>
+        </section>
+
+        <section class="petpay-auth-modal" data-auth-panel="register" hidden>
+            <div class="petpay-auth-modal__backdrop" data-auth-panel-close></div>
+
+            <article class="petpay-auth-modal__card petpay-auth-modal__card--wide" role="dialog" aria-modal="true" aria-label="Registro comercio">
+                <button type="button" class="petpay-auth-modal__close" data-auth-panel-close aria-label="Cerrar">
+                    ×
+                </button>
+
+                <div class="petpay-auth__intro">
+                    <p class="petpay-auth__eyebrow">Portal Comercio</p>
+                    <h2>Registra tu comercio</h2>
+                    <p>
+                        Crea tu cuenta para vender productos, servicios y conectar tus pedidos dentro de Petpay.
+                    </p>
+                </div>
+
+                <form method="POST" action="{{ route('comercio.register.store') }}" class="petpay-auth__form">
+                    @csrf
+
+                    <label class="petpay-auth__label" for="commerce_register_name">
+                        Nombre del comercio
+                    </label>
+                    <input
+                        id="commerce_register_name"
+                        class="petpay-auth__field"
+                        type="text"
+                        name="business_name"
+                        value="{{ old('business_name') }}"
+                        placeholder="Nombre de tu comercio"
+                        required
+                    >
+
+                    <label class="petpay-auth__label" for="commerce_register_email">
+                        Correo electrónico
+                    </label>
+                    <input
+                        id="commerce_register_email"
+                        class="petpay-auth__field"
+                        type="email"
+                        name="email"
+                        value="{{ old('email') }}"
+                        placeholder="correo@comercio.com"
+                        required
+                    >
+
+                    <label class="petpay-auth__label" for="commerce_register_phone">
+                        Teléfono
+                    </label>
+                    <input
+                        id="commerce_register_phone"
+                        class="petpay-auth__field"
+                        type="tel"
+                        name="phone"
+                        value="{{ old('phone') }}"
+                        placeholder="55 0000 0000"
+                        required
+                    >
+
+                    <label class="petpay-auth__label" for="commerce_register_password">
+                        Contraseña
+                    </label>
+                    <input
+                        id="commerce_register_password"
+                        class="petpay-auth__field"
+                        type="password"
+                        name="password"
+                        placeholder="Crea una contraseña"
+                        autocomplete="new-password"
+                        required
+                    >
+
+                    <label class="petpay-auth__label" for="commerce_register_password_confirmation">
+                        Confirmar contraseña
+                    </label>
+                    <input
+                        id="commerce_register_password_confirmation"
+                        class="petpay-auth__field"
+                        type="password"
+                        name="password_confirmation"
+                        placeholder="Repite tu contraseña"
+                        autocomplete="new-password"
+                        required
+                    >
+
+                    <button type="submit" class="petpay-auth__primary">
+                        Registrar comercio
+                    </button>
+                </form>
+            </article>
+        </section>
             </div>
         </section>
+
+        <section class="petpay-auth-modal" data-auth-panel="forgot" hidden>
+    <div class="petpay-auth-modal__backdrop" data-auth-panel-close></div>
+
+    <article class="petpay-auth-modal__card" role="dialog" aria-modal="true" aria-label="Recuperar contraseña comercio">
+        <button type="button" class="petpay-auth-modal__close" data-auth-panel-close aria-label="Cerrar">
+            ×
+        </button>
+
+        <div class="petpay-auth__intro">
+            <p class="petpay-auth__eyebrow">Portal Comercio</p>
+            <h2>Recupera tu contraseña</h2>
+            <p>Ingresa el correo de tu comercio. Te enviaremos instrucciones para recuperar tu acceso.</p>
+        </div>
+
+        <form method="POST" action="{{ route('comercio.password.request') }}" class="petpay-auth__form">
+            @csrf
+
+            <label class="petpay-auth__label" for="commerce_forgot_email">
+                Correo electrónico
+            </label>
+
+            <input
+                id="commerce_forgot_email"
+                class="petpay-auth__field"
+                type="email"
+                name="email"
+                placeholder="correo@comercio.com"
+                autocomplete="email"
+                required
+            >
+
+            <button type="submit" class="petpay-auth__primary">
+                Enviar instrucciones
+            </button>
+        </form>
+    </article>
+</section>
+
+<section class="petpay-auth-modal" data-auth-panel="register" hidden>
+    <div class="petpay-auth-modal__backdrop" data-auth-panel-close></div>
+
+    <article class="petpay-auth-modal__card petpay-auth-modal__card--wide" role="dialog" aria-modal="true" aria-label="Registro comercio">
+        <button type="button" class="petpay-auth-modal__close" data-auth-panel-close aria-label="Cerrar">
+            ×
+        </button>
+
+        <div class="petpay-auth__intro">
+            <p class="petpay-auth__eyebrow">Portal Comercio</p>
+            <h2>Registra tu comercio</h2>
+            <p>Crea tu cuenta para vender productos, servicios y conectar tus pedidos dentro de Petpay.</p>
+        </div>
+
+        <form method="POST" action="{{ route('comercio.register.store') }}" class="petpay-auth__form">
+            @csrf
+
+            <label class="petpay-auth__label" for="commerce_register_name">
+                Nombre del comercio
+            </label>
+            <input
+                id="commerce_register_name"
+                class="petpay-auth__field"
+                type="text"
+                name="business_name"
+                value="{{ old('business_name') }}"
+                placeholder="Nombre de tu comercio"
+                required
+            >
+
+            <label class="petpay-auth__label" for="commerce_register_email">
+                Correo electrónico
+            </label>
+            <input
+                id="commerce_register_email"
+                class="petpay-auth__field"
+                type="email"
+                name="email"
+                value="{{ old('email') }}"
+                placeholder="correo@comercio.com"
+                required
+            >
+
+            <label class="petpay-auth__label" for="commerce_register_phone">
+                Teléfono
+            </label>
+            <input
+                id="commerce_register_phone"
+                class="petpay-auth__field"
+                type="tel"
+                name="phone"
+                value="{{ old('phone') }}"
+                placeholder="55 0000 0000"
+                required
+            >
+
+            <label class="petpay-auth__label" for="commerce_register_password">
+                Contraseña
+            </label>
+            <input
+                id="commerce_register_password"
+                class="petpay-auth__field"
+                type="password"
+                name="password"
+                placeholder="Crea una contraseña"
+                autocomplete="new-password"
+                required
+            >
+
+            <label class="petpay-auth__label" for="commerce_register_password_confirmation">
+                Confirmar contraseña
+            </label>
+            <input
+                id="commerce_register_password_confirmation"
+                class="petpay-auth__field"
+                type="password"
+                name="password_confirmation"
+                placeholder="Repite tu contraseña"
+                autocomplete="new-password"
+                required
+            >
+
+            <button type="submit" class="petpay-auth__primary">
+                Registrar comercio
+            </button>
+        </form>
+    </article>
+</section>
     </main>
+
+    <script>
+    (() => {
+        const panels = document.querySelectorAll('[data-auth-panel]');
+        const openButtons = document.querySelectorAll('[data-auth-panel-open]');
+        const closeButtons = document.querySelectorAll('[data-auth-panel-close]');
+
+        const closePanels = () => {
+            panels.forEach((panel) => {
+                panel.hidden = true;
+            });
+
+            document.body.classList.remove('petpay-auth-modal-is-open');
+        };
+
+        openButtons.forEach((button) => {
+            button.addEventListener('click', () => {
+                const target = button.dataset.authPanelOpen;
+                const panel = document.querySelector(`[data-auth-panel="${target}"]`);
+
+                if (!panel) {
+                    return;
+                }
+
+                closePanels();
+                panel.hidden = false;
+                document.body.classList.add('petpay-auth-modal-is-open');
+            });
+        });
+
+        closeButtons.forEach((button) => {
+            button.addEventListener('click', closePanels);
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                closePanels();
+            }
+        });
+    })();
+</script>
 @endsection
+
+    <script>
+        (() => {
+            const panels = document.querySelectorAll('[data-auth-panel]');
+            const openButtons = document.querySelectorAll('[data-auth-panel-open]');
+            const closeButtons = document.querySelectorAll('[data-auth-panel-close]');
+
+            const closePanels = () => {
+                panels.forEach((panel) => {
+                    panel.hidden = true;
+                });
+
+                document.body.classList.remove('petpay-auth-modal-is-open');
+            };
+
+            openButtons.forEach((button) => {
+                button.addEventListener('click', () => {
+                    const target = button.dataset.authPanelOpen;
+                    const panel = document.querySelector(`[data-auth-panel="${target}"]`);
+
+                    if (!panel) {
+                        return;
+                    }
+
+                    closePanels();
+                    panel.hidden = false;
+                    document.body.classList.add('petpay-auth-modal-is-open');
+                });
+            });
+
+            closeButtons.forEach((button) => {
+                button.addEventListener('click', closePanels);
+            });
+
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') {
+                    closePanels();
+                }
+            });
+        })();
+    </script>
