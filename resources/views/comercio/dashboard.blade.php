@@ -92,7 +92,7 @@
                             id="first_name"
                             type="text"
                             name="first_name"
-                            value="{{ old('first_name', $comercio->first_name ?? '') }}"
+                            value="{{ old('first_name') }}"
                             autocomplete="given-name"
                             required
                         >
@@ -104,7 +104,7 @@
                             id="last_name_paternal"
                             type="text"
                             name="last_name_paternal"
-                            value="{{ old('last_name_paternal', $comercio->last_name ?? '') }}"
+                            value="{{ old('last_name_paternal') }}"
                             autocomplete="family-name"
                         >
                     </label>
@@ -122,15 +122,32 @@
                 </div>
 
                 <fieldset class="commerce-fieldset">
-                    <legend class="commerce-fieldset__legend">Dirección de contacto</legend>
+                        <div class="commerce-fieldset__header">
+                            <legend class="commerce-fieldset__legend">Dirección de contacto</legend>
 
-                    <div class="commerce-admin__grid commerce-admin__grid--address">
+                            <button
+                                type="button"
+                                class="commerce-location-button"
+                                id="locateContactButton"
+                                title="Usar mi ubicación actual"
+                                aria-label="Usar mi ubicación actual"
+                            >
+                                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                                    <path d="M12 21s7-4.8 7-11a7 7 0 1 0-14 0c0 6.2 7 11 7 11Z"></path>
+                                    <circle cx="12" cy="10" r="2.5"></circle>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <small class="commerce-location-hint" id="contactLocationHint"></small>
+
+                        <div class="commerce-admin__grid commerce-admin__grid--address">
                         <label class="commerce-field">
                             <input
                                 id="street"
                                 type="text"
                                 name="street"
-                                value="{{ old('street', $comercio->business_address ?? '') }}"
+                                value="{{ old('street') }}"
                                 placeholder="Calle y número"
                                 autocomplete="street-address"
                             >
@@ -180,7 +197,7 @@
                                 id="phone"
                                 type="tel"
                                 name="phone"
-                                value="{{ old('phone', $comercio->phone ?? $comercio->business_phone ?? '') }}"
+                                value="{{ old('phone') }}"
                                 autocomplete="tel"
                                 inputmode="numeric"
                                 maxlength="10"
@@ -199,7 +216,7 @@
                                 id="email"
                                 type="email"
                                 name="email"
-                                value="{{ old('email', $comercio->email ?? $comercio->business_email ?? '') }}"
+                                value="{{ old('email') }}"
                                 autocomplete="email"
                             >
                             <button type="button" class="commerce-verify__button" id="verifyEmailButton">
@@ -221,112 +238,180 @@
                 </div>
             </form>
 
-            <div class="commerce-contacts">
-                @forelse ($contacts as $contact)
-                    <article class="commerce-contact-card">
-                        <h3 class="commerce-contact-card__title">
-                            Contacto {{ $loop->iteration }}
+                        <div class="commerce-contacts">
+                <?php
+                    $contactItems = collect($contacts ?? [])->values();
+                ?>
 
-                            @if ($contact->is_primary)
-                                <span class="commerce-contact-card__badge">Principal</span>
-                            @endif
-                        </h3>
-
-                        <div class="commerce-contact-card__body">
-                            <p><strong>Nombre:</strong> {{ $contact->full_name }}</p>
-
-                            <p>
-                                <strong>Dirección:</strong>
-                                {{ $contact->full_address ?: 'Sin dirección registrada' }}
-                            </p>
-
-                            <p>
-                                <strong>Teléfono:</strong>
-                                {{ $contact->phone ?: 'Sin teléfono' }}
-
-                                @if ($contact->phone_verified_at)
-                                    <span class="commerce-verified">Verificado</span>
-                                @endif
-                            </p>
-
-                            <p>
-                                <strong>Correo:</strong>
-                                {{ $contact->email ?: 'Sin correo' }}
-
-                                @if ($contact->email_verified_at)
-                                    <span class="commerce-verified">Verificado</span>
-                                @endif
-                            </p>
-                        </div>
-
-                        <div class="commerce-contact-card__actions" aria-label="Acciones del contacto">
-                            <form
-                                method="POST"
-                                action="{{ route('comercio.contacts.destroy', $contact) }}"
-                                onsubmit="return confirm('¿Seguro que deseas eliminar este contacto?');"
-                            >
-                                @csrf
-                                @method('DELETE')
-
-                                <button type="submit" class="commerce-icon-button" aria-label="Eliminar contacto">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-                                        <path d="M4 7h16"></path>
-                                        <path d="M10 11v6"></path>
-                                        <path d="M14 11v6"></path>
-                                        <path d="M6 7l1 14h10l1-14"></path>
-                                        <path d="M9 7V4h6v3"></path>
-                                    </svg>
-                                </button>
-                            </form>
-
-                            <button
-                                type="button"
-                                class="commerce-icon-button commerce-edit-contact"
-                                aria-label="Editar contacto"
-                                data-update-action="{{ route('comercio.contacts.update', $contact) }}"
-                                data-first-name="{{ $contact->first_name }}"
-                                data-last-name-paternal="{{ $contact->last_name_paternal }}"
-                                data-last-name-maternal="{{ $contact->last_name_maternal }}"
-                                data-street="{{ $contact->street }}"
-                                data-neighborhood="{{ $contact->neighborhood }}"
-                                data-postal-code="{{ $contact->postal_code }}"
-                                data-state="{{ $contact->state }}"
-                                data-phone="{{ $contact->phone }}"
-                                data-email="{{ $contact->email }}"
-                                data-phone-verified="{{ $contact->phone_verified_at ? '1' : '0' }}"
-                                data-email-verified="{{ $contact->email_verified_at ? '1' : '0' }}"
-                            >
-                                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-                                    <path d="M12 20h9"></path>
-                                    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4 11.5-11.5Z"></path>
-                                </svg>
-                            </button>
-                        </div>
-
-                        <form
-                            method="POST"
-                            action="{{ route('comercio.contacts.primary', $contact) }}"
-                            class="commerce-contact-card__main"
-                        >
-                            @csrf
-                            @method('PATCH')
-
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    onchange="this.form.submit()"
-                                    @checked($contact->is_primary)
-                                >
-                                <span>Guardar como contacto principal</span>
-                            </label>
-                        </form>
-                    </article>
-                @empty
+                <?php if ($contactItems->isEmpty()): ?>
                     <article class="commerce-empty">
                         <h3>Aún no tienes contactos registrados</h3>
                         <p>Agrega el primer contacto administrativo de tu comercio.</p>
                     </article>
-                @endforelse
+                <?php else: ?>
+                    <?php $contactCounter = 0; ?>
+
+                    <?php foreach ($contactItems as $contact): ?>
+                        <?php
+                            $contactCounter++;
+
+                            $contactMissingFields = [];
+
+                            if (! filled($contact->first_name)) {
+                                $contactMissingFields[] = 'nombre';
+                            }
+
+                            if (! filled($contact->street)) {
+                                $contactMissingFields[] = 'calle y número';
+                            }
+
+                            if (! filled($contact->neighborhood)) {
+                                $contactMissingFields[] = 'colonia';
+                            }
+
+                            if (! filled($contact->postal_code)) {
+                                $contactMissingFields[] = 'CP';
+                            }
+
+                            if (! filled($contact->state)) {
+                                $contactMissingFields[] = 'estado';
+                            }
+
+                            if (! filled($contact->phone)) {
+                                $contactMissingFields[] = 'teléfono';
+                            }
+
+                            if (! filled($contact->email)) {
+                                $contactMissingFields[] = 'correo';
+                            }
+
+                            $contactIsComplete = count($contactMissingFields) === 0;
+                            $contactMissingText = implode(', ', $contactMissingFields);
+                        ?>
+
+                        <article class="commerce-contact-card {{ $contactIsComplete ? 'is-complete' : 'is-incomplete' }}">
+                            <h3 class="commerce-contact-card__title">
+                                Contacto {{ $contactCounter }}
+
+                                <?php if ($contact->is_primary): ?>
+                                    <span class="commerce-contact-card__badge">Principal</span>
+                                <?php endif; ?>
+
+                                <?php if (! $contactIsComplete): ?>
+                                    <span
+                                        class="commerce-contact-card__alert"
+                                        title="Faltan datos: {{ $contactMissingText }}"
+                                        aria-label="Faltan datos por llenar"
+                                    >
+                                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                                            <path d="M12 9v4"></path>
+                                            <path d="M12 17h.01"></path>
+                                            <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"></path>
+                                        </svg>
+                                        Faltan datos
+                                    </span>
+                                <?php endif; ?>
+                            </h3>
+
+                            <div class="commerce-contact-card__body">
+                                <p><strong>Nombre:</strong> {{ $contact->full_name ?: 'Sin nombre registrado' }}</p>
+
+                                <p>
+                                    <strong>Dirección:</strong>
+                                    {{ $contact->full_address ?: 'Sin dirección registrada' }}
+                                </p>
+
+                                <p>
+                                    <strong>Teléfono:</strong>
+                                    {{ $contact->phone ?: 'Sin teléfono' }}
+
+                                    <?php if ($contact->phone_verified_at): ?>
+                                        <span class="commerce-verified">Verificado</span>
+                                    <?php endif; ?>
+                                </p>
+
+                                <p>
+                                    <strong>Correo:</strong>
+                                    {{ $contact->email ?: 'Sin correo' }}
+
+                                    <?php if ($contact->email_verified_at): ?>
+                                        <span class="commerce-verified">Verificado</span>
+                                    <?php endif; ?>
+                                </p>
+
+                                <?php if (! $contactIsComplete): ?>
+                                    <p class="commerce-contact-card__missing">
+                                        <strong>Completa:</strong> {{ $contactMissingText }}.
+                                    </p>
+                                <?php endif; ?>
+                            </div>
+
+                            <div class="commerce-contact-card__actions" aria-label="Acciones del contacto">
+                                <form
+                                    method="POST"
+                                    action="{{ route('comercio.contacts.destroy', $contact) }}"
+                                    onsubmit="return confirm('¿Seguro que deseas eliminar este contacto?');"
+                                >
+                                    <?php echo csrf_field(); ?>
+                                    <?php echo method_field('DELETE'); ?>
+
+                                    <button type="submit" class="commerce-icon-button" aria-label="Eliminar contacto">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                                            <path d="M4 7h16"></path>
+                                            <path d="M10 11v6"></path>
+                                            <path d="M14 11v6"></path>
+                                            <path d="M6 7l1 14h10l1-14"></path>
+                                            <path d="M9 7V4h6v3"></path>
+                                        </svg>
+                                    </button>
+                                </form>
+
+                                <button
+                                    type="button"
+                                    class="commerce-icon-button commerce-edit-contact"
+                                    aria-label="Editar contacto"
+                                    data-update-action="{{ route('comercio.contacts.update', $contact) }}"
+                                    data-first-name="{{ $contact->first_name }}"
+                                    data-last-name-paternal="{{ $contact->last_name_paternal }}"
+                                    data-last-name-maternal="{{ $contact->last_name_maternal }}"
+                                    data-street="{{ $contact->street }}"
+                                    data-neighborhood="{{ $contact->neighborhood }}"
+                                    data-postal-code="{{ $contact->postal_code }}"
+                                    data-state="{{ $contact->state }}"
+                                    data-phone="{{ $contact->phone }}"
+                                    data-email="{{ $contact->email }}"
+                                    data-phone-verified="{{ $contact->phone_verified_at ? '1' : '0' }}"
+                                    data-email-verified="{{ $contact->email_verified_at ? '1' : '0' }}"
+                                >
+                                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                                        <path d="M12 20h9"></path>
+                                        <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4 11.5-11.5Z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <form
+                                method="POST"
+                                action="{{ route('comercio.contacts.primary', $contact) }}"
+                                class="commerce-contact-card__main {{ $contactIsComplete ? '' : 'is-disabled' }}"
+                                data-contact-complete="{{ $contactIsComplete ? '1' : '0' }}"
+                            >
+                                <?php echo csrf_field(); ?>
+                                <?php echo method_field('PATCH'); ?>
+
+                                <label title="{{ $contactIsComplete ? 'Guardar como contacto principal' : 'Completa todos los datos antes de marcarlo como principal' }}">
+                                    <input
+                                        type="checkbox"
+                                        onchange="{{ $contactIsComplete ? 'this.form.submit()' : 'return false' }}"
+                                        <?php echo $contact->is_primary ? 'checked' : ''; ?>
+                                        <?php echo $contactIsComplete ? '' : 'disabled'; ?>
+                                    >
+                                    <span>Guardar como contacto principal</span>
+                                </label>
+                            </form>
+                        </article>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </div>
         </div>
 
@@ -797,7 +882,7 @@
             });
         })();
 
-        (() => {
+                (() => {
             const form = document.getElementById('commerceContactForm');
 
             if (!form) {
@@ -814,6 +899,8 @@
             const emailVerifiedInput = document.getElementById('email_verified');
             const phoneHint = document.getElementById('phoneHint');
             const emailHint = document.getElementById('emailHint');
+            const locateButton = document.getElementById('locateContactButton');
+            const locationHint = document.getElementById('contactLocationHint');
 
             const fields = {
                 first_name: document.getElementById('first_name'),
@@ -833,6 +920,16 @@
                 element.classList.toggle('is-invalid', !valid);
             };
 
+            const showLocationHint = (message, valid = null) => {
+                if (!locationHint) {
+                    return;
+                }
+
+                locationHint.textContent = message;
+                locationHint.classList.toggle('is-valid', valid === true);
+                locationHint.classList.toggle('is-invalid', valid === false);
+            };
+
             const normalizePhone = () => {
                 phoneInput.value = phoneInput.value.replace(/\D+/g, '').slice(0, 10);
                 phoneVerifiedInput.value = '0';
@@ -846,8 +943,171 @@
                 emailHint.className = 'commerce-field__hint';
             };
 
+            const clearContactForm = () => {
+                form.action = form.dataset.storeAction;
+                methodInput.value = 'POST';
+                saveButton.textContent = 'Guardar';
+                resetButton.hidden = true;
+
+                Object.values(fields).forEach((field) => {
+                    field.value = '';
+                });
+
+                phoneVerifiedInput.value = '0';
+                emailVerifiedInput.value = '0';
+                phoneHint.textContent = '';
+                emailHint.textContent = '';
+                phoneHint.className = 'commerce-field__hint';
+                emailHint.className = 'commerce-field__hint';
+                showLocationHint('');
+            };
+
+            const normalizeText = (value) => {
+                return String(value || '')
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '')
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]+/g, '_')
+                    .replace(/^_+|_+$/g, '');
+            };
+
+            const stateAliases = {
+                aguascalientes: 'aguascalientes',
+                baja_california: 'baja_california',
+                baja_california_sur: 'baja_california_sur',
+                campeche: 'campeche',
+                chiapas: 'chiapas',
+                chihuahua: 'chihuahua',
+                ciudad_de_mexico: 'ciudad_de_mexico',
+                cdmx: 'ciudad_de_mexico',
+                mexico_city: 'ciudad_de_mexico',
+                coahuila: 'coahuila',
+                coahuila_de_zaragoza: 'coahuila',
+                colima: 'colima',
+                durango: 'durango',
+                estado_de_mexico: 'estado_de_mexico',
+                mexico_state: 'estado_de_mexico',
+                guanajuato: 'guanajuato',
+                guerrero: 'guerrero',
+                hidalgo: 'hidalgo',
+                jalisco: 'jalisco',
+                michoacan: 'michoacan',
+                michoacan_de_ocampo: 'michoacan',
+                morelos: 'morelos',
+                nayarit: 'nayarit',
+                nuevo_leon: 'nuevo_leon',
+                oaxaca: 'oaxaca',
+                puebla: 'puebla',
+                queretaro: 'queretaro',
+                quintana_roo: 'quintana_roo',
+                san_luis_potosi: 'san_luis_potosi',
+                sinaloa: 'sinaloa',
+                sonora: 'sonora',
+                tabasco: 'tabasco',
+                tamaulipas: 'tamaulipas',
+                tlaxcala: 'tlaxcala',
+                veracruz: 'veracruz',
+                veracruz_de_ignacio_de_la_llave: 'veracruz',
+                yucatan: 'yucatan',
+                zacatecas: 'zacatecas',
+            };
+
+            const selectStateFromText = (stateText) => {
+                const normalized = normalizeText(stateText);
+                const stateKey = stateAliases[normalized] || normalized;
+
+                if (!stateKey) {
+                    return;
+                }
+
+                const option = Array.from(fields.state.options).find((item) => item.value === stateKey);
+
+                if (option) {
+                    fields.state.value = option.value;
+                }
+            };
+
+            const fillAddressFromGeocode = (address) => {
+                const streetParts = [
+                    address.road,
+                    address.pedestrian,
+                    address.footway,
+                    address.house_number,
+                ].filter(Boolean);
+
+                const neighborhood = address.neighbourhood
+                    || address.suburb
+                    || address.city_district
+                    || address.quarter
+                    || address.village
+                    || '';
+
+                fields.street.value = streetParts.join(' ').trim();
+                fields.neighborhood.value = neighborhood;
+                fields.postal_code.value = address.postcode || '';
+
+                selectStateFromText(address.state || address.region || '');
+            };
+
+            const useCurrentLocation = () => {
+                if (!navigator.geolocation) {
+                    showLocationHint('Tu navegador no permite geolocalización.', false);
+                    return;
+                }
+
+                locateButton.disabled = true;
+                locateButton.classList.add('is-loading');
+                showLocationHint('Obteniendo ubicación...', null);
+
+                navigator.geolocation.getCurrentPosition(async (position) => {
+                    const { latitude, longitude } = position.coords;
+
+                    try {
+                        const url = new URL('https://nominatim.openstreetmap.org/reverse');
+                        url.searchParams.set('format', 'jsonv2');
+                        url.searchParams.set('lat', latitude);
+                        url.searchParams.set('lon', longitude);
+                        url.searchParams.set('addressdetails', '1');
+
+                        const response = await fetch(url.toString(), {
+                            headers: {
+                                Accept: 'application/json',
+                            },
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('No se pudo consultar la dirección.');
+                        }
+
+                        const data = await response.json();
+                        fillAddressFromGeocode(data.address || {});
+                        showLocationHint('Dirección detectada. Revisa y ajusta los datos antes de guardar.', true);
+                    } catch (error) {
+                        fields.street.value = `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+                        showLocationHint('No se pudo convertir la ubicación a dirección. Guardamos las coordenadas en calle para que las ajustes.', false);
+                    } finally {
+                        locateButton.disabled = false;
+                        locateButton.classList.remove('is-loading');
+                    }
+                }, () => {
+                    locateButton.disabled = false;
+                    locateButton.classList.remove('is-loading');
+                    showLocationHint('Permiso de ubicación rechazado o no disponible.', false);
+                }, {
+                    enableHighAccuracy: true,
+                    timeout: 12000,
+                    maximumAge: 0,
+                });
+            };
+
+            clearContactForm();
+
             phoneInput.addEventListener('input', normalizePhone);
             emailInput.addEventListener('input', normalizeEmail);
+
+            if (locateButton) {
+                locateButton.addEventListener('click', useCurrentLocation);
+            }
 
             document.getElementById('verifyPhoneButton').addEventListener('click', () => {
                 normalizePhone();
@@ -910,6 +1170,7 @@
 
                     saveButton.textContent = 'Actualizar';
                     resetButton.hidden = false;
+                    showLocationHint('');
 
                     form.scrollIntoView({
                         behavior: 'smooth',
@@ -918,21 +1179,7 @@
                 });
             });
 
-            resetButton.addEventListener('click', () => {
-                form.action = form.dataset.storeAction;
-                methodInput.value = 'POST';
-                saveButton.textContent = 'Guardar';
-                resetButton.hidden = true;
-
-                form.reset();
-
-                phoneVerifiedInput.value = '0';
-                emailVerifiedInput.value = '0';
-                phoneHint.textContent = '';
-                emailHint.textContent = '';
-                phoneHint.className = 'commerce-field__hint';
-                emailHint.className = 'commerce-field__hint';
-            });
+            resetButton.addEventListener('click', clearContactForm);
         })();
 
         (() => {

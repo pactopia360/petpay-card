@@ -19,6 +19,14 @@ class CommerceContactController extends Controller
 
         $isPrimary = $request->boolean('is_primary');
 
+        if ($isPrimary && ! $this->validatedContactIsComplete($validated)) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'is_primary' => 'No puedes marcar como principal un contacto con datos faltantes.',
+                ]);
+        }
+
         if ($isPrimary) {
             $this->clearPrimaryContact((int) $commerce->id);
         }
@@ -53,6 +61,14 @@ class CommerceContactController extends Controller
         $validated = $this->validateContact($request);
 
         $isPrimary = $request->boolean('is_primary');
+
+        if ($isPrimary && ! $this->validatedContactIsComplete($validated)) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'is_primary' => 'No puedes marcar como principal un contacto con datos faltantes.',
+                ]);
+        }
 
         if ($isPrimary) {
             $this->clearPrimaryContact((int) $commerce->id, (int) $contact->id);
@@ -97,6 +113,14 @@ class CommerceContactController extends Controller
 
         abort_unless((int) $contact->commerce_user_id === (int) $commerce->id, 403);
 
+        if (! $this->contactIsComplete($contact)) {
+            return redirect()
+                ->route('comercio.dashboard')
+                ->withErrors([
+                    'is_primary' => 'No puedes marcar como principal un contacto con datos faltantes.',
+                ]);
+        }
+
         $this->clearPrimaryContact((int) $commerce->id, (int) $contact->id);
 
         $contact->forceFill([
@@ -128,6 +152,38 @@ class CommerceContactController extends Controller
             'email.email' => 'Ingresa un correo electrónico válido.',
             'state.in' => 'Selecciona un estado válido.',
         ]);
+    }
+
+    private function validatedContactIsComplete(array $validated): bool
+    {
+        $requiredFields = [
+            'first_name',
+            'street',
+            'neighborhood',
+            'postal_code',
+            'state',
+            'phone',
+            'email',
+        ];
+
+        foreach ($requiredFields as $field) {
+            if (! filled($validated[$field] ?? null)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function contactIsComplete(CommerceContact $contact): bool
+    {
+        return filled($contact->first_name)
+            && filled($contact->street)
+            && filled($contact->neighborhood)
+            && filled($contact->postal_code)
+            && filled($contact->state)
+            && filled($contact->phone)
+            && filled($contact->email);
     }
 
     private function clearPrimaryContact(int $commerceId, ?int $exceptContactId = null): void

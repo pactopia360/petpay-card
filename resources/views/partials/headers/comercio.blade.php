@@ -18,8 +18,11 @@
 
 <header class="commerce-shell-header">
     <a href="{{ route('comercio.dashboard') }}" class="commerce-shell-header__brand" aria-label="PETPAY Comercio">
-        <span class="commerce-shell-header__brand-mark">🐾</span>
-        <span class="commerce-shell-header__brand-text">PETPAY-CARD</span>
+        <img
+            src="{{ asset('assets/petpay-card/img/public/Logo-petpay.png') }}"
+            alt="Petpay"
+            class="commerce-shell-header__logo"
+        >
     </a>
 
     <div class="commerce-shell-header__actions">

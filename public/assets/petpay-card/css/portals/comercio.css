@@ -2537,3 +2537,153 @@ body {
         display: none !important;
     }
 }
+
+/* ==========================================================================
+   COMERCIO HEADER - PETPAY LOGO
+   ========================================================================== */
+
+.commerce-shell-header__brand {
+    display: inline-flex !important;
+    align-items: center !important;
+    height: 54px !important;
+    min-height: 54px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    text-decoration: none !important;
+}
+
+.commerce-shell-header__brand-mark,
+.commerce-shell-header__brand-text {
+    display: none !important;
+}
+
+.commerce-shell-header__logo {
+    display: block !important;
+    width: auto !important;
+    height: 30px !important;
+    max-width: 150px !important;
+    object-fit: contain !important;
+}
+
+@media (max-width: 520px) {
+    .commerce-shell-header__logo {
+        height: 26px !important;
+        max-width: 130px !important;
+    }
+}
+
+/* ==========================================================================
+   COMERCIO CONTACT BUSINESS RULES / LOCATION
+   ========================================================================== */
+
+.commerce-fieldset__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.commerce-fieldset__header .commerce-fieldset__legend {
+    margin: 0;
+}
+
+.commerce-location-button {
+    display: inline-grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border: 1px solid #d5d0c7;
+    border-radius: 8px;
+    background: #f4efe3;
+    color: #4f5865;
+    cursor: pointer;
+}
+
+.commerce-location-button:hover {
+    background: #eee8dc;
+    color: #001b44;
+}
+
+.commerce-location-button:disabled {
+    cursor: wait;
+    opacity: 0.72;
+}
+
+.commerce-location-button svg {
+    width: 17px;
+    height: 17px;
+    stroke: currentColor;
+}
+
+.commerce-location-button.is-loading svg {
+    animation: commerceLocationPulse 0.85s ease-in-out infinite alternate;
+}
+
+@keyframes commerceLocationPulse {
+    from {
+        transform: scale(0.92);
+        opacity: 0.55;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.commerce-location-hint {
+    display: block;
+    min-height: 16px;
+    margin: -4px 0 12px;
+    color: #6b7280;
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+
+.commerce-location-hint.is-valid {
+    color: #067647;
+}
+
+.commerce-location-hint.is-invalid {
+    color: #b42318;
+}
+
+.commerce-contact-card.is-incomplete {
+    border-color: rgba(180, 35, 24, 0.28);
+}
+
+.commerce-contact-card__alert {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: 8px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: #fee4e2;
+    color: #b42318;
+    font-size: 0.68rem;
+    font-weight: 800;
+    vertical-align: middle;
+}
+
+.commerce-contact-card__alert svg {
+    width: 13px;
+    height: 13px;
+    stroke: currentColor;
+}
+
+.commerce-contact-card__missing {
+    margin-top: 8px !important;
+    color: #b42318 !important;
+    font-size: 0.78rem !important;
+}
+
+.commerce-contact-card__main.is-disabled {
+    opacity: 0.58;
+    cursor: not-allowed;
+}
+
+.commerce-contact-card__main.is-disabled label,
+.commerce-contact-card__main.is-disabled input {
+    cursor: not-allowed;
+}
