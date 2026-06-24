@@ -56,3 +56,31 @@
         </div>
     </div>
 </header>
+
+<script>
+    (() => {
+        const accountMenu = document.querySelector('.commerce-shell-account__menu');
+
+        if (!accountMenu) {
+            return;
+        }
+
+        document.addEventListener('click', (event) => {
+            if (!accountMenu.open) {
+                return;
+            }
+
+            if (accountMenu.contains(event.target)) {
+                return;
+            }
+
+            accountMenu.open = false;
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                accountMenu.open = false;
+            }
+        });
+    })();
+</script>
