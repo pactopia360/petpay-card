@@ -2687,3 +2687,757 @@ body {
 .commerce-contact-card__main.is-disabled input {
     cursor: not-allowed;
 }
+
+/* ==========================================================================
+   PETPAY COMERCIO - KPI + BLOQUES DE INFORMACIÓN
+   Pegar al final del archivo
+   ========================================================================== */
+
+.commerce-kpis {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+    margin: 0 0 28px;
+}
+
+.commerce-kpi-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 94px;
+    padding: 16px 18px;
+    border: 1px solid #d9d1c5;
+    border-radius: 14px;
+    background: #f9f7f2;
+    box-shadow: 0 3px 10px rgba(20, 26, 40, 0.04);
+}
+
+.commerce-kpi-card__label {
+    display: block;
+    margin-bottom: 10px;
+    color: #556173;
+    font-size: 0.90rem;
+    font-weight: 500;
+    line-height: 1.15;
+}
+
+.commerce-kpi-card__value {
+    display: block;
+    color: #071833;
+    font-size: 1.85rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.04em;
+}
+
+.commerce-info-block {
+    margin: 0 0 18px;
+    padding: 0;
+    border: 1px solid #d9d1c5;
+    border-radius: 14px;
+    background: #f9f7f2;
+    box-shadow: 0 3px 10px rgba(20, 26, 40, 0.04);
+    overflow: hidden;
+}
+
+.commerce-info-block__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 18px 18px 14px;
+    border-bottom: 1px solid #e7dfd3;
+}
+
+.commerce-info-block__content {
+    min-width: 0;
+}
+
+.commerce-info-block__title {
+    margin: 0 0 4px;
+    color: #4c596f;
+    font-size: 1.05rem;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+}
+
+.commerce-info-block__subtitle {
+    margin: 0;
+    color: #6d7683;
+    font-size: 0.82rem;
+    font-weight: 500;
+    line-height: 1.35;
+}
+
+.commerce-info-block__meta {
+    min-width: 220px;
+    text-align: right;
+}
+
+.commerce-info-block__meta-main {
+    display: block;
+    color: #071833;
+    font-size: 0.98rem;
+    font-weight: 800;
+    line-height: 1.15;
+}
+
+.commerce-info-block__meta-sub {
+    display: block;
+    margin-top: 4px;
+    color: #6d7683;
+    font-size: 0.78rem;
+    font-weight: 500;
+    line-height: 1.3;
+}
+
+.commerce-info-block .commerce-admin__form {
+    padding: 18px;
+}
+
+.commerce-info-block .commerce-contacts {
+    margin-top: 0;
+    padding: 18px;
+}
+
+.commerce-contact-card {
+    position: relative;
+    min-height: auto;
+    padding: 18px 18px 54px;
+    border: 1px solid #ddd5c9;
+    border-radius: 14px;
+    background: #fffdfa;
+    box-shadow: 0 2px 8px rgba(20, 26, 40, 0.03);
+}
+
+.commerce-contact-card__top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 12px;
+}
+
+.commerce-contact-card__title {
+    margin: 0;
+    color: #0d1b34;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.commerce-contact-card__badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 8px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #e9f2ff;
+    color: #35527b;
+    font-size: 0.70rem;
+    font-weight: 800;
+    vertical-align: middle;
+}
+
+.commerce-contact-card__body {
+    display: grid;
+    gap: 8px;
+    color: #0d1b34;
+    font-size: 0.87rem;
+    line-height: 1.3;
+}
+
+.commerce-contact-card__actions {
+    position: static;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.commerce-contact-card__main {
+    position: absolute;
+    right: 18px;
+    bottom: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #6f7277;
+    font-size: 0.74rem;
+}
+
+.commerce-contact-card__main label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.commerce-verified {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 8px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: #dcfae6;
+    color: #067647;
+    font-size: 0.66rem;
+    font-weight: 800;
+    vertical-align: middle;
+}
+
+@media (max-width: 1024px) {
+    .commerce-kpis {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 860px) {
+    .commerce-info-block__header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .commerce-info-block__meta {
+        min-width: 0;
+        text-align: left;
+    }
+
+    .commerce-contact-card__top {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .commerce-contact-card__main {
+        position: static;
+        margin-top: 14px;
+    }
+}
+
+@media (max-width: 640px) {
+    .commerce-kpis {
+        grid-template-columns: 1fr;
+    }
+
+    .commerce-info-block .commerce-admin__form,
+    .commerce-info-block .commerce-contacts {
+        padding: 14px;
+    }
+
+    .commerce-info-block__header {
+        padding: 16px 14px 12px;
+    }
+
+    .commerce-kpi-card {
+        min-height: 84px;
+        padding: 14px 16px;
+    }
+
+    .commerce-kpi-card__value {
+        font-size: 1.55rem;
+    }
+}
+
+/* ==========================================================================
+   PETPAY COMERCIO - FILTRO USUARIOS
+   ========================================================================== */
+
+.commerce-filter-block {
+    margin: 0 0 18px;
+    padding: 16px 18px;
+    border: 1px solid #d9d1c5;
+    border-radius: 14px;
+    background: #f9f7f2;
+    box-shadow: 0 3px 10px rgba(20, 26, 40, 0.04);
+}
+
+.commerce-filter-grid {
+    display: grid;
+    grid-template-columns: minmax(220px, 1.25fr) 130px 150px 150px 130px 160px;
+    gap: 14px;
+    align-items: end;
+}
+
+.commerce-filter-field {
+    display: grid;
+    gap: 8px;
+    min-width: 0;
+}
+
+.commerce-filter-field>span {
+    color: #071833;
+    font-size: 0.86rem;
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+.commerce-filter-field input,
+.commerce-filter-field select {
+    width: 100%;
+    height: 40px;
+    border: 1px solid #d1c9bd;
+    border-radius: 7px;
+    background: #ffffff;
+    color: #071833;
+    padding: 0 13px;
+    font: inherit;
+    font-size: 0.86rem;
+    font-weight: 500;
+    outline: none;
+}
+
+.commerce-filter-field input::placeholder {
+    color: #9b9ca5;
+    font-weight: 400;
+}
+
+.commerce-filter-field input:focus,
+.commerce-filter-field select:focus {
+    border-color: #9fc7ec;
+    box-shadow: 0 0 0 3px rgba(159, 199, 236, 0.18);
+}
+
+.commerce-filter-search {
+    position: relative;
+    display: block;
+}
+
+.commerce-filter-search input {
+    padding-right: 42px;
+}
+
+.commerce-filter-search svg {
+    position: absolute;
+    top: 50%;
+    right: 13px;
+    width: 18px;
+    height: 18px;
+    color: #4f5865;
+    stroke: currentColor;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.commerce-filter-download {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    width: 100%;
+    height: 40px;
+    border: 0;
+    border-radius: 8px;
+    background: #555c66;
+    color: #ffffff;
+    font-size: 0.86rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.commerce-filter-download:hover {
+    filter: brightness(0.96);
+}
+
+.commerce-filter-download svg {
+    width: 17px;
+    height: 17px;
+    stroke: currentColor;
+}
+
+.commerce-filter-empty {
+    margin: 14px 0 0;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: #fff0e5;
+    color: #9a3412;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+@media (max-width: 1100px) {
+    .commerce-filter-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .commerce-filter-field--search {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 720px) {
+    .commerce-filter-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ==========================================================================
+   COMERCIO KPI - COMPACTO
+   ========================================================================== */
+
+.commerce-kpis {
+    gap: 12px !important;
+    margin: 0 0 22px !important;
+}
+
+.commerce-kpi-card {
+    min-height: 68px !important;
+    padding: 12px 16px !important;
+    border-radius: 12px !important;
+}
+
+.commerce-kpi-card__label {
+    margin-bottom: 8px !important;
+    font-size: 0.78rem !important;
+    line-height: 1.1 !important;
+}
+
+.commerce-kpi-card__value {
+    font-size: 1.32rem !important;
+    line-height: 1.05 !important;
+    letter-spacing: -0.04em !important;
+}
+
+@media (max-width: 640px) {
+    .commerce-kpi-card {
+        min-height: 62px !important;
+        padding: 11px 14px !important;
+    }
+
+    .commerce-kpi-card__value {
+        font-size: 1.18rem !important;
+    }
+}
+
+/* ==========================================================================
+   COMERCIO - BLOQUES TIPO PERSIANA + LISTADO PAGINADO
+   ========================================================================== */
+
+.commerce-info-block {
+    overflow: hidden !important;
+}
+
+.commerce-info-block__header {
+    position: relative !important;
+    align-items: center !important;
+    cursor: pointer !important;
+    user-select: none !important;
+}
+
+.commerce-info-block__header:hover {
+    background: rgba(255, 255, 255, 0.32) !important;
+}
+
+.commerce-info-block__toggle {
+    display: inline-grid !important;
+    place-items: center !important;
+    width: 30px !important;
+    height: 30px !important;
+    margin-left: 12px !important;
+    border: 1px solid #d5cec2 !important;
+    border-radius: 999px !important;
+    background: #f4efe3 !important;
+    color: #4f5865 !important;
+    cursor: pointer !important;
+    flex: 0 0 auto !important;
+    transition:
+        transform 0.18s ease,
+        background 0.18s ease,
+        color 0.18s ease !important;
+}
+
+.commerce-info-block__toggle:hover {
+    background: #eee8dc !important;
+    color: #001b44 !important;
+}
+
+.commerce-info-block__toggle svg {
+    width: 16px !important;
+    height: 16px !important;
+    stroke: currentColor !important;
+    transition: transform 0.22s ease !important;
+}
+
+.commerce-info-block.is-open .commerce-info-block__toggle svg {
+    transform: rotate(180deg) !important;
+}
+
+.commerce-info-block__body {
+    display: grid !important;
+    grid-template-rows: 0fr !important;
+    opacity: 0 !important;
+    transition:
+        grid-template-rows 0.26s ease,
+        opacity 0.20s ease !important;
+}
+
+.commerce-info-block.is-open .commerce-info-block__body {
+    grid-template-rows: 1fr !important;
+    opacity: 1 !important;
+}
+
+.commerce-info-block__body-inner {
+    min-height: 0 !important;
+    overflow: hidden !important;
+}
+
+.commerce-info-block.is-open .commerce-info-block__body-inner {
+    overflow: visible !important;
+}
+
+.commerce-info-block:not(.is-open) {
+    margin-bottom: 12px !important;
+}
+
+.commerce-info-block:not(.is-open) .commerce-info-block__header {
+    border-bottom: 0 !important;
+}
+
+/* Listado paginado de contactos */
+
+.commerce-contacts {
+    display: grid !important;
+    gap: 10px !important;
+}
+
+.commerce-contact-card {
+    min-height: auto !important;
+    padding: 14px 16px 48px !important;
+}
+
+.commerce-contact-card__top {
+    margin-bottom: 8px !important;
+}
+
+.commerce-contact-card__body {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 6px 18px !important;
+    font-size: 0.80rem !important;
+}
+
+.commerce-contact-card__body p {
+    min-width: 0 !important;
+}
+
+.commerce-contact-card__body p:nth-child(2) {
+    grid-column: 1 / -1 !important;
+}
+
+.commerce-contact-pagination {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    margin: 14px 18px 18px !important;
+    padding: 10px 12px !important;
+    border: 1px solid #ddd5c9 !important;
+    border-radius: 12px !important;
+    background: #fffdfa !important;
+}
+
+.commerce-contact-pagination__info {
+    color: #4f5865 !important;
+    font-size: 0.76rem !important;
+    font-weight: 700 !important;
+}
+
+.commerce-contact-pagination__actions {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+}
+
+.commerce-contact-pagination__button {
+    min-width: 34px !important;
+    height: 32px !important;
+    padding: 0 10px !important;
+    border: 1px solid #d5cec2 !important;
+    border-radius: 9px !important;
+    background: #f4efe3 !important;
+    color: #001b44 !important;
+    font-size: 0.76rem !important;
+    font-weight: 800 !important;
+    cursor: pointer !important;
+}
+
+.commerce-contact-pagination__button:hover:not(:disabled),
+.commerce-contact-pagination__button.is-active {
+    background: #555c66 !important;
+    color: #ffffff !important;
+    border-color: #555c66 !important;
+}
+
+.commerce-contact-pagination__button:disabled {
+    opacity: 0.42 !important;
+    cursor: not-allowed !important;
+}
+
+@media (max-width: 760px) {
+    .commerce-info-block__header {
+        align-items: flex-start !important;
+    }
+
+    .commerce-info-block__toggle {
+        margin-left: auto !important;
+    }
+
+    .commerce-contact-card__body {
+        grid-template-columns: 1fr !important;
+    }
+
+    .commerce-contact-pagination {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+
+    .commerce-contact-pagination__actions {
+        justify-content: space-between !important;
+    }
+}
+
+/* ==========================================================================
+   COMERCIO - BLOQUE CONTACTOS COMO PERSIANA
+   ========================================================================== */
+
+.commerce-info-block--contacts .commerce-info-block__content-area {
+    padding: 18px !important;
+}
+
+.commerce-info-block--contacts .commerce-filter-block {
+    margin: 0 0 16px !important;
+}
+
+.commerce-info-block--contacts .commerce-contacts {
+    margin-top: 0 !important;
+    padding: 0 !important;
+}
+
+.commerce-info-block--contacts .commerce-contact-pagination {
+    margin: 14px 0 0 !important;
+}
+
+.commerce-info-block:not(.is-open) .commerce-contact-pagination {
+    display: none !important;
+}
+
+.commerce-info-block--contacts .commerce-info-block__meta {
+    pointer-events: none !important;
+}
+
+/* ==========================================================================
+   COMERCIO - ALINEACION FILA TELEFONO / CORREO / GUARDAR
+   ========================================================================== */
+
+.commerce-admin__grid--bottom {
+    align-items: end !important;
+}
+
+.commerce-admin__grid--bottom .commerce-field {
+    display: grid !important;
+    align-content: end !important;
+    min-height: 72px !important;
+}
+
+.commerce-admin__grid--bottom .commerce-field>span:first-child {
+    display: block !important;
+    min-height: 20px !important;
+    margin-bottom: 6px !important;
+}
+
+.commerce-admin__grid--bottom .commerce-verify {
+    height: 42px !important;
+}
+
+.commerce-admin__grid--bottom .commerce-verify input {
+    height: 42px !important;
+}
+
+.commerce-admin__grid--bottom .commerce-admin__save {
+    height: 42px !important;
+    align-self: end !important;
+    margin: 0 !important;
+    transform: none !important;
+}
+
+.commerce-admin__grid--bottom .commerce-field__hint {
+    display: none !important;
+}
+
+/* ==========================================================================
+   COMERCIO - FIX DEFINITIVO ALINEACION BOTON GUARDAR CON INPUTS
+   ========================================================================== */
+
+.commerce-admin__grid--bottom {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 1fr !important;
+    align-items: start !important;
+    column-gap: 24px !important;
+}
+
+.commerce-admin__grid--bottom>.commerce-field {
+    display: block !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+}
+
+.commerce-admin__grid--bottom>.commerce-field>span:first-child {
+    display: block !important;
+    height: 20px !important;
+    min-height: 20px !important;
+    margin: 0 0 8px !important;
+    padding: 0 !important;
+    line-height: 20px !important;
+}
+
+.commerce-admin__grid--bottom .commerce-verify,
+.commerce-admin__grid--bottom .commerce-verify input,
+.commerce-admin__grid--bottom .commerce-admin__save {
+    height: 42px !important;
+    min-height: 42px !important;
+    max-height: 42px !important;
+}
+
+.commerce-admin__grid--bottom .commerce-admin__save {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    align-self: start !important;
+    margin-top: 28px !important;
+    padding: 0 18px !important;
+    line-height: 42px !important;
+}
+
+.commerce-admin__grid--bottom .commerce-field__hint {
+    display: none !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+}
+
+/* ==========================================================================
+   COMERCIO - REPORTE EXCEL CONTACTOS
+   ========================================================================== */
+
+.commerce-filter-download:disabled {
+    opacity: 0.48 !important;
+    cursor: not-allowed !important;
+    filter: grayscale(0.15) !important;
+}
+
+/* ==========================================================================
+   COMERCIO - CONTACT CARD DATOS EN LISTADO VERTICAL
+   ========================================================================== */
+
+.commerce-contact-card__body {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 6px !important;
+}
+
+.commerce-contact-card__body p {
+    grid-column: 1 / -1 !important;
+    margin: 0 !important;
+}
+
+.commerce-contact-card__body p:nth-child(2) {
+    grid-column: 1 / -1 !important;
+}

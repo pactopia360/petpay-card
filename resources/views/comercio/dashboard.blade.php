@@ -1,11 +1,31 @@
 @extends('layouts.app')
 
-@php($portal = 'comercio')
+@php
+    $portal = 'comercio';
+
+    $contactsCollection = collect($contacts ?? []);
+    $contactsCount = $contactsCollection->count();
+
+    $verifiedPhonesCount = $contactsCollection->filter(function ($contact) {
+        return ! empty($contact->phone_verified_at);
+    })->count();
+
+    $verifiedEmailsCount = $contactsCollection->filter(function ($contact) {
+        return ! empty($contact->email_verified_at);
+    })->count();
+
+    $primaryContact = $contactsCollection->firstWhere('is_primary', true);
+    $latestContactUpdate = $contactsCollection->sortByDesc('updated_at')->first();
+
+    $latestContactUpdateLabel = ($latestContactUpdate && ! empty($latestContactUpdate->updated_at))
+        ? $latestContactUpdate->updated_at->format('d M Y')
+        : 'Sin registros';
+@endphp
 
 @section('title', 'PETPAY-CARD | Panel administrador de comercio')
 
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/petpay-card/css/portals/comercio.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/petpay-card/css/portals/comercio.css') }}?v=20260624">
 @endpush
 
 @section('content')
@@ -72,349 +92,471 @@
                 <p>Alta, baja o modificación de usuarios.</p>
             </div>
 
-            <form
-                id="commerceContactForm"
-                class="commerce-admin__form"
-                method="POST"
-                action="{{ route('comercio.contacts.store') }}"
-                data-store-action="{{ route('comercio.contacts.store') }}"
-            >
-                @csrf
+            @php
+                $contactsKpiCollection = collect($contacts ?? []);
 
-                <input type="hidden" name="_method" id="commerceContactMethod" value="POST">
-                <input type="hidden" name="phone_verified" id="phone_verified" value="0">
-                <input type="hidden" name="email_verified" id="email_verified" value="0">
+                $contactsKpiCount = $contactsKpiCollection->count();
 
-                <div class="commerce-admin__grid commerce-admin__grid--three">
-                    <label class="commerce-field">
-                        <span>Nombre</span>
-                        <input
-                            id="first_name"
-                            type="text"
-                            name="first_name"
-                            value="{{ old('first_name') }}"
-                            autocomplete="given-name"
-                            required
-                        >
-                    </label>
+                $contactsKpiVerifiedPhones = $contactsKpiCollection->filter(function ($contact) {
+                    return ! empty($contact->phone_verified_at);
+                })->count();
 
-                    <label class="commerce-field">
-                        <span>Apellido paterno</span>
-                        <input
-                            id="last_name_paternal"
-                            type="text"
-                            name="last_name_paternal"
-                            value="{{ old('last_name_paternal') }}"
-                            autocomplete="family-name"
-                        >
-                    </label>
+                $contactsKpiVerifiedEmails = $contactsKpiCollection->filter(function ($contact) {
+                    return ! empty($contact->email_verified_at);
+                })->count();
 
-                    <label class="commerce-field">
-                        <span>Apellido materno</span>
-                        <input
-                            id="last_name_maternal"
-                            type="text"
-                            name="last_name_maternal"
-                            value="{{ old('last_name_maternal') }}"
-                            autocomplete="additional-name"
-                        >
-                    </label>
+                $contactsKpiLatestUpdate = $contactsKpiCollection->sortByDesc('updated_at')->first();
+
+                $contactsKpiLatestUpdateLabel = ($contactsKpiLatestUpdate && ! empty($contactsKpiLatestUpdate->updated_at))
+                    ? $contactsKpiLatestUpdate->updated_at->format('d M Y')
+                    : 'Sin registros';
+            @endphp
+
+            <section class="commerce-kpis" aria-label="Indicadores del módulo de usuarios">
+                <article class="commerce-kpi-card">
+                    <span class="commerce-kpi-card__label">Contactos registrados</span>
+                    <strong class="commerce-kpi-card__value">{{ $contactsKpiCount }}</strong>
+                </article>
+
+                <article class="commerce-kpi-card">
+                    <span class="commerce-kpi-card__label">Teléfonos verificados</span>
+                    <strong class="commerce-kpi-card__value">{{ $contactsKpiVerifiedPhones }}</strong>
+                </article>
+
+                <article class="commerce-kpi-card">
+                    <span class="commerce-kpi-card__label">Correos verificados</span>
+                    <strong class="commerce-kpi-card__value">{{ $contactsKpiVerifiedEmails }}</strong>
+                </article>
+
+                <article class="commerce-kpi-card">
+                    <span class="commerce-kpi-card__label">Última actualización</span>
+                    <strong class="commerce-kpi-card__value">{{ $contactsKpiLatestUpdateLabel }}</strong>
+                </article>
+            </section>
+
+            <section class="commerce-info-block">
+                <div class="commerce-info-block__header">
+                    <div class="commerce-info-block__content">
+                        <h3 class="commerce-info-block__title">Registro de contacto administrativo</h3>
+                        <p class="commerce-info-block__subtitle">
+                            Captura la información del responsable o actualiza sus datos.
+                        </p>
+                    </div>
+
+                    <div class="commerce-info-block__meta">
+                        <strong class="commerce-info-block__meta-main">
+                            {{ isset($primaryContact) && $primaryContact ? 'Principal asignado' : 'Pendiente de principal' }}
+                        </strong>
+                        <span class="commerce-info-block__meta-sub">
+                            {{ isset($primaryContact) && $primaryContact ? $primaryContact->full_name : 'Aún no hay contacto principal' }}
+                        </span>
+                    </div>
                 </div>
 
-                <fieldset class="commerce-fieldset">
-                        <div class="commerce-fieldset__header">
-                            <legend class="commerce-fieldset__legend">Dirección de contacto</legend>
+                <form
+                    id="commerceContactForm"
+                    class="commerce-admin__form"
+                    method="POST"
+                    action="{{ route('comercio.contacts.store') }}"
+                    data-store-action="{{ route('comercio.contacts.store') }}"
+                >
+                    @csrf
 
-                            <button
-                                type="button"
-                                class="commerce-location-button"
-                                id="locateContactButton"
-                                title="Usar mi ubicación actual"
-                                aria-label="Usar mi ubicación actual"
-                            >
-                                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-                                    <path d="M12 21s7-4.8 7-11a7 7 0 1 0-14 0c0 6.2 7 11 7 11Z"></path>
-                                    <circle cx="12" cy="10" r="2.5"></circle>
-                                </svg>
-                            </button>
-                        </div>
+                    <input type="hidden" name="_method" id="commerceContactMethod" value="POST">
+                    <input type="hidden" name="phone_verified" id="phone_verified" value="0">
+                    <input type="hidden" name="email_verified" id="email_verified" value="0">
 
-                        <small class="commerce-location-hint" id="contactLocationHint"></small>
-
-                        <div class="commerce-admin__grid commerce-admin__grid--address">
+                    <div class="commerce-admin__grid commerce-admin__grid--three">
                         <label class="commerce-field">
+                            <span>Nombre</span>
                             <input
-                                id="street"
+                                id="first_name"
                                 type="text"
-                                name="street"
-                                value="{{ old('street') }}"
-                                placeholder="Calle y número"
-                                autocomplete="street-address"
+                                name="first_name"
+                                value="{{ old('first_name', $comercio->first_name ?? '') }}"
+                                autocomplete="given-name"
+                                required
                             >
                         </label>
 
                         <label class="commerce-field">
+                            <span>Apellido paterno</span>
                             <input
-                                id="neighborhood"
+                                id="last_name_paternal"
                                 type="text"
-                                name="neighborhood"
-                                value="{{ old('neighborhood') }}"
-                                placeholder="Colonia"
+                                name="last_name_paternal"
+                                value="{{ old('last_name_paternal', $comercio->last_name ?? '') }}"
+                                autocomplete="family-name"
                             >
                         </label>
 
                         <label class="commerce-field">
+                            <span>Apellido materno</span>
                             <input
-                                id="postal_code"
+                                id="last_name_maternal"
                                 type="text"
-                                name="postal_code"
-                                value="{{ old('postal_code') }}"
-                                placeholder="CP"
-                                inputmode="numeric"
-                                maxlength="12"
-                                autocomplete="postal-code"
+                                name="last_name_maternal"
+                                value="{{ old('last_name_maternal') }}"
+                                autocomplete="additional-name"
                             >
-                        </label>
-
-                        <label class="commerce-field">
-                            <select id="state" name="state" aria-label="Estado">
-                                <option value="">Estado</option>
-                                @foreach ($states as $stateKey => $stateName)
-                                    <option value="{{ $stateKey }}" @selected(old('state') === $stateKey)>
-                                        {{ $stateName }}
-                                    </option>
-                                @endforeach
-                            </select>
                         </label>
                     </div>
-                </fieldset>
 
-                <div class="commerce-admin__grid commerce-admin__grid--bottom">
-                    <label class="commerce-field">
-                        <span>Teléfono</span>
-                        <span class="commerce-verify">
-                            <input
-                                id="phone"
-                                type="tel"
-                                name="phone"
-                                value="{{ old('phone') }}"
-                                autocomplete="tel"
-                                inputmode="numeric"
-                                maxlength="10"
-                            >
-                            <button type="button" class="commerce-verify__button" id="verifyPhoneButton">
-                                Verifica teléfono
-                            </button>
+                    <fieldset class="commerce-fieldset">
+                        <legend class="commerce-fieldset__legend">Dirección de contacto</legend>
+
+                        <div class="commerce-admin__grid commerce-admin__grid--address">
+                            <label class="commerce-field">
+                                <input
+                                    id="street"
+                                    type="text"
+                                    name="street"
+                                    value="{{ old('street', $comercio->business_address ?? '') }}"
+                                    placeholder="Calle y número"
+                                    autocomplete="street-address"
+                                >
+                            </label>
+
+                            <label class="commerce-field">
+                                <input
+                                    id="neighborhood"
+                                    type="text"
+                                    name="neighborhood"
+                                    value="{{ old('neighborhood') }}"
+                                    placeholder="Colonia"
+                                >
+                            </label>
+
+                            <label class="commerce-field">
+                                <input
+                                    id="postal_code"
+                                    type="text"
+                                    name="postal_code"
+                                    value="{{ old('postal_code') }}"
+                                    placeholder="CP"
+                                    inputmode="numeric"
+                                    maxlength="12"
+                                    autocomplete="postal-code"
+                                >
+                            </label>
+
+                            <label class="commerce-field">
+                                <select id="state" name="state" aria-label="Estado">
+                                    <option value="">Estado</option>
+                                    @foreach ($states as $stateKey => $stateName)
+                                        <option value="{{ $stateKey }}" @selected(old('state') === $stateKey)>
+                                            {{ $stateName }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </label>
+                        </div>
+                    </fieldset>
+
+                    <div class="commerce-admin__grid commerce-admin__grid--bottom">
+                        <label class="commerce-field">
+                            <span>Teléfono</span>
+                            <span class="commerce-verify">
+                                <input
+                                    id="phone"
+                                    type="tel"
+                                    name="phone"
+                                    value="{{ old('phone', $comercio->phone ?? $comercio->business_phone ?? '') }}"
+                                    autocomplete="tel"
+                                    inputmode="numeric"
+                                    maxlength="10"
+                                >
+                                <button type="button" class="commerce-verify__button" id="verifyPhoneButton">
+                                    Verifica teléfono
+                                </button>
+                            </span>
+                            <small class="commerce-field__hint" id="phoneHint"></small>
+                        </label>
+
+                        <label class="commerce-field">
+                            <span>Correo electrónico</span>
+                            <span class="commerce-verify">
+                                <input
+                                    id="email"
+                                    type="email"
+                                    name="email"
+                                    value="{{ old('email', $comercio->email ?? $comercio->business_email ?? '') }}"
+                                    autocomplete="email"
+                                >
+                                <button type="button" class="commerce-verify__button" id="verifyEmailButton">
+                                    Verifica correo
+                                </button>
+                            </span>
+                            <small class="commerce-field__hint" id="emailHint"></small>
+                        </label>
+
+                        <button type="submit" class="commerce-admin__save" id="commerceSaveButton">
+                            Guardar
+                        </button>
+                    </div>
+
+                    <div class="commerce-form-actions">
+                        <button type="button" class="commerce-form-actions__reset" id="commerceResetButton" hidden>
+                            Cancelar edición
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="commerce-info-block commerce-info-block--contacts">
+                <div class="commerce-info-block__header">
+                    <div class="commerce-info-block__content">
+                        <h3 class="commerce-info-block__title">Contactos registrados</h3>
+                        <p class="commerce-info-block__subtitle">
+                            Consulta, filtra, edita o elimina los usuarios administrativos guardados.
+                        </p>
+                    </div>
+
+                    <div class="commerce-info-block__meta">
+                        <strong class="commerce-info-block__meta-main">{{ $contactsKpiCount }} registrados</strong>
+                        <span class="commerce-info-block__meta-sub">
+                            {{ isset($primaryContact) && $primaryContact ? 'Principal: ' . $primaryContact->full_name : 'Sin contacto principal' }}
                         </span>
-                        <small class="commerce-field__hint" id="phoneHint"></small>
+                    </div>
+                </div>
+
+                <div class="commerce-info-block__content-area">
+
+            <section class="commerce-filter-block" aria-label="Filtro de usuarios administrativos">
+                <div class="commerce-filter-grid">
+                    <label class="commerce-filter-field commerce-filter-field--search">
+                        <span>Buscar usuario o UUID</span>
+
+                        <span class="commerce-filter-search">
+                            <input
+                                type="search"
+                                id="commerceUserSearch"
+                                placeholder="Buscar por nombre, correo, teléfono o UUID"
+                                autocomplete="off"
+                            >
+
+                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true">
+                                <circle cx="11" cy="11" r="7"></circle>
+                                <path d="m20 20-3.5-3.5"></path>
+                            </svg>
+                        </span>
                     </label>
 
-                    <label class="commerce-field">
-                        <span>Correo electrónico</span>
-                        <span class="commerce-verify">
-                            <input
-                                id="email"
-                                type="email"
-                                name="email"
-                                value="{{ old('email') }}"
-                                autocomplete="email"
-                            >
-                            <button type="button" class="commerce-verify__button" id="verifyEmailButton">
-                                Verifica correo
-                            </button>
-                        </span>
-                        <small class="commerce-field__hint" id="emailHint"></small>
+                    <label class="commerce-filter-field">
+                        <span>Año</span>
+
+                        <select id="commerceUserYear">
+                            <option value="">Todos</option>
+                            <option value="{{ now()->year }}">{{ now()->year }}</option>
+                            <option value="{{ now()->subYear()->year }}">{{ now()->subYear()->year }}</option>
+                        </select>
                     </label>
 
-                    <button type="submit" class="commerce-admin__save" id="commerceSaveButton">
-                        Guardar
+                    <label class="commerce-filter-field">
+                        <span>Estatus</span>
+
+                        <select id="commerceUserStatus">
+                            <option value="">Todos</option>
+                            <option value="principal">Principal</option>
+                            <option value="completo">Completo</option>
+                            <option value="pendiente">Pendiente</option>
+                        </select>
+                    </label>
+
+                    <label class="commerce-filter-field">
+                        <span>Tipo</span>
+
+                        <select id="commerceUserType">
+                            <option value="">Todos</option>
+                            <option value="contacto">Contacto</option>
+                            <option value="administrativo">Administrativo</option>
+                        </select>
+                    </label>
+
+                    <label class="commerce-filter-field">
+                        <span>Versión</span>
+
+                        <select id="commerceUserVersion">
+                            <option value="">Todas</option>
+                            <option value="2026">2026</option>
+                        </select>
+                    </label>
+
+                    <button type="button" class="commerce-filter-download" id="commerceUserDownloadButton">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true">
+                            <path d="M12 3v12"></path>
+                            <path d="m7 10 5 5 5-5"></path>
+                            <path d="M5 21h14"></path>
+                        </svg>
+                        Descargar Excel
                     </button>
                 </div>
 
-                <div class="commerce-form-actions">
-                    <button type="button" class="commerce-form-actions__reset" id="commerceResetButton" hidden>
-                        Cancelar edición
-                    </button>
-                </div>
-            </form>
+                <p class="commerce-filter-empty" id="commerceUserFilterEmpty" hidden>
+                    No hay usuarios que coincidan con los filtros seleccionados.
+                </p>
+            </section>
 
-                        <div class="commerce-contacts">
-                <?php
-                    $contactItems = collect($contacts ?? [])->values();
-                ?>
+                    <div class="commerce-contacts">
+                        @forelse ($contacts as $contact)
+                            @php
+                                $contactFilterText = trim(implode(' ', [
+                                    $contact->id,
+                                    $contact->full_name,
+                                    $contact->phone,
+                                    $contact->email,
+                                    $contact->full_address,
+                                ]));
 
-                <?php if ($contactItems->isEmpty()): ?>
-                    <article class="commerce-empty">
-                        <h3>Aún no tienes contactos registrados</h3>
-                        <p>Agrega el primer contacto administrativo de tu comercio.</p>
-                    </article>
-                <?php else: ?>
-                    <?php $contactCounter = 0; ?>
+                                $contactFilterSearch = mb_strtolower($contactFilterText, 'UTF-8');
 
-                    <?php foreach ($contactItems as $contact): ?>
-                        <?php
-                            $contactCounter++;
+                                $contactFilterYear = $contact->updated_at
+                                    ? $contact->updated_at->format('Y')
+                                    : now()->year;
 
-                            $contactMissingFields = [];
+                                $contactFilterIsComplete =
+                                    filled($contact->first_name)
+                                    && filled($contact->street)
+                                    && filled($contact->neighborhood)
+                                    && filled($contact->postal_code)
+                                    && filled($contact->state)
+                                    && filled($contact->phone)
+                                    && filled($contact->email);
 
-                            if (! filled($contact->first_name)) {
-                                $contactMissingFields[] = 'nombre';
-                            }
+                                $contactFilterStatus = $contact->is_primary
+                                    ? 'principal'
+                                    : ($contactFilterIsComplete ? 'completo' : 'pendiente');
+                            @endphp
 
-                            if (! filled($contact->street)) {
-                                $contactMissingFields[] = 'calle y número';
-                            }
+                            <article
+                                class="commerce-contact-card"
+                                data-commerce-user-card
+                                data-search="{{ e($contactFilterSearch) }}"
+                                data-year="{{ e($contactFilterYear) }}"
+                                data-status="{{ e($contactFilterStatus) }}"
+                                data-type="contacto administrativo"
+                                data-version="2026"
+                                data-name="{{ e($contact->full_name ?: 'Sin nombre registrado') }}"
+                                data-address="{{ e($contact->full_address ?: 'Sin dirección registrada') }}"
+                                data-phone="{{ e($contact->phone ?: 'Sin teléfono') }}"
+                                data-email="{{ e($contact->email ?: 'Sin correo') }}"
+                                data-primary="{{ $contact->is_primary ? 'Sí' : 'No' }}"
+                                data-phone-verified-label="{{ $contact->phone_verified_at ? 'Sí' : 'No' }}"
+                                data-email-verified-label="{{ $contact->email_verified_at ? 'Sí' : 'No' }}"
+                                data-updated-label="{{ $contact->updated_at ? $contact->updated_at->format('d/m/Y H:i') : 'Sin actualización' }}"
+                            >
+                                <div class="commerce-contact-card__top">
+                                    <h3 class="commerce-contact-card__title">
+                                        Contacto {{ $loop->iteration }}
 
-                            if (! filled($contact->neighborhood)) {
-                                $contactMissingFields[] = 'colonia';
-                            }
+                                        @if ($contact->is_primary)
+                                            <span class="commerce-contact-card__badge">Principal</span>
+                                        @endif
+                                    </h3>
 
-                            if (! filled($contact->postal_code)) {
-                                $contactMissingFields[] = 'CP';
-                            }
+                                    <div class="commerce-contact-card__actions" aria-label="Acciones del contacto">
+                                        <form
+                                            method="POST"
+                                            action="{{ route('comercio.contacts.destroy', $contact) }}"
+                                            onsubmit="return confirm('¿Seguro que deseas eliminar este contacto?');"
+                                        >
+                                            @csrf
+                                            @method('DELETE')
 
-                            if (! filled($contact->state)) {
-                                $contactMissingFields[] = 'estado';
-                            }
+                                            <button type="submit" class="commerce-icon-button" aria-label="Eliminar contacto">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                                                    <path d="M4 7h16"></path>
+                                                    <path d="M10 11v6"></path>
+                                                    <path d="M14 11v6"></path>
+                                                    <path d="M6 7l1 14h10l1-14"></path>
+                                                    <path d="M9 7V4h6v3"></path>
+                                                </svg>
+                                            </button>
+                                        </form>
 
-                            if (! filled($contact->phone)) {
-                                $contactMissingFields[] = 'teléfono';
-                            }
+                                        <button
+                                            type="button"
+                                            class="commerce-icon-button commerce-edit-contact"
+                                            aria-label="Editar contacto"
+                                            data-update-action="{{ route('comercio.contacts.update', $contact) }}"
+                                            data-first-name="{{ $contact->first_name }}"
+                                            data-last-name-paternal="{{ $contact->last_name_paternal }}"
+                                            data-last-name-maternal="{{ $contact->last_name_maternal }}"
+                                            data-street="{{ $contact->street }}"
+                                            data-neighborhood="{{ $contact->neighborhood }}"
+                                            data-postal-code="{{ $contact->postal_code }}"
+                                            data-state="{{ $contact->state }}"
+                                            data-phone="{{ $contact->phone }}"
+                                            data-email="{{ $contact->email }}"
+                                            data-phone-verified="{{ $contact->phone_verified_at ? '1' : '0' }}"
+                                            data-email-verified="{{ $contact->email_verified_at ? '1' : '0' }}"
+                                        >
+                                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                                                <path d="M12 20h9"></path>
+                                                <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4 11.5-11.5Z"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
 
-                            if (! filled($contact->email)) {
-                                $contactMissingFields[] = 'correo';
-                            }
-
-                            $contactIsComplete = count($contactMissingFields) === 0;
-                            $contactMissingText = implode(', ', $contactMissingFields);
-                        ?>
-
-                        <article class="commerce-contact-card {{ $contactIsComplete ? 'is-complete' : 'is-incomplete' }}">
-                            <h3 class="commerce-contact-card__title">
-                                Contacto {{ $contactCounter }}
-
-                                <?php if ($contact->is_primary): ?>
-                                    <span class="commerce-contact-card__badge">Principal</span>
-                                <?php endif; ?>
-
-                                <?php if (! $contactIsComplete): ?>
-                                    <span
-                                        class="commerce-contact-card__alert"
-                                        title="Faltan datos: {{ $contactMissingText }}"
-                                        aria-label="Faltan datos por llenar"
-                                    >
-                                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-                                            <path d="M12 9v4"></path>
-                                            <path d="M12 17h.01"></path>
-                                            <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"></path>
-                                        </svg>
-                                        Faltan datos
-                                    </span>
-                                <?php endif; ?>
-                            </h3>
-
-                            <div class="commerce-contact-card__body">
-                                <p><strong>Nombre:</strong> {{ $contact->full_name ?: 'Sin nombre registrado' }}</p>
-
-                                <p>
-                                    <strong>Dirección:</strong>
-                                    {{ $contact->full_address ?: 'Sin dirección registrada' }}
-                                </p>
-
-                                <p>
-                                    <strong>Teléfono:</strong>
-                                    {{ $contact->phone ?: 'Sin teléfono' }}
-
-                                    <?php if ($contact->phone_verified_at): ?>
-                                        <span class="commerce-verified">Verificado</span>
-                                    <?php endif; ?>
-                                </p>
-
-                                <p>
-                                    <strong>Correo:</strong>
-                                    {{ $contact->email ?: 'Sin correo' }}
-
-                                    <?php if ($contact->email_verified_at): ?>
-                                        <span class="commerce-verified">Verificado</span>
-                                    <?php endif; ?>
-                                </p>
-
-                                <?php if (! $contactIsComplete): ?>
-                                    <p class="commerce-contact-card__missing">
-                                        <strong>Completa:</strong> {{ $contactMissingText }}.
+                                <div class="commerce-contact-card__body">
+                                    <p>
+                                        <strong>Nombre:</strong>
+                                        {{ $contact->full_name ?: 'Sin nombre registrado' }}
                                     </p>
-                                <?php endif; ?>
-                            </div>
 
-                            <div class="commerce-contact-card__actions" aria-label="Acciones del contacto">
+                                    <p>
+                                        <strong>Dirección:</strong>
+                                        {{ $contact->full_address ?: 'Sin dirección registrada' }}
+                                    </p>
+
+                                    <p>
+                                        <strong>Teléfono:</strong>
+                                        {{ $contact->phone ?: 'Sin teléfono' }}
+
+                                        @if ($contact->phone_verified_at)
+                                            <span class="commerce-verified">Verificado</span>
+                                        @endif
+                                    </p>
+
+                                    <p>
+                                        <strong>Correo:</strong>
+                                        {{ $contact->email ?: 'Sin correo' }}
+
+                                        @if ($contact->email_verified_at)
+                                            <span class="commerce-verified">Verificado</span>
+                                        @endif
+                                    </p>
+                                </div>
+
                                 <form
                                     method="POST"
-                                    action="{{ route('comercio.contacts.destroy', $contact) }}"
-                                    onsubmit="return confirm('¿Seguro que deseas eliminar este contacto?');"
+                                    action="{{ route('comercio.contacts.primary', $contact) }}"
+                                    class="commerce-contact-card__main"
                                 >
-                                    <?php echo csrf_field(); ?>
-                                    <?php echo method_field('DELETE'); ?>
+                                    @csrf
+                                    @method('PATCH')
 
-                                    <button type="submit" class="commerce-icon-button" aria-label="Eliminar contacto">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-                                            <path d="M4 7h16"></path>
-                                            <path d="M10 11v6"></path>
-                                            <path d="M14 11v6"></path>
-                                            <path d="M6 7l1 14h10l1-14"></path>
-                                            <path d="M9 7V4h6v3"></path>
-                                        </svg>
-                                    </button>
+                                    <label>
+                                        <input
+                                            type="checkbox"
+                                            onchange="this.form.submit()"
+                                            @checked($contact->is_primary)
+                                        >
+                                        <span>Guardar como contacto principal</span>
+                                    </label>
                                 </form>
-
-                                <button
-                                    type="button"
-                                    class="commerce-icon-button commerce-edit-contact"
-                                    aria-label="Editar contacto"
-                                    data-update-action="{{ route('comercio.contacts.update', $contact) }}"
-                                    data-first-name="{{ $contact->first_name }}"
-                                    data-last-name-paternal="{{ $contact->last_name_paternal }}"
-                                    data-last-name-maternal="{{ $contact->last_name_maternal }}"
-                                    data-street="{{ $contact->street }}"
-                                    data-neighborhood="{{ $contact->neighborhood }}"
-                                    data-postal-code="{{ $contact->postal_code }}"
-                                    data-state="{{ $contact->state }}"
-                                    data-phone="{{ $contact->phone }}"
-                                    data-email="{{ $contact->email }}"
-                                    data-phone-verified="{{ $contact->phone_verified_at ? '1' : '0' }}"
-                                    data-email-verified="{{ $contact->email_verified_at ? '1' : '0' }}"
-                                >
-                                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-                                        <path d="M12 20h9"></path>
-                                        <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4 11.5-11.5Z"></path>
-                                    </svg>
-                                </button>
-                            </div>
-
-                            <form
-                                method="POST"
-                                action="{{ route('comercio.contacts.primary', $contact) }}"
-                                class="commerce-contact-card__main {{ $contactIsComplete ? '' : 'is-disabled' }}"
-                                data-contact-complete="{{ $contactIsComplete ? '1' : '0' }}"
-                            >
-                                <?php echo csrf_field(); ?>
-                                <?php echo method_field('PATCH'); ?>
-
-                                <label title="{{ $contactIsComplete ? 'Guardar como contacto principal' : 'Completa todos los datos antes de marcarlo como principal' }}">
-                                    <input
-                                        type="checkbox"
-                                        onchange="{{ $contactIsComplete ? 'this.form.submit()' : 'return false' }}"
-                                        <?php echo $contact->is_primary ? 'checked' : ''; ?>
-                                        <?php echo $contactIsComplete ? '' : 'disabled'; ?>
-                                    >
-                                    <span>Guardar como contacto principal</span>
-                                </label>
-                            </form>
-                        </article>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </div>
+                            </article>
+                        @empty
+                            <article class="commerce-empty">
+                                <h3>Aún no tienes contactos registrados</h3>
+                                <p>Agrega el primer contacto administrativo de tu comercio.</p>
+                            </article>
+                        @endforelse
+                    </div>
+                </div>
+            </section>
         </div>
-
         <div
             class="commerce-tab-panel {{ ($activeTab ?? 'usuarios') === 'sucursales' ? 'is-active' : '' }}"
             data-commerce-tab-panel="sucursales"
@@ -705,19 +847,19 @@
                 </div>
             </form>
 
-                       <div class="commerce-branches-list">
-                <?php
+                        <div class="commerce-branches-list">
+                @php
                     $branchItems = collect($branches ?? [])->values();
-                ?>
+                @endphp
 
-                <?php if ($branchItems->isEmpty()): ?>
+                @if ($branchItems->isEmpty())
                     <article class="commerce-empty">
                         <h3>Aún no tienes sucursales registradas</h3>
                         <p>Agrega tu primera sucursal para comenzar a operar en Petpay.</p>
                     </article>
-                <?php else: ?>
-                    <?php foreach ($branchItems as $branch): ?>
-                        <?php
+                @else
+                    @foreach ($branchItems as $branch)
+                        @php
                             $missingFields = $branch->missing_fields ?? [];
                             $serviceDaysValue = $branch->service_days ?? [];
 
@@ -729,7 +871,7 @@
                             if (! is_array($serviceDaysValue)) {
                                 $serviceDaysValue = [];
                             }
-                        ?>
+                        @endphp
 
                         <article class="commerce-branch-card {{ $branch->is_complete ? 'is-complete' : 'is-incomplete' }}">
                             <div class="commerce-branch-card__flag">
@@ -776,16 +918,16 @@
                                     </span>
                                 </p>
 
-                                <?php if (count($missingFields) > 0): ?>
+                                @if (count($missingFields) > 0)
                                     <div class="commerce-branch-card__missing">
                                         <strong>Faltan datos:</strong>
                                         {{ implode(', ', $missingFields) }}
                                     </div>
-                                <?php else: ?>
+                                @else
                                     <div class="commerce-branch-card__complete">
                                         Información completa. Bandera verde.
                                     </div>
-                                <?php endif; ?>
+                                @endif
                             </div>
 
                             <div class="commerce-branch-card__actions">
@@ -820,8 +962,8 @@
                                 </button>
 
                                 <form method="POST" action="{{ route('comercio.branches.service', $branch) }}">
-                                    <?php echo csrf_field(); ?>
-                                    <?php echo method_field('PATCH'); ?>
+                                    @csrf
+                                    @method('PATCH')
 
                                     <button
                                         type="submit"
@@ -837,8 +979,8 @@
                                     action="{{ route('comercio.branches.destroy', $branch) }}"
                                     onsubmit="return confirm('¿Seguro que deseas eliminar esta sucursal?');"
                                 >
-                                    <?php echo csrf_field(); ?>
-                                    <?php echo method_field('DELETE'); ?>
+                                    @csrf
+                                    @method('DELETE')
 
                                     <button type="submit" class="commerce-icon-button" aria-label="Eliminar sucursal">
                                         <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
@@ -852,15 +994,13 @@
                                 </form>
                             </div>
                         </article>
-                    <?php endforeach; ?>
-                <?php endif; ?>
+                    @endforeach
+                @endif
             </div>
-        </div>
-    </section>
-@endsection
 
 @push('scripts')
     <script>
+
         (() => {
             const tabButtons = document.querySelectorAll('[data-commerce-tab-button]');
             const tabPanels = document.querySelectorAll('[data-commerce-tab-panel]');
@@ -1575,6 +1715,338 @@
             });
 
             updateStatus();
+        })();
+
+                (() => {
+            const accordionBlocks = Array.from(document.querySelectorAll('.commerce-info-block'));
+
+            accordionBlocks.forEach((block, index) => {
+                const header = block.querySelector('.commerce-info-block__header');
+
+                if (!header || block.dataset.accordionReady === '1') {
+                    return;
+                }
+
+                block.dataset.accordionReady = '1';
+
+                const body = document.createElement('div');
+                const bodyInner = document.createElement('div');
+
+                body.className = 'commerce-info-block__body';
+                bodyInner.className = 'commerce-info-block__body-inner';
+
+                const childrenToMove = Array.from(block.children).filter((child) => child !== header);
+
+                childrenToMove.forEach((child) => {
+                    bodyInner.appendChild(child);
+                });
+
+                body.appendChild(bodyInner);
+                block.appendChild(body);
+
+                const toggle = document.createElement('button');
+                toggle.type = 'button';
+                toggle.className = 'commerce-info-block__toggle';
+                toggle.setAttribute('aria-label', 'Abrir o cerrar bloque');
+                toggle.innerHTML = `
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                        <path d="m6 9 6 6 6-6"></path>
+                    </svg>
+                `;
+
+                header.appendChild(toggle);
+
+                const setOpen = (open) => {
+                    block.classList.toggle('is-open', open);
+                    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+                };
+
+                setOpen(index === 0);
+
+                header.addEventListener('click', (event) => {
+                    if (event.target.closest('a, button, input, select, textarea, label')) {
+                        if (!event.target.closest('.commerce-info-block__toggle')) {
+                            return;
+                        }
+                    }
+
+                    setOpen(!block.classList.contains('is-open'));
+                });
+            });
+        })();
+
+                (() => {
+            const searchInput = document.getElementById('commerceUserSearch');
+            const yearSelect = document.getElementById('commerceUserYear');
+            const statusSelect = document.getElementById('commerceUserStatus');
+            const typeSelect = document.getElementById('commerceUserType');
+            const versionSelect = document.getElementById('commerceUserVersion');
+            const emptyMessage = document.getElementById('commerceUserFilterEmpty');
+            const downloadButton = document.getElementById('commerceUserDownloadButton');
+            const contactsContainer = document.querySelector('.commerce-contacts');
+            const cards = Array.from(document.querySelectorAll('[data-commerce-user-card]'));
+
+            if (!contactsContainer || !cards.length) {
+                if (downloadButton) {
+                    downloadButton.disabled = true;
+                }
+
+                return;
+            }
+
+            const perPage = 5;
+            let currentPage = 1;
+
+            let pagination = document.querySelector('.commerce-contact-pagination');
+
+            if (!pagination) {
+                pagination = document.createElement('div');
+                pagination.className = 'commerce-contact-pagination';
+                pagination.innerHTML = `
+                    <span class="commerce-contact-pagination__info" data-contact-pagination-info></span>
+
+                    <div class="commerce-contact-pagination__actions">
+                        <button type="button" class="commerce-contact-pagination__button" data-contact-page-prev>
+                            Anterior
+                        </button>
+
+                        <span data-contact-page-numbers></span>
+
+                        <button type="button" class="commerce-contact-pagination__button" data-contact-page-next>
+                            Siguiente
+                        </button>
+                    </div>
+                `;
+
+                contactsContainer.insertAdjacentElement('afterend', pagination);
+            }
+
+            const info = pagination.querySelector('[data-contact-pagination-info]');
+            const numbers = pagination.querySelector('[data-contact-page-numbers]');
+            const prevButton = pagination.querySelector('[data-contact-page-prev]');
+            const nextButton = pagination.querySelector('[data-contact-page-next]');
+
+            const normalize = (value) => {
+                return String(value || '')
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '')
+                    .toLowerCase()
+                    .trim();
+            };
+
+            const getSelectedFilters = () => {
+                return {
+                    search: normalize(searchInput ? searchInput.value : ''),
+                    year: yearSelect ? yearSelect.value : '',
+                    status: statusSelect ? statusSelect.value : '',
+                    type: typeSelect ? typeSelect.value : '',
+                    version: versionSelect ? versionSelect.value : '',
+                };
+            };
+
+            const cardMatchesFilters = (card, filters) => {
+                const cardSearch = normalize(card.dataset.search);
+                const cardYear = card.dataset.year || '';
+                const cardStatus = card.dataset.status || '';
+                const cardType = normalize(card.dataset.type);
+                const cardVersion = card.dataset.version || '';
+
+                const matchesSearch = !filters.search || cardSearch.includes(filters.search);
+                const matchesYear = !filters.year || cardYear === filters.year;
+                const matchesStatus = !filters.status || cardStatus === filters.status;
+                const matchesType = !filters.type || cardType.includes(normalize(filters.type));
+                const matchesVersion = !filters.version || cardVersion === filters.version;
+
+                return matchesSearch && matchesYear && matchesStatus && matchesType && matchesVersion;
+            };
+
+            const getFilteredCards = () => {
+                const filters = getSelectedFilters();
+
+                return cards.filter((card) => {
+                    return cardMatchesFilters(card, filters);
+                });
+            };
+
+            const renderPagination = () => {
+                const filteredCards = getFilteredCards();
+                const total = filteredCards.length;
+                const totalPages = Math.max(1, Math.ceil(total / perPage));
+
+                currentPage = Math.min(currentPage, totalPages);
+
+                const start = (currentPage - 1) * perPage;
+                const end = start + perPage;
+
+                cards.forEach((card) => {
+                    card.hidden = true;
+                });
+
+                filteredCards.slice(start, end).forEach((card) => {
+                    card.hidden = false;
+                });
+
+                if (emptyMessage) {
+                    emptyMessage.hidden = total > 0;
+                }
+
+                if (pagination) {
+                    pagination.hidden = total === 0;
+                }
+
+                if (downloadButton) {
+                    downloadButton.disabled = total === 0;
+                }
+
+                if (info) {
+                    const firstVisible = total === 0 ? 0 : start + 1;
+                    const lastVisible = Math.min(end, total);
+
+                    info.textContent = total === 0
+                        ? 'Sin contactos para mostrar'
+                        : `Mostrando ${firstVisible}-${lastVisible} de ${total} contactos`;
+                }
+
+                if (prevButton) {
+                    prevButton.disabled = currentPage <= 1;
+                }
+
+                if (nextButton) {
+                    nextButton.disabled = currentPage >= totalPages;
+                }
+
+                if (numbers) {
+                    numbers.innerHTML = '';
+
+                    for (let page = 1; page <= totalPages; page++) {
+                        const button = document.createElement('button');
+                        button.type = 'button';
+                        button.className = `commerce-contact-pagination__button ${page === currentPage ? 'is-active' : ''}`;
+                        button.textContent = page;
+
+                        button.addEventListener('click', () => {
+                            currentPage = page;
+                            renderPagination();
+                        });
+
+                        numbers.appendChild(button);
+                    }
+                }
+            };
+
+            const resetAndRender = () => {
+                currentPage = 1;
+                renderPagination();
+            };
+
+            const escapeExcelCell = (value) => {
+                return String(value || '')
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;');
+            };
+
+            const downloadExcelReport = () => {
+                const filteredCards = getFilteredCards();
+
+                if (!filteredCards.length) {
+                    alert('No hay contactos para exportar con los filtros seleccionados.');
+                    return;
+                }
+
+                const rows = filteredCards.map((card, index) => {
+                    return `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${escapeExcelCell(card.dataset.name)}</td>
+                            <td>${escapeExcelCell(card.dataset.address)}</td>
+                            <td>${escapeExcelCell(card.dataset.phone)}</td>
+                            <td>${escapeExcelCell(card.dataset.email)}</td>
+                            <td>${escapeExcelCell(card.dataset.primary)}</td>
+                            <td>${escapeExcelCell(card.dataset.status)}</td>
+                            <td>${escapeExcelCell(card.dataset.phoneVerifiedLabel)}</td>
+                            <td>${escapeExcelCell(card.dataset.emailVerifiedLabel)}</td>
+                            <td>${escapeExcelCell(card.dataset.year)}</td>
+                            <td>${escapeExcelCell(card.dataset.updatedLabel)}</td>
+                        </tr>
+                    `;
+                }).join('');
+
+                const html = `
+                    <html>
+                        <head>
+                            <meta charset="UTF-8">
+                        </head>
+                        <body>
+                            <table border="1">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Nombre</th>
+                                        <th>Dirección</th>
+                                        <th>Teléfono</th>
+                                        <th>Correo</th>
+                                        <th>Contacto principal</th>
+                                        <th>Estatus</th>
+                                        <th>Teléfono verificado</th>
+                                        <th>Correo verificado</th>
+                                        <th>Año</th>
+                                        <th>Última actualización</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${rows}
+                                </tbody>
+                            </table>
+                        </body>
+                    </html>
+                `;
+
+                const blob = new Blob([html], {
+                    type: 'application/vnd.ms-excel;charset=utf-8;',
+                });
+
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                const date = new Date().toISOString().slice(0, 10);
+
+                link.href = url;
+                link.download = `reporte-contactos-comercio-${date}.xls`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            };
+
+            [searchInput, yearSelect, statusSelect, typeSelect, versionSelect].forEach((element) => {
+                if (!element) {
+                    return;
+                }
+
+                element.addEventListener('input', resetAndRender);
+                element.addEventListener('change', resetAndRender);
+            });
+
+            if (prevButton) {
+                prevButton.addEventListener('click', () => {
+                    currentPage = Math.max(1, currentPage - 1);
+                    renderPagination();
+                });
+            }
+
+            if (nextButton) {
+                nextButton.addEventListener('click', () => {
+                    currentPage += 1;
+                    renderPagination();
+                });
+            }
+
+            if (downloadButton) {
+                downloadButton.addEventListener('click', downloadExcelReport);
+            }
+
+            renderPagination();
         })();
     </script>
 @endpush
