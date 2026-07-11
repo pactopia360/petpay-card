@@ -4,7 +4,12 @@ namespace App\Http\Controllers\Comercio;
 
 use App\Http\Controllers\Controller;
 use App\Models\Comercio\CommerceBranch;
+use App\Models\Comercio\CommerceBranding;
+use App\Models\Comercio\CommerceCatalogProduct;
+use App\Models\Comercio\CommerceCatalogBrand;
+use App\Models\Comercio\CommerceCatalogCategory;
 use App\Models\Comercio\CommerceContact;
+use App\Models\Comercio\CommerceUser;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +19,8 @@ class DashboardController extends Controller
     public function index(Request $request): View
     {
         $comercio = Auth::guard('comercio')->user();
+
+        abort_unless($comercio instanceof CommerceUser, 401);
 
         $contacts = CommerceContact::query()
             ->where('commerce_user_id', $comercio->id)
@@ -27,12 +34,55 @@ class DashboardController extends Controller
             ->latest('id')
             ->get();
 
+        $branding = CommerceBranding::query()
+            ->where('commerce_user_id', $comercio->id)
+            ->first();
+
+        $catalogCategories = CommerceCatalogCategory::query()
+            ->where('commerce_user_id', $comercio->id)
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get();
+
+        $catalogBrands = CommerceCatalogBrand::query()
+            ->where('commerce_user_id', $comercio->id)
+            ->orderBy('name')
+            ->get();
+
+        $catalogProducts = CommerceCatalogProduct::query()
+            ->with([
+                'category',
+                'brand',
+                'variants',
+                'stocks.branch',
+            ])
+            ->where('commerce_user_id', $comercio->id)
+            ->latest('id')
+            ->get();
+
+        $allowedTabs = [
+            'usuarios',
+            'sucursales',
+            'branding',
+            'catalogos',
+                    'finanzas',
+];
+
+        $requestedTab = (string) $request->query('tab', 'usuarios');
+        $activeTab = in_array($requestedTab, $allowedTabs, true)
+            ? $requestedTab
+            : 'usuarios';
+
         return view('comercio.dashboard', [
             'comercio' => $comercio,
             'contacts' => $contacts,
             'branches' => $branches,
+            'branding' => $branding,
+            'catalogCategories' => $catalogCategories,
+            'catalogBrands' => $catalogBrands,
+            'catalogProducts' => $catalogProducts,
             'states' => $this->states(),
-            'activeTab' => $request->query('tab', 'usuarios'),
+            'activeTab' => $activeTab,
             'serviceDays' => $this->serviceDays(),
         ]);
     }
