@@ -5,6 +5,7 @@ namespace App\Models\Comercio;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class CommerceBranch extends Model
 {
@@ -43,6 +44,8 @@ class CommerceBranch extends Model
         'email_verified',
 
         'is_open',
+        'delivery_radius_km',
+        'preparation_minutes',
         'missing_fields',
         'status_flag',
     ];
@@ -56,12 +59,19 @@ class CommerceBranch extends Model
         'phone_verified' => 'boolean',
         'email_verified' => 'boolean',
         'is_open' => 'boolean',
+        'delivery_radius_km' => 'decimal:2',
+        'preparation_minutes' => 'integer',
         'missing_fields' => 'array',
     ];
 
     public function commerce(): BelongsTo
     {
         return $this->belongsTo(CommerceUser::class, 'commerce_user_id');
+    }
+
+    public function catalogStocks(): HasMany
+    {
+        return $this->hasMany(CommerceCatalogBranchStock::class, 'branch_id');
     }
 
     public function getFullAddressAttribute(): string

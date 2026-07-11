@@ -2,13 +2,12 @@
 
 namespace App\Models\Comercio;
 
+use App\Models\Comercio\CommerceBranch;
+use App\Models\Comercio\CommerceContact;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Models\Comercio\CommerceContact;
-use App\Models\Comercio\CommerceBranch;
-
 
 class CommerceUser extends Authenticatable
 {
@@ -32,10 +31,15 @@ class CommerceUser extends Authenticatable
         'email_verified_at',
 
         'business_name',
+        'brand_name',
         'business_type',
         'business_phone',
         'business_email',
+        'website_url',
+        'whatsapp_enabled',
+        'terms_accepted_at',
         'business_address',
+        'floor_office',
         'business_latitude',
         'business_longitude',
 
@@ -67,6 +71,7 @@ class CommerceUser extends Authenticatable
             'email_verified_at' => 'datetime',
             'last_login_at' => 'datetime',
             'approved_at' => 'datetime',
+            'terms_accepted_at' => 'datetime',
 
             'password' => 'hashed',
 
@@ -78,6 +83,7 @@ class CommerceUser extends Authenticatable
             'offers_services' => 'boolean',
             'has_own_delivery' => 'boolean',
             'uses_petpay_delivery' => 'boolean',
+            'whatsapp_enabled' => 'boolean',
             'is_open' => 'boolean',
         ];
     }
@@ -94,17 +100,20 @@ class CommerceUser extends Authenticatable
 
     public function isPendingApproval(): bool
     {
-        return $this->approval_status === 'pending' || $this->status === 'pending';
+        return $this->approval_status === 'pending'
+            || $this->status === 'pending';
     }
 
     public function isRejected(): bool
     {
-        return $this->approval_status === 'rejected' || $this->status === 'rejected';
+        return $this->approval_status === 'rejected'
+            || $this->status === 'rejected';
     }
 
     public function isSuspended(): bool
     {
-        return $this->approval_status === 'suspended' || $this->status === 'suspended';
+        return $this->approval_status === 'suspended'
+            || $this->status === 'suspended';
     }
 
     public function canAccessPortal(): bool
@@ -114,11 +123,41 @@ class CommerceUser extends Authenticatable
 
     public function contacts(): HasMany
     {
-        return $this->hasMany(CommerceContact::class, 'commerce_user_id');
+        return $this->hasMany(
+            CommerceContact::class,
+            'commerce_user_id'
+        );
     }
 
     public function branches(): HasMany
     {
-        return $this->hasMany(CommerceBranch::class, 'commerce_user_id');
+        return $this->hasMany(
+            CommerceBranch::class,
+            'commerce_user_id'
+        );
+    }
+
+    public function catalogCategories(): HasMany
+    {
+        return $this->hasMany(
+            CommerceCatalogCategory::class,
+            'commerce_user_id'
+        );
+    }
+
+    public function catalogBrands(): HasMany
+    {
+        return $this->hasMany(
+            CommerceCatalogBrand::class,
+            'commerce_user_id'
+        );
+    }
+
+    public function catalogProducts(): HasMany
+    {
+        return $this->hasMany(
+            CommerceCatalogProduct::class,
+            'commerce_user_id'
+        );
     }
 }
