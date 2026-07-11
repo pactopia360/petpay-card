@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class CommerceBranchController extends Controller
 {
@@ -15,50 +16,28 @@ class CommerceBranchController extends Controller
     {
         $commerce = Auth::guard('comercio')->user();
 
-        $validated = $this->validateBranch($request);
+        abort_unless($commerce, 401);
+
+        $validated = $this->validateBranch($request, (int) $commerce->id);
         $coordinates = $this->parseCoordinates($validated['google_coordinates'] ?? null);
-        $missingFields = $this->missingFields($validated);
+        $this->ensureCoordinatesAreValid($validated['google_coordinates'] ?? null, $coordinates);
 
-        CommerceBranch::create([
-            'commerce_user_id' => $commerce->id,
+        $payload = $this->branchPayload(
+            request: $request,
+            validated: $validated,
+            coordinates: $coordinates,
+            commerceUserId: (int) $commerce->id
+        );
 
-            'chain_name' => $validated['chain_name'] ?: 'Cadena sin nombre',
-            'branch_name' => $validated['branch_name'] ?: 'Sucursal sin nombre',
-            'branch_code' => $validated['branch_code'] ?? null,
-
-            'google_coordinates' => $validated['google_coordinates'] ?? null,
-            'latitude' => $coordinates['latitude'],
-            'longitude' => $coordinates['longitude'],
-
-            'street' => $validated['street'] ?: 'Dirección pendiente',
-            'neighborhood' => $validated['neighborhood'] ?? null,
-            'postal_code' => $validated['postal_code'] ?? null,
-            'state' => $validated['state'] ?? null,
-
-            'phone' => $validated['phone'] ?? null,
-            'email' => $validated['email'] ?? null,
-            'website' => $this->normalizeWebsite($validated['website'] ?? null),
-            'whatsapp_phone' => $validated['whatsapp_phone'] ?? null,
-
-            'service_days' => $validated['service_days'] ?? [],
-            'service_open_time' => $validated['service_open_time'] ?? null,
-            'service_close_time' => $validated['service_close_time'] ?? null,
-
-            'phone_verified' => $request->boolean('phone_verified'),
-            'email_verified' => $request->boolean('email_verified'),
-
-            'is_open' => $request->boolean('is_open', true),
-            'missing_fields' => $missingFields,
-            'status_flag' => count($missingFields) === 0 ? 'complete' : 'incomplete',
-        ]);
+        $branch = CommerceBranch::create($payload);
 
         return redirect()
             ->route('comercio.dashboard', ['tab' => 'sucursales'])
             ->with(
-                count($missingFields) === 0 ? 'status' : 'warning',
-                count($missingFields) === 0
+                $branch->is_complete ? 'status' : 'warning',
+                $branch->is_complete
                     ? 'Sucursal guardada correctamente. La bandera está en verde.'
-                    : 'Sucursal guardada, pero faltan datos: ' . implode(', ', $missingFields) . '.'
+                    : 'Sucursal guardada, pero faltan datos: '.implode(', ', $branch->missing_fields ?? []).'.'
             );
     }
 
@@ -66,50 +45,36 @@ class CommerceBranchController extends Controller
     {
         $commerce = Auth::guard('comercio')->user();
 
+        abort_unless($commerce, 401);
         abort_unless((int) $branch->commerce_user_id === (int) $commerce->id, 403);
 
-        $validated = $this->validateBranch($request);
+        $validated = $this->validateBranch(
+            request: $request,
+            commerceUserId: (int) $commerce->id,
+            branchId: (int) $branch->id
+        );
+
         $coordinates = $this->parseCoordinates($validated['google_coordinates'] ?? null);
-        $missingFields = $this->missingFields($validated);
+        $this->ensureCoordinatesAreValid($validated['google_coordinates'] ?? null, $coordinates);
 
-        $branch->update([
-            'chain_name' => $validated['chain_name'] ?: 'Cadena sin nombre',
-            'branch_name' => $validated['branch_name'] ?: 'Sucursal sin nombre',
-            'branch_code' => $validated['branch_code'] ?? null,
+        $branch->update(
+            $this->branchPayload(
+                request: $request,
+                validated: $validated,
+                coordinates: $coordinates,
+                commerceUserId: (int) $commerce->id
+            )
+        );
 
-            'google_coordinates' => $validated['google_coordinates'] ?? null,
-            'latitude' => $coordinates['latitude'],
-            'longitude' => $coordinates['longitude'],
-
-            'street' => $validated['street'] ?: 'Dirección pendiente',
-            'neighborhood' => $validated['neighborhood'] ?? null,
-            'postal_code' => $validated['postal_code'] ?? null,
-            'state' => $validated['state'] ?? null,
-
-            'phone' => $validated['phone'] ?? null,
-            'email' => $validated['email'] ?? null,
-            'website' => $this->normalizeWebsite($validated['website'] ?? null),
-            'whatsapp_phone' => $validated['whatsapp_phone'] ?? null,
-
-            'service_days' => $validated['service_days'] ?? [],
-            'service_open_time' => $validated['service_open_time'] ?? null,
-            'service_close_time' => $validated['service_close_time'] ?? null,
-
-            'phone_verified' => $request->boolean('phone_verified'),
-            'email_verified' => $request->boolean('email_verified'),
-
-            'is_open' => $request->boolean('is_open'),
-            'missing_fields' => $missingFields,
-            'status_flag' => count($missingFields) === 0 ? 'complete' : 'incomplete',
-        ]);
+        $branch->refresh();
 
         return redirect()
             ->route('comercio.dashboard', ['tab' => 'sucursales'])
             ->with(
-                count($missingFields) === 0 ? 'status' : 'warning',
-                count($missingFields) === 0
+                $branch->is_complete ? 'status' : 'warning',
+                $branch->is_complete
                     ? 'Sucursal actualizada correctamente. La bandera está en verde.'
-                    : 'Sucursal actualizada, pero faltan datos: ' . implode(', ', $missingFields) . '.'
+                    : 'Sucursal actualizada, pero faltan datos: '.implode(', ', $branch->missing_fields ?? []).'.'
             );
     }
 
@@ -117,6 +82,7 @@ class CommerceBranchController extends Controller
     {
         $commerce = Auth::guard('comercio')->user();
 
+        abort_unless($commerce, 401);
         abort_unless((int) $branch->commerce_user_id === (int) $commerce->id, 403);
 
         $branch->delete();
@@ -130,6 +96,7 @@ class CommerceBranchController extends Controller
     {
         $commerce = Auth::guard('comercio')->user();
 
+        abort_unless($commerce, 401);
         abort_unless((int) $branch->commerce_user_id === (int) $commerce->id, 403);
 
         $branch->forceFill([
@@ -138,17 +105,36 @@ class CommerceBranchController extends Controller
 
         return redirect()
             ->route('comercio.dashboard', ['tab' => 'sucursales'])
-            ->with('status', $branch->is_open ? 'Sucursal en servicio.' : 'Sucursal apagada.');
+            ->with(
+                'status',
+                $branch->is_open
+                    ? 'Sucursal visible para usuarios.'
+                    : 'Sucursal oculta para usuarios.'
+            );
     }
 
-    private function validateBranch(Request $request): array
-    {
+    private function validateBranch(
+        Request $request,
+        int $commerceUserId,
+        ?int $branchId = null
+    ): array {
+        $branchCodeRule = Rule::unique(
+            'mysql_comercio.commerce_branches',
+            'branch_code'
+        )->where(
+            fn ($query) => $query->where('commerce_user_id', $commerceUserId)
+        );
+
+        if ($branchId !== null) {
+            $branchCodeRule->ignore($branchId);
+        }
+
         return $request->validate([
             'chain_name' => ['nullable', 'string', 'max:160'],
             'branch_name' => ['nullable', 'string', 'max:160'],
-            'branch_code' => ['nullable', 'string', 'max:50'],
+            'branch_code' => ['nullable', 'string', 'max:50', $branchCodeRule],
 
-            'google_coordinates' => ['nullable', 'string', 'max:120'],
+            'google_coordinates' => ['nullable', 'string', 'max:2048'],
 
             'street' => ['nullable', 'string', 'max:180'],
             'neighborhood' => ['nullable', 'string', 'max:120'],
@@ -163,15 +149,78 @@ class CommerceBranchController extends Controller
             'service_days' => ['nullable', 'array'],
             'service_days.*' => ['string', Rule::in(['L', 'M', 'X', 'J', 'V', 'S', 'D'])],
             'service_open_time' => ['nullable', 'date_format:H:i'],
-            'service_close_time' => ['nullable', 'date_format:H:i'],
+            'service_close_time' => [
+                'nullable',
+                'date_format:H:i',
+                'after:service_open_time',
+            ],
+
+            'phone_verified' => ['nullable', 'boolean'],
+            'email_verified' => ['nullable', 'boolean'],
+            'is_open' => ['nullable', 'boolean'],
         ], [
+            'branch_code.unique' => 'El código de sucursal ya está siendo usado por otra sucursal de este comercio.',
             'phone.regex' => 'El teléfono debe tener 10 dígitos.',
             'email.email' => 'Ingresa un correo electrónico válido.',
             'whatsapp_phone.regex' => 'El WhatsApp debe tener 10 dígitos.',
             'state.in' => 'Selecciona un estado válido.',
             'service_open_time.date_format' => 'La hora de apertura no es válida.',
             'service_close_time.date_format' => 'La hora de cierre no es válida.',
+            'service_close_time.after' => 'La hora de cierre debe ser posterior a la hora de apertura.',
         ]);
+    }
+
+    private function branchPayload(
+        Request $request,
+        array $validated,
+        array $coordinates,
+        int $commerceUserId
+    ): array {
+        $normalizedCoordinates = null;
+
+        if ($coordinates['latitude'] !== null && $coordinates['longitude'] !== null) {
+            $normalizedCoordinates = number_format($coordinates['latitude'], 8, '.', '')
+                .', '
+                .number_format($coordinates['longitude'], 8, '.', '');
+        }
+
+        $validated['google_coordinates'] = $normalizedCoordinates
+            ?? ($validated['google_coordinates'] ?? null);
+
+        $missingFields = $this->missingFields($validated);
+
+        return [
+            'commerce_user_id' => $commerceUserId,
+
+            'chain_name' => $validated['chain_name'] ?: 'Cadena sin nombre',
+            'branch_name' => $validated['branch_name'] ?: 'Sucursal sin nombre',
+            'branch_code' => $validated['branch_code'] ?: null,
+
+            'google_coordinates' => $validated['google_coordinates'] ?: null,
+            'latitude' => $coordinates['latitude'],
+            'longitude' => $coordinates['longitude'],
+
+            'street' => $validated['street'] ?: 'Dirección pendiente',
+            'neighborhood' => $validated['neighborhood'] ?: null,
+            'postal_code' => $validated['postal_code'] ?: null,
+            'state' => $validated['state'] ?: null,
+
+            'phone' => $validated['phone'] ?: null,
+            'email' => $validated['email'] ?: null,
+            'website' => $this->normalizeWebsite($validated['website'] ?? null),
+            'whatsapp_phone' => $validated['whatsapp_phone'] ?: null,
+
+            'service_days' => array_values($validated['service_days'] ?? []),
+            'service_open_time' => $validated['service_open_time'] ?: null,
+            'service_close_time' => $validated['service_close_time'] ?: null,
+
+            'phone_verified' => $request->boolean('phone_verified'),
+            'email_verified' => $request->boolean('email_verified'),
+            'is_open' => $request->boolean('is_open', true),
+
+            'missing_fields' => $missingFields,
+            'status_flag' => $missingFields === [] ? 'complete' : 'incomplete',
+        ];
     }
 
     private function missingFields(array $data): array
@@ -207,38 +256,82 @@ class CommerceBranchController extends Controller
         return $missing;
     }
 
-    private function parseCoordinates(?string $coordinates): array
+    private function parseCoordinates(?string $value): array
     {
-        if (! $coordinates) {
+        if (! filled($value)) {
             return [
                 'latitude' => null,
                 'longitude' => null,
             ];
         }
 
-        preg_match_all('/-?\d+(?:\.\d+)?/', $coordinates, $matches);
+        $decoded = urldecode(trim($value));
 
-        $numbers = $matches[0] ?? [];
+        $patterns = [
+            '/@(-?\d{1,2}(?:\.\d+)?),\s*(-?\d{1,3}(?:\.\d+)?)/',
+            '/[?&](?:query|q|ll|center)=(-?\d{1,2}(?:\.\d+)?)(?:%2C|,|\s)+(-?\d{1,3}(?:\.\d+)?)/i',
+            '/(-?\d{1,2}(?:\.\d+)?)\s*[,;]\s*(-?\d{1,3}(?:\.\d+)?)/',
+        ];
+
+        foreach ($patterns as $pattern) {
+            if (! preg_match($pattern, $decoded, $matches)) {
+                continue;
+            }
+
+            $latitude = (float) $matches[1];
+            $longitude = (float) $matches[2];
+
+            if (
+                $latitude >= -90
+                && $latitude <= 90
+                && $longitude >= -180
+                && $longitude <= 180
+            ) {
+                return [
+                    'latitude' => $latitude,
+                    'longitude' => $longitude,
+                ];
+            }
+        }
 
         return [
-            'latitude' => isset($numbers[0]) ? (float) $numbers[0] : null,
-            'longitude' => isset($numbers[1]) ? (float) $numbers[1] : null,
+            'latitude' => null,
+            'longitude' => null,
         ];
+    }
+
+    private function ensureCoordinatesAreValid(
+        ?string $originalValue,
+        array $coordinates
+    ): void {
+        if (! filled($originalValue)) {
+            return;
+        }
+
+        if ($coordinates['latitude'] !== null && $coordinates['longitude'] !== null) {
+            return;
+        }
+
+        throw ValidationException::withMessages([
+            'google_coordinates' => 'Ingresa coordenadas válidas en formato latitud, longitud o un enlace de Google Maps que incluya coordenadas.',
+        ]);
     }
 
     private function normalizeWebsite(?string $website): ?string
     {
-        if (! $website) {
+        if (! filled($website)) {
             return null;
         }
 
         $website = trim($website);
 
         if (! preg_match('/^https?:\/\//i', $website)) {
-            return 'https://' . $website;
+            $website = 'https://'.$website;
         }
 
-        return $website;
+        return filter_var($website, FILTER_VALIDATE_URL)
+            ? $website
+            : null;
     }
 
     private function stateKeys(): array

@@ -1,0 +1,38 @@
+/* PETPAY FINANZAS V1 */
+.commerce-finance{display:grid;gap:16px;color:#172033}
+.commerce-finance__header,.commerce-finance__section-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
+.commerce-finance__header h2,.commerce-finance__section-head h3{margin:0;color:#1f2937}
+.commerce-finance__header p,.commerce-finance__section-head p{margin:4px 0 0;color:#64748b;font-size:13px}
+.commerce-finance__tabs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+.commerce-finance__tabs button{min-height:42px;border:1px solid rgba(15,23,42,.12);border-radius:12px;background:rgba(255,255,255,.72);font-weight:800;color:#475569;cursor:pointer}
+.commerce-finance__tabs button.is-active{background:#4b5563;color:#fff;border-color:#4b5563}
+.commerce-finance__kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+.commerce-finance__kpi,.commerce-finance__panel,.commerce-finance__form,.commerce-finance__card{border:1px solid rgba(15,23,42,.1);background:rgba(255,255,255,.78);box-shadow:0 14px 34px rgba(15,23,42,.07);backdrop-filter:blur(12px)}
+.commerce-finance__kpi{border-radius:15px;padding:12px}
+.commerce-finance__kpi span{display:block;color:#64748b;font-size:11px;font-weight:800}
+.commerce-finance__kpi strong{display:block;margin-top:6px;font-size:20px;letter-spacing:-.03em}
+.commerce-finance__panel,.commerce-finance__form{border-radius:20px;padding:16px}
+.commerce-finance__filters{display:grid;grid-template-columns:repeat(5,minmax(120px,1fr)) minmax(180px,1.5fr) auto auto;gap:10px;align-items:end;margin-bottom:14px}
+.commerce-finance__filters label,.commerce-finance__form-grid label{display:grid;gap:5px;font-size:12px;font-weight:800;color:#334155}
+.commerce-finance input,.commerce-finance select,.commerce-finance textarea{width:100%;border:1px solid rgba(15,23,42,.14);border-radius:11px;background:#fff;padding:9px 11px;color:#0f172a;outline:none}
+.commerce-finance input,.commerce-finance select{min-height:40px}
+.commerce-finance input:focus,.commerce-finance select:focus,.commerce-finance textarea:focus{border-color:rgba(249,115,22,.62);box-shadow:0 0 0 4px rgba(249,115,22,.1)}
+.commerce-finance__button{min-height:40px;border:0;border-radius:11px;background:#111827;color:#fff;padding:0 14px;font-weight:900;cursor:pointer;white-space:nowrap}
+.commerce-finance__button--soft{background:#fff7ed;color:#9a3412;border:1px solid rgba(249,115,22,.28)}
+.commerce-finance__table-wrap{overflow:auto;border:1px solid rgba(15,23,42,.08);border-radius:15px}
+.commerce-finance__table{width:100%;border-collapse:collapse;min-width:900px;background:rgba(255,255,255,.7)}
+.commerce-finance__table th,.commerce-finance__table td{padding:11px 12px;border-bottom:1px solid rgba(15,23,42,.07);text-align:left;font-size:12px}
+.commerce-finance__table th{background:#f8fafc;color:#475569;font-weight:900}
+.commerce-finance__empty{text-align:center!important;color:#64748b;padding:28px!important}
+.commerce-finance__cards{display:grid;gap:10px;margin-top:12px}
+.commerce-finance__card{display:grid;grid-template-columns:minmax(0,1.5fr) repeat(4,minmax(90px,.7fr));gap:12px;align-items:center;border-radius:15px;padding:13px}
+.commerce-finance__card strong,.commerce-finance__card span{display:block}
+.commerce-finance__card small,.commerce-finance__card span{color:#64748b;font-size:11px}
+.commerce-finance__status{display:inline-flex;align-items:center;padding:5px 9px;border-radius:999px;background:#fff7ed;color:#9a3412;font-size:11px;font-weight:900}
+.commerce-finance__form{margin-top:14px}
+.commerce-finance__form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px}
+.commerce-finance__form-grid .is-wide{grid-column:span 2}
+.commerce-finance__form-grid .is-full{grid-column:1/-1}
+.commerce-finance__actions{display:flex;justify-content:flex-end;margin-top:14px}
+@media(max-width:1050px){.commerce-finance__tabs{grid-template-columns:repeat(3,minmax(0,1fr))}.commerce-finance__kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.commerce-finance__filters{grid-template-columns:repeat(3,minmax(0,1fr))}.commerce-finance__card{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:680px){.commerce-finance__header,.commerce-finance__section-head{flex-direction:column}.commerce-finance__tabs,.commerce-finance__kpis,.commerce-finance__filters,.commerce-finance__form-grid,.commerce-finance__card{grid-template-columns:1fr}.commerce-finance__form-grid .is-wide,.commerce-finance__form-grid .is-full{grid-column:auto}.commerce-finance__button{width:100%}.commerce-finance__actions{justify-content:stretch}}

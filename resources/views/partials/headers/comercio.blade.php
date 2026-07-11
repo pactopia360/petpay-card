@@ -1,85 +1,73 @@
-@php
+﻿@php
     $commerceHeaderUser = auth('comercio')->user();
 
-    $commerceHeaderName = 'Mi cuenta';
-
-    if ($commerceHeaderUser) {
-        $commerceHeaderName = $commerceHeaderUser->name
-            ?? $commerceHeaderUser->full_name
-            ?? $commerceHeaderUser->nombre
-            ?? $commerceHeaderUser->business_name
-            ?? $commerceHeaderUser->commerce_name
-            ?? $commerceHeaderUser->email
-            ?? 'Mi cuenta';
-    }
-
-    $commerceHeaderInitial = mb_strtoupper(mb_substr($commerceHeaderName, 0, 1));
+    $commerceHeaderName = $commerceHeaderUser->business_name
+        ?? $commerceHeaderUser->commerce_name
+        ?? $commerceHeaderUser->name
+        ?? $commerceHeaderUser->full_name
+        ?? $commerceHeaderUser->nombre
+        ?? $commerceHeaderUser->email
+        ?? 'Mi cuenta';
 @endphp
 
-<header class="commerce-shell-header">
-    <a href="{{ route('comercio.dashboard') }}" class="commerce-shell-header__brand" aria-label="PETPAY Comercio">
-        <img
-            src="{{ asset('assets/petpay-card/img/public/Logo-petpay.png') }}"
-            alt="Petpay"
-            class="commerce-shell-header__logo"
-        >
-    </a>
+<header class="commerce-black-header" aria-label="Encabezado del portal Comercio">
+    <div class="commerce-black-header__inner">
+        <span class="commerce-black-header__title">
+            Panel de comercio
+        </span>
 
-    <div class="commerce-shell-header__actions">
-        <div class="commerce-shell-account">
-            <div class="commerce-shell-account__identity">
-                <span class="commerce-shell-account__meta">
+        <details class="commerce-black-header__account">
+            <summary
+                class="commerce-black-header__logo-button"
+                aria-label="Abrir opciones de cuenta"
+                title="Opciones de cuenta"
+            >
+                <img
+                    src="{{ asset('assets/petpay-card/img/public/Logo-petpay.png') }}"
+                    alt="Petpay"
+                    class="commerce-black-header__logo"
+                >
+            </summary>
+
+            <div class="commerce-black-header__menu">
+                <div class="commerce-black-header__identity">
                     <strong>{{ $commerceHeaderName }}</strong>
-                    <small>Comercio</small>
-                </span>
-            </div>
-
-            <details class="commerce-shell-account__menu">
-                <summary class="commerce-shell-account__avatar-trigger" aria-label="Opciones de cuenta">
-                    {{ $commerceHeaderInitial }}
-                </summary>
-
-                <div class="commerce-shell-account__panel">
-                    <a href="{{ route('comercio.dashboard') }}">
-                        Mi panel
-                    </a>
-
-                    <form method="POST" action="{{ route('comercio.logout') }}">
-                        @csrf
-
-                        <button type="submit">
-                            Cerrar sesión
-                        </button>
-                    </form>
+                    <small>Portal Comercio</small>
                 </div>
-            </details>
-        </div>
+
+                <a href="{{ route('comercio.dashboard') }}">
+                    Ir al panel
+                </a>
+
+                <form method="POST" action="{{ route('comercio.logout') }}">
+                    @csrf
+
+                    <button type="submit">
+                        Cerrar sesión
+                    </button>
+                </form>
+            </div>
+        </details>
     </div>
 </header>
 
 <script>
     (() => {
-        const accountMenu = document.querySelector('.commerce-shell-account__menu');
+        const menu = document.querySelector('.commerce-black-header__account');
 
-        if (!accountMenu) {
+        if (!menu) {
             return;
         }
 
         document.addEventListener('click', (event) => {
-            if (!accountMenu.open) {
-                return;
+            if (menu.open && !menu.contains(event.target)) {
+                menu.open = false;
             }
-
-            if (accountMenu.contains(event.target)) {
-                return;
-            }
-
-            accountMenu.open = false;
         });
 
         document.addEventListener('keydown', (event) => {
             if (event.key === 'Escape') {
-                accountMenu.open = false;
+                menu.open = false;
             }
         });
     })();

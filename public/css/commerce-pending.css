@@ -1,0 +1,257 @@
+.commerce-pending {
+    position: relative;
+    min-height: 100vh;
+    padding: 32px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background:
+        linear-gradient(
+            147deg,
+            rgba(255, 150, 28, 0.94) 0%,
+            rgba(242, 41, 91, 0.94) 100%
+        ),
+        url("/images/auth/commerce-register-background.jpg")
+        center / cover no-repeat;
+}
+
+.commerce-pending__overlay {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(
+            circle at top left,
+            rgba(255, 255, 255, 0.24),
+            transparent 35%
+        );
+}
+
+.commerce-pending__card {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 520px);
+    padding: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.72);
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.97);
+    box-shadow: 0 25px 70px rgba(15, 23, 42, 0.26);
+    color: #17233d;
+}
+
+.commerce-pending__logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    color: #17233d;
+    font-size: 20px;
+    font-weight: 900;
+    text-decoration: none;
+}
+
+.commerce-pending__logo-symbol {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: #ff8a00;
+    color: #ffffff;
+    font-size: 19px;
+}
+
+.commerce-pending__status-icon {
+    width: 72px;
+    height: 72px;
+    margin: 24px auto 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #bbf7d0;
+    border-radius: 50%;
+    background: #ecfdf3;
+}
+
+.commerce-pending__status-icon span {
+    color: #15803d;
+    font-size: 35px;
+    font-weight: 900;
+}
+
+.commerce-pending__eyebrow {
+    margin: 0 0 7px;
+    color: #f97316;
+    font-size: 11px;
+    font-weight: 900;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.commerce-pending h1 {
+    margin: 0;
+    color: #17233d;
+    font-size: 36px;
+    line-height: 1.05;
+    text-align: center;
+}
+
+.commerce-pending__description {
+    margin: 15px auto 20px;
+    max-width: 440px;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.6;
+    text-align: center;
+}
+
+.commerce-pending__description strong {
+    color: #17233d;
+}
+
+.commerce-pending__success {
+    margin-bottom: 17px;
+    padding: 11px 13px;
+    border: 1px solid #bbf7d0;
+    border-radius: 10px;
+    background: #f0fdf4;
+    color: #166534;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.commerce-pending__summary {
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border: 1px solid #e2e8f0;
+    border-radius: 13px;
+    overflow: hidden;
+}
+
+.commerce-pending__summary div {
+    padding: 12px 14px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.commerce-pending__summary div:nth-child(odd) {
+    border-right: 1px solid #e2e8f0;
+}
+
+.commerce-pending__summary div:nth-last-child(-n + 2) {
+    border-bottom: 0;
+}
+
+.commerce-pending__summary dt {
+    margin-bottom: 3px;
+    color: #94a3b8;
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.commerce-pending__summary dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+    color: #17233d;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.commerce-pending__steps {
+    margin-top: 18px;
+    display: grid;
+    gap: 8px;
+}
+
+.commerce-pending__steps > div {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 10px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 11px;
+    background: #f8fafc;
+}
+
+.commerce-pending__steps > div > span {
+    flex: 0 0 auto;
+    width: 27px;
+    height: 27px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: #17233d;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 900;
+}
+
+.commerce-pending__steps p {
+    margin: 0;
+    color: #64748b;
+    font-size: 10px;
+    line-height: 1.4;
+}
+
+.commerce-pending__steps strong {
+    display: block;
+    color: #17233d;
+    font-size: 11px;
+}
+
+.commerce-pending__note {
+    margin: 18px 0 12px;
+    color: #94a3b8;
+    font-size: 10px;
+    text-align: center;
+}
+
+.commerce-pending__logout {
+    width: 100%;
+    min-height: 44px;
+    border: 0;
+    border-radius: 10px;
+    background: #111111;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.commerce-pending__logout:hover {
+    background: #ff8a00;
+}
+
+@media (max-width: 540px) {
+    .commerce-pending {
+        align-items: flex-start;
+        padding: 14px;
+    }
+
+    .commerce-pending__card {
+        padding: 23px 17px;
+        border-radius: 17px;
+    }
+
+    .commerce-pending h1 {
+        font-size: 29px;
+    }
+
+    .commerce-pending__summary {
+        grid-template-columns: 1fr;
+    }
+
+    .commerce-pending__summary div,
+    .commerce-pending__summary div:nth-child(odd),
+    .commerce-pending__summary div:nth-last-child(-n + 2) {
+        border-right: 0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .commerce-pending__summary div:last-child {
+        border-bottom: 0;
+    }
+}

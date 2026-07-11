@@ -35,6 +35,9 @@ return [
         'redirect_cliente' => env('GOOGLE_REDIRECT_CLIENTE_URL'),
         'redirect_comercio' => env('GOOGLE_REDIRECT_COMERCIO_URL'),
         'redirect_repartidor' => env('GOOGLE_REDIRECT_REPARTIDOR_URL'),
+
+        'maps_browser_key' => env('GOOGLE_MAPS_BROWSER_KEY', ''),
+        'maps_api_key' => env('GOOGLE_MAPS_API_KEY', ''),
     ],
 
 ];

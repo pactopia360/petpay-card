@@ -1,0 +1,432 @@
+/* PETPAY COMERCIO BRANDING - DISEÑO FINAL CON SUCURSALES */
+
+.commerce-branding-home {
+    display: grid;
+    gap: 24px;
+}
+
+.commerce-branding-home__intro {
+    display: grid;
+    gap: 4px;
+    margin-bottom: 8px;
+}
+
+.commerce-branding-home__intro h2 {
+    margin: 0;
+    color: #334155;
+    font-size: 20px;
+    font-weight: 900;
+}
+
+.commerce-branding-home__intro h3 {
+    margin: 0;
+    color: #475569;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.commerce-branding-home__intro p {
+    max-width: 1040px;
+    margin: 8px 0 0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.commerce-branding-assets {
+    display: grid;
+}
+
+.commerce-branding-asset {
+    display: grid;
+    grid-template-columns: minmax(230px, 300px) minmax(280px, 1fr) minmax(220px, 280px) 44px;
+    gap: 26px;
+    align-items: center;
+    padding: 26px 0;
+    border-bottom: 1px solid rgba(15, 23, 42, .09);
+}
+
+.commerce-branding-asset:last-child {
+    border-bottom: 0;
+}
+
+.commerce-branding-asset__copy h3 {
+    margin: 0;
+    color: #3f4b5d;
+    font-size: clamp(27px, 2.5vw, 34px);
+    line-height: 1;
+    letter-spacing: -.045em;
+}
+
+.commerce-branding-asset__copy h4 {
+    margin: 5px 0 0;
+    color: #475569;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.commerce-branding-asset__copy p {
+    max-width: 280px;
+    margin: 20px 0 0;
+    color: #64748b;
+    font-size: 15px;
+    line-height: 1.3;
+}
+
+.commerce-branding-upload {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 138px;
+    overflow: hidden;
+    border: 1.5px dashed #b8c0cc;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .70);
+    cursor: pointer;
+    transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+
+.commerce-branding-upload--header {
+    min-height: 138px;
+    width: min(100%, 520px);
+}
+
+.commerce-branding-upload--square {
+    width: 164px;
+    min-height: 164px;
+}
+
+.commerce-branding-upload--listing {
+    width: min(100%, 320px);
+    min-height: 164px;
+}
+
+.commerce-branding-upload:hover,
+.commerce-branding-upload:focus-within {
+    border-color: #64748b;
+    box-shadow: 0 16px 34px rgba(15, 23, 42, .09);
+    transform: translateY(-1px);
+}
+
+.commerce-branding-upload input[type="file"] {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.commerce-branding-upload__placeholder {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    gap: 5px;
+    padding: 16px;
+    text-align: center;
+    color: #64748b;
+    pointer-events: none;
+}
+
+.commerce-branding-upload__placeholder svg {
+    width: 24px;
+    height: 24px;
+    stroke: currentColor;
+}
+
+.commerce-branding-upload__placeholder strong {
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.commerce-branding-upload__placeholder span {
+    font-size: 11px;
+    line-height: 1.25;
+}
+
+.commerce-branding-upload__preview {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+.commerce-branding-upload--square .commerce-branding-upload__preview {
+    object-fit: contain;
+    padding: 10px;
+    background: #fff;
+}
+
+.commerce-branding-upload__preview[hidden],
+.commerce-branding-upload__preview:not([src]),
+.commerce-branding-upload__preview[src=""] {
+    display: none !important;
+}
+
+.commerce-branding-upload.has-image {
+    border-style: solid;
+    background: #fff;
+}
+
+.commerce-branding-upload.has-image .commerce-branding-upload__placeholder {
+    opacity: 0;
+}
+
+.commerce-branding-meta {
+    display: grid;
+    gap: 10px;
+    align-content: center;
+}
+
+.commerce-branding-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    padding: 7px 11px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 900;
+}
+
+.commerce-branding-status--pending {
+    background: rgba(245, 158, 11, .13);
+    color: #b45309;
+}
+
+.commerce-branding-status--approved {
+    background: rgba(16, 185, 129, .13);
+    color: #047857;
+}
+
+.commerce-branding-status--rejected {
+    background: rgba(239, 68, 68, .12);
+    color: #b91c1c;
+}
+
+.commerce-branding-status--empty {
+    background: rgba(100, 116, 139, .10);
+    color: #64748b;
+}
+
+.commerce-branding-status__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: currentColor;
+}
+
+.commerce-branding-date {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.35;
+}
+
+.commerce-branding-date svg {
+    width: 16px;
+    height: 16px;
+    flex: 0 0 auto;
+    stroke: currentColor;
+}
+
+.commerce-branding-branch {
+    display: grid;
+    gap: 5px;
+}
+
+.commerce-branding-branch span {
+    color: #475569;
+    font-size: 11px;
+    font-weight: 900;
+}
+
+.commerce-branding-branch select {
+    width: 100%;
+    min-height: 38px;
+    border: 1px solid rgba(15, 23, 42, .14);
+    border-radius: 11px;
+    background: rgba(255, 255, 255, .94);
+    padding: 8px 10px;
+    color: #0f172a;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 750;
+    outline: none;
+}
+
+.commerce-branding-branch select:focus {
+    border-color: rgba(249, 115, 22, .6);
+    box-shadow: 0 0 0 4px rgba(249, 115, 22, .11);
+}
+
+.commerce-branding-rejection {
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: rgba(239, 68, 68, .08);
+    color: #991b1b;
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+.commerce-branding-asset__tools {
+    display: grid;
+    gap: 10px;
+    justify-items: center;
+}
+
+.commerce-branding-tool {
+    width: 34px;
+    height: 34px;
+    display: inline-grid;
+    place-items: center;
+    padding: 0;
+    border: 1px solid rgba(15, 23, 42, .15);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .78);
+    color: #64748b;
+    cursor: pointer;
+    transition: transform .16s ease, color .16s ease, border-color .16s ease, background .16s ease;
+}
+
+.commerce-branding-tool:hover {
+    transform: translateY(-1px);
+    color: #111827;
+    border-color: rgba(15, 23, 42, .28);
+    background: #fff;
+}
+
+.commerce-branding-tool svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+}
+
+.commerce-branding-tool[disabled] {
+    opacity: .35;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.commerce-branding-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 10px;
+}
+
+.commerce-branding-save {
+    min-width: 190px;
+    min-height: 42px;
+    padding: 0 24px;
+    border: 0;
+    border-radius: 999px;
+    background: #9ca3af;
+    color: #fff;
+    font-weight: 900;
+    cursor: not-allowed;
+    opacity: .72;
+}
+
+.commerce-branding-save.is-ready {
+    background: #374151;
+    cursor: pointer;
+    opacity: 1;
+    box-shadow: 0 14px 28px rgba(55, 65, 81, .20);
+}
+
+.commerce-branding-modal[hidden] {
+    display: none !important;
+}
+
+.commerce-branding-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    background: rgba(15, 23, 42, .55);
+    backdrop-filter: blur(6px);
+}
+
+.commerce-branding-modal__card {
+    width: min(520px, 100%);
+    padding: 20px;
+    border-radius: 22px;
+    background: #fff;
+    box-shadow: 0 24px 70px rgba(15, 23, 42, .24);
+}
+
+.commerce-branding-modal__card h3 {
+    margin: 0;
+    color: #111827;
+}
+
+.commerce-branding-modal__card p {
+    margin: 10px 0 0;
+    color: #475569;
+    line-height: 1.5;
+}
+
+.commerce-branding-modal__close {
+    margin-top: 16px;
+    min-height: 38px;
+    padding: 0 16px;
+    border: 0;
+    border-radius: 999px;
+    background: #111827;
+    color: #fff;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.commerce-admin__tab[data-commerce-tab-button="branding"].is-active {
+    background: #4b5563 !important;
+    border-color: #4b5563 !important;
+    color: #fff !important;
+    opacity: 1 !important;
+}
+
+@media (max-width: 1080px) {
+    .commerce-branding-asset {
+        grid-template-columns: minmax(220px, 280px) minmax(260px, 1fr) minmax(210px, 250px) 42px;
+        gap: 18px;
+    }
+}
+
+@media (max-width: 900px) {
+    .commerce-branding-asset {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .commerce-branding-upload--header,
+    .commerce-branding-upload--listing,
+    .commerce-branding-upload--square {
+        width: 100%;
+        max-width: none;
+    }
+
+    .commerce-branding-asset__tools {
+        grid-auto-flow: column;
+        justify-content: flex-start;
+        justify-items: start;
+    }
+}
+
+@media (max-width: 560px) {
+    .commerce-branding-actions {
+        justify-content: stretch;
+    }
+
+    .commerce-branding-save {
+        width: 100%;
+    }
+}

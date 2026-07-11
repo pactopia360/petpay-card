@@ -40,6 +40,38 @@ return Application::configure(basePath: dirname(__DIR__))
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->redirectGuestsTo(function (Request $request): string {
+            if (
+                $request->is('comercio') ||
+                $request->is('comercio/*')
+            ) {
+                return route('comercio.login');
+            }
+
+            if (
+                $request->is('cliente') ||
+                $request->is('cliente/*')
+            ) {
+                return route('cliente.login');
+            }
+
+            if (
+                $request->is('proveedor') ||
+                $request->is('proveedor/*')
+            ) {
+                return route('proveedor.login');
+            }
+
+            if (
+                $request->is('repartidor') ||
+                $request->is('repartidor/*')
+            ) {
+                return route('repartidor.login');
+            }
+
+            return route('admin.login');
+        });
+
         $middleware->alias([
             'role' => \App\Http\Middleware\EnsureUserHasRole::class,
         ]);

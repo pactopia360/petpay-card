@@ -1,0 +1,256 @@
+(() => {
+    "use strict";
+
+    const money = new Intl.NumberFormat("es-MX", {
+        style: "currency",
+        currency: "MXN",
+    });
+
+    const dateTime = new Intl.DateTimeFormat("es-MX", {
+        dateStyle: "medium",
+        timeStyle: "short",
+    });
+
+    const init = () => {
+        const root = document.querySelector("[data-finance-root]");
+
+        if (!root) {
+            return;
+        }
+
+        const endpoint = root.dataset.endpoint;
+        const exportUrl = root.dataset.exportUrl;
+        const filters = Array.from(root.querySelectorAll("[data-finance-filter]"));
+
+        const escapeHtml = (value) => String(value ?? "")
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+
+        const formatDate = (value) => {
+            if (!value) {
+                return "Sin fecha";
+            }
+
+            const parsed = new Date(value);
+
+            return Number.isNaN(parsed.getTime()) ? String(value) : dateTime.format(parsed);
+        };
+
+        const queryParams = () => {
+            const params = new URLSearchParams();
+
+            filters.forEach((field) => {
+                const value = String(field.value || "").trim();
+
+                if (value) {
+                    params.set(field.dataset.financeFilter, value);
+                }
+            });
+
+            return params;
+        };
+
+        const setTabs = () => {
+            root.querySelectorAll("[data-finance-tab]").forEach((button) => {
+                button.addEventListener("click", () => {
+                    const name = button.dataset.financeTab;
+
+                    root.querySelectorAll("[data-finance-tab]").forEach((item) => {
+                        item.classList.toggle("is-active", item === button);
+                    });
+
+                    root.querySelectorAll("[data-finance-panel]").forEach((panel) => {
+                        panel.hidden = panel.dataset.financePanel !== name;
+                    });
+                });
+            });
+        };
+
+        const renderBranches = (branches) => {
+            root.querySelectorAll('[data-finance-filter="branch_id"], [data-finance-branch-form]').forEach((select) => {
+                const current = select.value;
+                const first = select.dataset.financeFilter ? "Todas" : "General";
+
+                select.innerHTML = `<option value="">${first}</option>`;
+
+                branches.forEach((branch) => {
+                    const option = document.createElement("option");
+                    option.value = branch.id;
+                    option.textContent = `${branch.branch_name}${branch.branch_code ? ` · ${branch.branch_code}` : ""}`;
+                    select.appendChild(option);
+                });
+
+                select.value = current;
+            });
+        };
+
+        const renderSummary = (summary) => {
+            Object.entries(summary).forEach(([key, value]) => {
+                const node = root.querySelector(`[data-finance-kpi="${key}"]`);
+
+                if (node) {
+                    node.textContent = money.format(Number(value || 0));
+                }
+            });
+        };
+
+        const renderMovements = (rows) => {
+            const tbody = root.querySelector("[data-finance-movements]");
+
+            if (!rows.length) {
+                tbody.innerHTML = '<tr><td colspan="8" class="commerce-finance__empty">No hay movimientos para los filtros seleccionados.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = rows.map((row) => `
+                <tr>
+                    <td>${escapeHtml(formatDate(row.occurred_at))}</td>
+                    <td><strong>${escapeHtml(row.concept)}</strong><br><small>${escapeHtml(row.type)}</small></td>
+                    <td>${escapeHtml(row.branch_id || "General")}</td>
+                    <td>${money.format(Number(row.gross_amount || 0))}</td>
+                    <td>${money.format(Number(row.commission_amount || 0))}</td>
+                    <td>${money.format(Number(row.delivery_amount || 0))}</td>
+                    <td><strong>${money.format(Number(row.net_amount || 0))}</strong></td>
+                    <td><span class="commerce-finance__status">${escapeHtml(row.status)}</span></td>
+                </tr>
+            `).join("");
+        };
+
+        const renderSettlements = (rows) => {
+            const target = root.querySelector("[data-finance-settlements]");
+
+            target.innerHTML = rows.length
+                ? rows.map((row) => `
+                    <article class="commerce-finance__card">
+                        <div><strong>${escapeHtml(row.folio)}</strong><small>${escapeHtml(row.period_start)} a ${escapeHtml(row.period_end)}</small></div>
+                        <div><span>Pedidos</span><strong>${Number(row.orders_count || 0)}</strong></div>
+                        <div><span>Bruto</span><strong>${money.format(Number(row.gross_amount || 0))}</strong></div>
+                        <div><span>Comisión</span><strong>${money.format(Number(row.commission_amount || 0))}</strong></div>
+                        <div><span>Neto</span><strong>${money.format(Number(row.net_amount || 0))}</strong><small>${escapeHtml(row.status)}</small></div>
+                    </article>
+                `).join("")
+                : '<div class="commerce-finance__empty">Todavía no hay liquidaciones.</div>';
+        };
+
+        const renderInvoices = (rows) => {
+            const target = root.querySelector("[data-finance-invoices]");
+
+            target.innerHTML = rows.length
+                ? rows.map((row) => `
+                    <tr>
+                        <td>${escapeHtml(formatDate(row.created_at))}</td>
+                        <td>${escapeHtml(row.invoice_type)}</td>
+                        <td>${escapeHtml([row.series, row.folio].filter(Boolean).join("-") || "Pendiente")}</td>
+                        <td>${escapeHtml(row.uuid || "Sin timbrar")}</td>
+                        <td>${money.format(Number(row.total || 0))}</td>
+                        <td><span class="commerce-finance__status">${escapeHtml(row.status)}</span></td>
+                    </tr>
+                `).join("")
+                : '<tr><td colspan="6" class="commerce-finance__empty">Todavía no hay comprobantes fiscales.</td></tr>';
+        };
+
+        const renderBankAccounts = (rows) => {
+            const target = root.querySelector("[data-finance-bank-accounts]");
+
+            target.innerHTML = rows.length
+                ? rows.map((row) => `
+                    <article class="commerce-finance__card">
+                        <div><strong>${escapeHtml(row.bank_name)}</strong><small>${escapeHtml(row.account_holder)}</small></div>
+                        <div><span>CLABE</span><strong>${escapeHtml(row.masked_clabe)}</strong></div>
+                        <div><span>Moneda</span><strong>${escapeHtml(row.currency)}</strong></div>
+                        <div><span>Principal</span><strong>${row.is_primary ? "Sí" : "No"}</strong></div>
+                        <div><span>Estatus</span><strong>${escapeHtml(row.status)}</strong></div>
+                    </article>
+                `).join("")
+                : '<div class="commerce-finance__empty">No hay cuentas bancarias registradas.</div>';
+        };
+
+        const renderDisputes = (rows) => {
+            const target = root.querySelector("[data-finance-disputes]");
+
+            target.innerHTML = rows.length
+                ? rows.map((row) => `
+                    <article class="commerce-finance__card">
+                        <div><strong>${escapeHtml(row.folio)}</strong><small>${escapeHtml(row.subject)}</small></div>
+                        <div><span>Tipo</span><strong>${escapeHtml(row.type)}</strong></div>
+                        <div><span>Monto</span><strong>${money.format(Number(row.claimed_amount || 0))}</strong></div>
+                        <div><span>Creada</span><strong>${escapeHtml(formatDate(row.created_at))}</strong></div>
+                        <div><span>Estatus</span><strong>${escapeHtml(row.status)}</strong></div>
+                    </article>
+                `).join("")
+                : '<div class="commerce-finance__empty">No hay aclaraciones abiertas.</div>';
+        };
+
+        const fillTaxProfile = (profile) => {
+            if (!profile) {
+                return;
+            }
+
+            const form = root.querySelector('[data-finance-panel="tax"] form');
+
+            ["rfc", "legal_name", "tax_regime", "postal_code", "cfdi_use", "tax_email"].forEach((name) => {
+                if (form?.elements[name]) {
+                    form.elements[name].value = profile[name] || "";
+                }
+            });
+
+            const status = root.querySelector("[data-finance-tax-status]");
+
+            if (status) {
+                status.textContent = profile.status || "incomplete";
+            }
+        };
+
+        const load = async () => {
+            root.classList.add("is-loading");
+
+            try {
+                const response = await fetch(`${endpoint}?${queryParams().toString()}`, {
+                    headers: {
+                        Accept: "application/json",
+                        "X-Requested-With": "XMLHttpRequest",
+                    },
+                });
+
+                const payload = await response.json();
+
+                if (!response.ok || !payload.ok) {
+                    throw new Error(payload.message || "No se pudo cargar Finanzas.");
+                }
+
+                renderBranches(payload.branches || []);
+                renderSummary(payload.summary || {});
+                renderMovements(payload.movements || []);
+                renderSettlements(payload.settlements || []);
+                renderInvoices(payload.invoices || []);
+                renderBankAccounts(payload.bank_accounts || []);
+                renderDisputes(payload.disputes || []);
+                fillTaxProfile(payload.tax_profile);
+            } catch (error) {
+                console.error("PETPAY Finanzas", error);
+                root.querySelector("[data-finance-movements]").innerHTML =
+                    '<tr><td colspan="8" class="commerce-finance__empty">No se pudo cargar la información financiera.</td></tr>';
+            } finally {
+                root.classList.remove("is-loading");
+            }
+        };
+
+        root.querySelector("[data-finance-apply]")?.addEventListener("click", load);
+        root.querySelector("[data-finance-refresh]")?.addEventListener("click", load);
+        root.querySelector("[data-finance-export]")?.addEventListener("click", () => {
+            window.location.href = `${exportUrl}?${queryParams().toString()}`;
+        });
+
+        setTabs();
+        load();
+    };
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init, { once: true });
+    } else {
+        init();
+    }
+})();

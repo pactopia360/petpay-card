@@ -1,0 +1,853 @@
+/* ==========================================================================
+   PETPAY COMERCIO — DASHBOARD V2
+   Diseño basado en panel administrativo de referencia
+   ========================================================================== */
+
+:root {
+    --commerce-v2-bg: #f4efe3;
+    --commerce-v2-surface: #faf7f0;
+    --commerce-v2-surface-strong: #ffffff;
+    --commerce-v2-text: #071a36;
+    --commerce-v2-heading: #505967;
+    --commerce-v2-muted: #737984;
+    --commerce-v2-line: #d8d1c5;
+    --commerce-v2-line-soft: #e8e1d6;
+    --commerce-v2-active: #555c66;
+    --commerce-v2-blue: #9fc7ec;
+    --commerce-v2-pink: #ffd7f4;
+    --commerce-v2-green: #169b62;
+    --commerce-v2-red: #c43d34;
+    --commerce-v2-radius: 12px;
+    --commerce-v2-shadow: 0 4px 18px rgba(44, 38, 29, 0.055);
+}
+
+html,
+body,
+.petpay-page-comercio {
+    background: var(--commerce-v2-bg) !important;
+}
+
+.petpay-page-comercio {
+    min-height: 100vh !important;
+    color: var(--commerce-v2-text) !important;
+}
+
+.petpay-page-comercio .petpay-main {
+    width: 100% !important;
+    min-height: calc(100vh - 56px) !important;
+    padding: 0 !important;
+    background: var(--commerce-v2-bg) !important;
+}
+
+.commerce-admin {
+    width: min(1120px, calc(100vw - 40px)) !important;
+    margin: 0 auto !important;
+    padding: 26px 0 64px !important;
+    color: var(--commerce-v2-text) !important;
+}
+
+/* Banner */
+
+.commerce-admin__hero {
+    display: block !important;
+    width: 100% !important;
+    height: 152px !important;
+    margin: 0 0 34px !important;
+    overflow: hidden !important;
+    border: 0 !important;
+    border-radius: 14px !important;
+    background: #ded6c8 !important;
+    box-shadow: none !important;
+}
+
+.commerce-admin__hero img {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
+}
+
+/* Encabezado principal */
+
+.commerce-admin__title {
+    margin: 0 0 30px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.commerce-admin__title h1 {
+    margin: 0 0 6px !important;
+    color: var(--commerce-v2-heading) !important;
+    font-size: clamp(34px, 4.4vw, 52px) !important;
+    line-height: 0.96 !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.065em !important;
+}
+
+.commerce-admin__title p {
+    margin: 0 !important;
+    color: var(--commerce-v2-heading) !important;
+    font-size: clamp(17px, 2vw, 23px) !important;
+    line-height: 1.15 !important;
+    font-weight: 400 !important;
+    letter-spacing: -0.035em !important;
+}
+
+/* Pestañas */
+
+.commerce-admin__tabs {
+    display: grid !important;
+    grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+    gap: 9px !important;
+    width: 100% !important;
+    margin: 0 0 34px !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.commerce-admin__tab {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 46px !important;
+    padding: 0 12px !important;
+    border: 1px solid var(--commerce-v2-line) !important;
+    border-radius: 8px !important;
+    background: transparent !important;
+    color: #536072 !important;
+    font-size: 13px !important;
+    line-height: 1 !important;
+    font-weight: 650 !important;
+    cursor: pointer !important;
+    box-shadow: none !important;
+    transition:
+        transform 0.16s ease,
+        background 0.16s ease,
+        border-color 0.16s ease,
+        color 0.16s ease !important;
+}
+
+.commerce-admin__tab:hover:not(:disabled) {
+    transform: translateY(-1px) !important;
+    border-color: #bdb5a8 !important;
+    background: #f9f5ed !important;
+}
+
+.commerce-admin__tab.is-active {
+    border-color: var(--commerce-v2-active) !important;
+    background: var(--commerce-v2-active) !important;
+    color: #ffffff !important;
+}
+
+.commerce-admin__tab:disabled {
+    opacity: 0.6 !important;
+    cursor: not-allowed !important;
+}
+
+/* Paneles */
+
+.commerce-tab-panel {
+    display: none !important;
+}
+
+.commerce-tab-panel.is-active {
+    display: block !important;
+}
+
+.commerce-admin__section-title {
+    display: flex !important;
+    align-items: flex-end !important;
+    justify-content: space-between !important;
+    gap: 16px !important;
+    margin: 0 0 18px !important;
+    padding: 0 !important;
+}
+
+.commerce-admin__section-title h2 {
+    margin: 0 !important;
+    color: var(--commerce-v2-heading) !important;
+    font-size: 17px !important;
+    line-height: 1.1 !important;
+    font-weight: 750 !important;
+    letter-spacing: -0.03em !important;
+}
+
+.commerce-admin__section-title p {
+    margin: 0 !important;
+    color: var(--commerce-v2-muted) !important;
+    font-size: 12px !important;
+    line-height: 1.25 !important;
+}
+
+/* KPI */
+
+.commerce-kpis {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+    margin: 0 0 16px !important;
+}
+
+.commerce-kpi-card {
+    min-height: 72px !important;
+    padding: 12px 14px !important;
+    border: 1px solid var(--commerce-v2-line) !important;
+    border-radius: 11px !important;
+    background: rgba(250, 247, 240, 0.86) !important;
+    box-shadow: var(--commerce-v2-shadow) !important;
+    backdrop-filter: none !important;
+}
+
+.commerce-kpi-card__label {
+    display: block !important;
+    margin: 0 0 8px !important;
+    color: var(--commerce-v2-muted) !important;
+    font-size: 11px !important;
+    line-height: 1.15 !important;
+    font-weight: 700 !important;
+}
+
+.commerce-kpi-card__value {
+    display: block !important;
+    color: var(--commerce-v2-text) !important;
+    font-size: 20px !important;
+    line-height: 1 !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.04em !important;
+}
+
+/* Bloques principales */
+
+.commerce-info-block,
+.commerce-branch-form,
+.commerce-branches-list {
+    margin: 0 0 16px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    border: 1px solid var(--commerce-v2-line) !important;
+    border-radius: 13px !important;
+    background: rgba(250, 247, 240, 0.92) !important;
+    box-shadow: var(--commerce-v2-shadow) !important;
+    backdrop-filter: none !important;
+}
+
+.commerce-info-block__header,
+.commerce-branch-toolbar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 14px !important;
+    margin: 0 !important;
+    padding: 15px 16px !important;
+    border-bottom: 1px solid var(--commerce-v2-line-soft) !important;
+    background: rgba(255, 255, 255, 0.28) !important;
+}
+
+.commerce-info-block__title {
+    margin: 0 0 3px !important;
+    color: var(--commerce-v2-heading) !important;
+    font-size: 15px !important;
+    line-height: 1.1 !important;
+    font-weight: 750 !important;
+}
+
+.commerce-info-block__subtitle {
+    margin: 0 !important;
+    color: var(--commerce-v2-muted) !important;
+    font-size: 11px !important;
+    line-height: 1.3 !important;
+}
+
+.commerce-info-block__meta {
+    min-width: 170px !important;
+    padding: 8px 10px !important;
+    border: 1px solid #e7d8c5 !important;
+    border-radius: 9px !important;
+    background: #fff8ef !important;
+    text-align: right !important;
+}
+
+.commerce-info-block__meta-main {
+    display: block !important;
+    color: #81522b !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+}
+
+.commerce-info-block__meta-sub {
+    display: block !important;
+    margin-top: 2px !important;
+    color: var(--commerce-v2-muted) !important;
+    font-size: 10px !important;
+}
+
+.commerce-info-block .commerce-admin__form,
+.commerce-info-block__content-area {
+    padding: 16px !important;
+}
+
+/* Formularios */
+
+.commerce-admin__grid,
+.commerce-branch-grid {
+    display: grid !important;
+    gap: 16px 14px !important;
+}
+
+.commerce-admin__grid--three,
+.commerce-branch-grid--three {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
+.commerce-admin__grid--two,
+.commerce-branch-grid--two {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+.commerce-admin__grid--address,
+.commerce-branch-grid--address {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1.2fr) 100px minmax(150px, 1fr) !important;
+}
+
+.commerce-admin__grid--bottom {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    align-items: start !important;
+    gap: 14px !important;
+}
+
+.commerce-field {
+    display: grid !important;
+    gap: 6px !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    color: var(--commerce-v2-text) !important;
+}
+
+.commerce-field>span:first-child,
+.commerce-fieldset__legend {
+    display: block !important;
+    min-height: auto !important;
+    margin: 0 !important;
+    color: var(--commerce-v2-text) !important;
+    font-size: 12px !important;
+    line-height: 1.15 !important;
+    font-weight: 650 !important;
+}
+
+.commerce-field input,
+.commerce-field select,
+.commerce-field textarea {
+    display: block !important;
+    width: 100% !important;
+    min-height: 40px !important;
+    height: 40px !important;
+    margin: 0 !important;
+    padding: 0 12px !important;
+    border: 1px solid #d4cdc2 !important;
+    border-radius: 7px !important;
+    background: #ffffff !important;
+    color: var(--commerce-v2-text) !important;
+    font: inherit !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.commerce-field textarea {
+    height: auto !important;
+    min-height: 90px !important;
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+}
+
+.commerce-field input::placeholder,
+.commerce-field textarea::placeholder {
+    color: #9b9b9f !important;
+    font-style: italic !important;
+    font-weight: 400 !important;
+}
+
+.commerce-field input:focus,
+.commerce-field select:focus,
+.commerce-field textarea:focus {
+    border-color: var(--commerce-v2-blue) !important;
+    box-shadow: 0 0 0 3px rgba(159, 199, 236, 0.18) !important;
+}
+
+.commerce-fieldset {
+    margin: 16px 0 0 !important;
+    padding: 14px !important;
+    border: 1px dashed #d8d1c5 !important;
+    border-radius: 10px !important;
+    background: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Verificación */
+
+.commerce-verify {
+    position: relative !important;
+    display: block !important;
+    height: 40px !important;
+}
+
+.commerce-verify input {
+    height: 40px !important;
+    padding-right: 116px !important;
+}
+
+.commerce-verify__button {
+    position: absolute !important;
+    top: 50% !important;
+    right: 7px !important;
+    min-width: 98px !important;
+    min-height: 24px !important;
+    height: 24px !important;
+    padding: 0 9px !important;
+    border: 0 !important;
+    border-radius: 999px !important;
+    background: var(--commerce-v2-pink) !important;
+    color: #7d7680 !important;
+    font-size: 9px !important;
+    line-height: 1 !important;
+    font-weight: 700 !important;
+    transform: translateY(-50%) !important;
+    box-shadow: none !important;
+}
+
+.commerce-field__hint {
+    min-height: 13px !important;
+    margin: 0 !important;
+    color: var(--commerce-v2-muted) !important;
+    font-size: 9px !important;
+    line-height: 1.2 !important;
+    font-weight: 600 !important;
+}
+
+.commerce-field__hint.is-valid {
+    color: var(--commerce-v2-green) !important;
+}
+
+.commerce-field__hint.is-invalid {
+    color: var(--commerce-v2-red) !important;
+}
+
+/* Botones */
+
+.commerce-admin__save {
+    width: 100% !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    margin: 20px 0 0 !important;
+    padding: 0 14px !important;
+    border: 0 !important;
+    border-radius: 7px !important;
+    background: var(--commerce-v2-blue) !important;
+    color: #ffffff !important;
+    font-size: 13px !important;
+    font-weight: 750 !important;
+    box-shadow: none !important;
+}
+
+.commerce-admin__save:hover {
+    filter: brightness(0.97) !important;
+    transform: none !important;
+}
+
+.commerce-form-actions {
+    display: flex !important;
+    justify-content: flex-end !important;
+    margin-top: 12px !important;
+}
+
+.commerce-form-actions__reset,
+.commerce-ai-button,
+.commerce-branch-map-button,
+.commerce-branch-location-button {
+    min-height: 36px !important;
+    padding: 0 12px !important;
+    border: 1px solid var(--commerce-v2-line) !important;
+    border-radius: 7px !important;
+    background: #ffffff !important;
+    color: var(--commerce-v2-text) !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    box-shadow: none !important;
+}
+
+/* Filtro */
+
+.commerce-filter-block {
+    margin: 0 0 14px !important;
+    padding: 14px !important;
+    border: 1px solid var(--commerce-v2-line) !important;
+    border-radius: 10px !important;
+    background: rgba(255, 255, 255, 0.36) !important;
+    box-shadow: none !important;
+}
+
+.commerce-filter-grid {
+    display: grid !important;
+    grid-template-columns: minmax(220px, 1.5fr) 110px 120px 120px 100px 145px !important;
+    gap: 10px !important;
+    align-items: end !important;
+}
+
+.commerce-filter-field {
+    display: grid !important;
+    gap: 5px !important;
+}
+
+.commerce-filter-field>span {
+    color: var(--commerce-v2-text) !important;
+    font-size: 10px !important;
+    font-weight: 750 !important;
+}
+
+.commerce-filter-field input,
+.commerce-filter-field select {
+    width: 100% !important;
+    height: 36px !important;
+    padding: 0 10px !important;
+    border: 1px solid #d4cdc2 !important;
+    border-radius: 7px !important;
+    background: #ffffff !important;
+    color: var(--commerce-v2-text) !important;
+    font-size: 11px !important;
+}
+
+.commerce-filter-download {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 7px !important;
+    width: 100% !important;
+    height: 36px !important;
+    border: 0 !important;
+    border-radius: 7px !important;
+    background: var(--commerce-v2-active) !important;
+    color: #ffffff !important;
+    font-size: 11px !important;
+    font-weight: 750 !important;
+}
+
+/* Contactos */
+
+.commerce-contacts {
+    display: grid !important;
+    gap: 10px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.commerce-contact-card {
+    position: relative !important;
+    min-height: 0 !important;
+    padding: 13px 14px 44px !important;
+    border: 1px solid var(--commerce-v2-line) !important;
+    border-radius: 10px !important;
+    background: #fffdf9 !important;
+    box-shadow: none !important;
+}
+
+.commerce-contact-card__top {
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    margin: 0 0 9px !important;
+}
+
+.commerce-contact-card__title {
+    margin: 0 !important;
+    color: var(--commerce-v2-text) !important;
+    font-size: 13px !important;
+    font-weight: 750 !important;
+}
+
+.commerce-contact-card__body {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 4px !important;
+    color: var(--commerce-v2-text) !important;
+    font-size: 11px !important;
+    line-height: 1.3 !important;
+}
+
+.commerce-contact-card__body p {
+    margin: 0 !important;
+}
+
+.commerce-contact-card__actions {
+    position: static !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 7px !important;
+}
+
+.commerce-icon-button {
+    display: inline-grid !important;
+    place-items: center !important;
+    width: 30px !important;
+    height: 30px !important;
+    padding: 0 !important;
+    border: 1px solid var(--commerce-v2-line) !important;
+    border-radius: 8px !important;
+    background: #ffffff !important;
+    color: #68717c !important;
+    box-shadow: none !important;
+}
+
+.commerce-icon-button svg {
+    width: 15px !important;
+    height: 15px !important;
+}
+
+.commerce-contact-card__main {
+    position: absolute !important;
+    right: 14px !important;
+    bottom: 11px !important;
+    color: var(--commerce-v2-muted) !important;
+    font-size: 10px !important;
+}
+
+/* Sucursales */
+
+.commerce-branch-form {
+    padding: 16px !important;
+}
+
+.commerce-branch-layout {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 260px !important;
+    gap: 16px !important;
+    align-items: start !important;
+}
+
+.commerce-branch-layout__preview {
+    position: sticky !important;
+    top: 72px !important;
+    display: grid !important;
+    gap: 10px !important;
+}
+
+.commerce-map-card,
+.commerce-branch-ai-card {
+    overflow: hidden !important;
+    border: 1px solid var(--commerce-v2-line) !important;
+    border-radius: 10px !important;
+    background: #fffdf9 !important;
+    box-shadow: none !important;
+}
+
+.commerce-map-card__map {
+    height: 210px !important;
+    border-bottom: 1px solid var(--commerce-v2-line) !important;
+}
+
+.commerce-map-card__body,
+.commerce-branch-ai-card {
+    padding: 12px !important;
+}
+
+.commerce-location-panel {
+    margin: 16px 0 !important;
+    padding: 14px !important;
+    border: 1px solid #e4d8c8 !important;
+    border-radius: 11px !important;
+    background: #fff8ef !important;
+    box-shadow: none !important;
+}
+
+.commerce-location-panel__map {
+    height: 280px !important;
+    min-height: 280px !important;
+    margin-top: 12px !important;
+    border: 1px solid var(--commerce-v2-line) !important;
+    border-radius: 10px !important;
+}
+
+.commerce-service-days {
+    display: grid !important;
+    grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+    gap: 7px !important;
+}
+
+.commerce-service-day {
+    min-height: 50px !important;
+    border: 1px solid var(--commerce-v2-line) !important;
+    border-radius: 8px !important;
+    background: #ffffff !important;
+}
+
+.commerce-branches-list {
+    display: grid !important;
+    gap: 10px !important;
+    padding: 14px !important;
+}
+
+.commerce-branch-card {
+    display: grid !important;
+    grid-template-columns: 10px minmax(0, 1fr) auto !important;
+    gap: 13px !important;
+    padding: 13px !important;
+    border: 1px solid var(--commerce-v2-line) !important;
+    border-radius: 10px !important;
+    background: #fffdf9 !important;
+    box-shadow: none !important;
+}
+
+/* Alertas */
+
+.commerce-alert {
+    margin: 0 0 14px !important;
+    padding: 10px 12px !important;
+    border-radius: 9px !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+}
+
+/* Acordeón */
+
+.commerce-info-block__toggle {
+    width: 28px !important;
+    height: 28px !important;
+    border: 1px solid var(--commerce-v2-line) !important;
+    border-radius: 999px !important;
+    background: transparent !important;
+    color: var(--commerce-v2-heading) !important;
+}
+
+.commerce-info-block__toggle svg {
+    width: 14px !important;
+    height: 14px !important;
+}
+
+/* Paginación */
+
+.commerce-contact-pagination {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+    margin: 12px 0 0 !important;
+    padding: 9px 10px !important;
+    border: 1px solid var(--commerce-v2-line) !important;
+    border-radius: 9px !important;
+    background: #fffdf9 !important;
+}
+
+.commerce-contact-pagination__button {
+    min-width: 30px !important;
+    height: 30px !important;
+    padding: 0 9px !important;
+    border: 1px solid var(--commerce-v2-line) !important;
+    border-radius: 7px !important;
+    background: transparent !important;
+    color: var(--commerce-v2-text) !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+}
+
+.commerce-contact-pagination__button.is-active {
+    border-color: var(--commerce-v2-active) !important;
+    background: var(--commerce-v2-active) !important;
+    color: #ffffff !important;
+}
+
+/* Responsive */
+
+@media (max-width: 1080px) {
+    .commerce-admin__tabs {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    }
+
+    .commerce-filter-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+
+    .commerce-filter-field--search {
+        grid-column: 1 / -1 !important;
+    }
+}
+
+@media (max-width: 900px) {
+    .commerce-admin {
+        width: min(100% - 24px, 1120px) !important;
+    }
+
+    .commerce-kpis {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    .commerce-branch-layout {
+        grid-template-columns: 1fr !important;
+    }
+
+    .commerce-branch-layout__preview {
+        position: static !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    .commerce-admin__grid--three,
+    .commerce-branch-grid--three,
+    .commerce-admin__grid--address,
+    .commerce-branch-grid--address {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .commerce-admin {
+        width: min(100% - 18px, 1120px) !important;
+        padding-top: 16px !important;
+    }
+
+    .commerce-admin__hero {
+        height: 98px !important;
+        margin-bottom: 24px !important;
+    }
+
+    .commerce-admin__tabs {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    .commerce-kpis,
+    .commerce-admin__grid--three,
+    .commerce-branch-grid--three,
+    .commerce-admin__grid--two,
+    .commerce-branch-grid--two,
+    .commerce-admin__grid--address,
+    .commerce-branch-grid--address,
+    .commerce-admin__grid--bottom,
+    .commerce-filter-grid,
+    .commerce-branch-layout__preview {
+        grid-template-columns: 1fr !important;
+    }
+
+    .commerce-admin__save {
+        margin-top: 0 !important;
+    }
+
+    .commerce-info-block__header,
+    .commerce-admin__section-title {
+        align-items: flex-start !important;
+        flex-direction: column !important;
+    }
+
+    .commerce-info-block__meta {
+        width: 100% !important;
+        min-width: 0 !important;
+        text-align: left !important;
+    }
+
+    .commerce-service-days {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}

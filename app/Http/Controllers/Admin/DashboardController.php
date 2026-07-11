@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cliente\CustomerUser;
+use App\Models\Comercio\CommerceBranding;
+use App\Models\Comercio\CommerceUser;
 use App\Models\Proveedor\ProviderUser;
 use App\Models\Repartidor\DriverUser;
 use Illuminate\Support\Facades\DB;
@@ -13,8 +15,26 @@ class DashboardController extends Controller
 {
     public function index(): View
     {
+        $brandingPending = 0;
+
+        foreach (['header', 'icon', 'listing'] as $type) {
+            $brandingPending += CommerceBranding::query()
+                ->where("{$type}_image_status", 'pending')
+                ->count();
+        }
+
         $metrics = [
             'customers_total' => CustomerUser::query()->count(),
+
+            'commerces_pending' => CommerceUser::query()
+                ->where('approval_status', 'pending')
+                ->count(),
+
+            'commerces_approved' => CommerceUser::query()
+                ->where('approval_status', 'approved')
+                ->count(),
+
+            'branding_pending' => $brandingPending,
 
             'providers_pending' => ProviderUser::query()
                 ->where('approval_status', 'pending')

@@ -1,0 +1,59 @@
+<?php
+
+namespace App\Models\Comercio;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class CommerceCatalogBranchStock extends Model
+{
+    protected $connection = 'mysql_comercio';
+
+    protected $table = 'commerce_catalog_branch_stocks';
+
+    protected $fillable = [
+        'commerce_user_id',
+        'branch_id',
+        'product_id',
+        'variant_id',
+        'stock',
+        'reserved_stock',
+        'minimum_stock',
+        'is_available',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'stock' => 'decimal:3',
+            'reserved_stock' => 'decimal:3',
+            'minimum_stock' => 'decimal:3',
+            'is_available' => 'boolean',
+        ];
+    }
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(CommerceBranch::class, 'branch_id');
+    }
+
+    public function product(): BelongsTo
+    {
+        return $this->belongsTo(CommerceCatalogProduct::class, 'product_id');
+    }
+
+    public function variant(): BelongsTo
+    {
+        return $this->belongsTo(CommerceCatalogProductVariant::class, 'variant_id');
+    }
+
+    public function getAvailableStockAttribute(): float
+    {
+        return max(0, (float) $this->stock - (float) $this->reserved_stock);
+    }
+
+    public function getIsLowStockAttribute(): bool
+    {
+        return $this->available_stock <= (float) $this->minimum_stock;
+    }
+}

@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DriverApprovalController;
 use App\Http\Controllers\Admin\ProviderApprovalController;
 use App\Http\Controllers\Admin\CommerceApprovalController;
+use App\Http\Controllers\Admin\CommerceBrandingReviewController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -42,6 +43,14 @@ Route::middleware(['auth:admin', 'role:admin,admin'])->group(function () {
     Route::post('/comercios/{commerceUser}/rechazar', [CommerceApprovalController::class, 'reject'])
         ->name('commerces.reject');
 
+    Route::get('/branding/pendientes', [CommerceBrandingReviewController::class, 'index'])
+        ->name('branding.pending');
+
+    Route::patch('/branding/{branding}/{type}/aprobar', [CommerceBrandingReviewController::class, 'approve'])
+        ->name('branding.approve');
+
+    Route::patch('/branding/{branding}/{type}/rechazar', [CommerceBrandingReviewController::class, 'reject'])
+        ->name('branding.reject');
     Route::get('/proveedores/pendientes', [ProviderApprovalController::class, 'index'])
         ->name('providers.pending');
 

@@ -1,0 +1,259 @@
+(() => {
+    "use strict";
+
+    const init = () => {
+        const form = document.getElementById("commerceCatalogProductForm");
+
+        if (!form) {
+            return;
+        }
+
+        const search = document.getElementById("commerceCatalogSearch");
+        const categoryFilter = document.getElementById("commerceCatalogCategoryFilter");
+        const statusFilter = document.getElementById("commerceCatalogStatusFilter");
+        const cards = Array.from(document.querySelectorAll("[data-catalog-product-card]"));
+        const resetButton = document.getElementById("commerceCatalogResetButton");
+        const methodInput = document.getElementById("commerceCatalogMethod");
+        const submitButton = document.getElementById("commerceCatalogSubmitButton");
+        const variantsContainer = document.getElementById("catalogVariantsContainer");
+        const addVariantButton = document.getElementById("catalogAddVariantButton");
+        const imageInput = document.getElementById("catalogImageInput");
+        const imagePreview = document.getElementById("catalogImagePreview");
+        const priceInput = document.getElementById("catalogPrice");
+        const costInput = document.getElementById("catalogCost");
+        const saleInput = document.getElementById("catalogSalePrice");
+        const marginValue = document.getElementById("catalogMarginValue");
+        const profitValue = document.getElementById("catalogProfitValue");
+
+        let variantIndex = 0;
+
+        const applyFilters = () => {
+            const needle = String(search?.value || "").toLowerCase().trim();
+            const category = String(categoryFilter?.value || "");
+            const status = String(statusFilter?.value || "");
+
+            cards.forEach((card) => {
+                const matchesSearch = !needle || String(card.dataset.search || "").includes(needle);
+                const matchesCategory = !category || String(card.dataset.category || "") === category;
+                const matchesStatus = !status || String(card.dataset.status || "") === status;
+                card.hidden = !(matchesSearch && matchesCategory && matchesStatus);
+            });
+        };
+
+        [search, categoryFilter, statusFilter].forEach((field) => {
+            field?.addEventListener("input", applyFilters);
+            field?.addEventListener("change", applyFilters);
+        });
+
+        document.querySelectorAll("[data-catalog-subtab]").forEach((button) => {
+            button.addEventListener("click", () => {
+                const name = button.dataset.catalogSubtab;
+
+                document.querySelectorAll("[data-catalog-subtab]").forEach((item) => {
+                    item.classList.toggle("is-active", item === button);
+                });
+
+                document.querySelectorAll("[data-catalog-subpanel]").forEach((panel) => {
+                    panel.hidden = panel.dataset.catalogSubpanel !== name;
+                });
+            });
+        });
+
+        document.querySelectorAll("[data-catalog-toggle]").forEach((button) => {
+            button.addEventListener("click", () => {
+                button.closest(".commerce-catalog__block--collapsible")?.classList.toggle("is-open");
+            });
+        });
+
+        document.querySelectorAll("[data-catalog-open-section]").forEach((button) => {
+            button.addEventListener("click", () => {
+                const target = document.querySelector(`[data-catalog-section="${button.dataset.catalogOpenSection}"]`);
+                target?.classList.add("is-open");
+                target?.scrollIntoView({ behavior: "smooth", block: "start" });
+            });
+        });
+
+        const calculateMargin = () => {
+            const cost = Number(costInput?.value || 0);
+            const normal = Number(priceInput?.value || 0);
+            const sale = Number(saleInput?.value || 0);
+            const effective = sale > 0 ? sale : normal;
+            const profit = effective - cost;
+            const margin = effective > 0 ? (profit / effective) * 100 : 0;
+
+            if (marginValue) {
+                marginValue.textContent = `${margin.toFixed(2)}%`;
+            }
+
+            if (profitValue) {
+                profitValue.textContent = `$${profit.toFixed(2)} utilidad`;
+            }
+        };
+
+        [priceInput, costInput, saleInput].forEach((field) => {
+            field?.addEventListener("input", calculateMargin);
+        });
+
+        imageInput?.addEventListener("change", () => {
+            const file = imageInput.files?.[0];
+
+            if (!file || !imagePreview) {
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.addEventListener("load", () => {
+                imagePreview.src = String(reader.result || "");
+                imagePreview.hidden = false;
+            });
+            reader.readAsDataURL(file);
+        });
+
+        const addVariant = (data = {}) => {
+            if (!variantsContainer) {
+                return;
+            }
+
+            const index = variantIndex++;
+            const row = document.createElement("div");
+            row.className = "commerce-catalog__variant-row";
+            row.innerHTML = `
+                <label class="commerce-catalog__field">
+                    <span>Nombre</span>
+                    <input name="variants[${index}][name]" value="${String(data.name || "").replaceAll('"', '&quot;')}">
+                </label>
+                <label class="commerce-catalog__field">
+                    <span>SKU</span>
+                    <input name="variants[${index}][sku]" value="${String(data.sku || "").replaceAll('"', '&quot;')}">
+                </label>
+                <label class="commerce-catalog__field">
+                    <span>Código</span>
+                    <input name="variants[${index}][barcode]" value="${String(data.barcode || "").replaceAll('"', '&quot;')}">
+                </label>
+                <label class="commerce-catalog__field">
+                    <span>Atributos</span>
+                    <input name="variants[${index}][attributes]" value="${String(data.attributes || "").replaceAll('"', '&quot;')}" placeholder="5 kg, pollo">
+                </label>
+                <label class="commerce-catalog__field">
+                    <span>Precio</span>
+                    <input type="number" min="0" step="0.01" name="variants[${index}][price]" value="${data.price ?? ""}">
+                </label>
+                <label class="commerce-catalog__field">
+                    <span>Oferta</span>
+                    <input type="number" min="0" step="0.01" name="variants[${index}][sale_price]" value="${data.sale_price ?? ""}">
+                </label>
+                <button type="button" class="commerce-catalog__variant-remove" aria-label="Eliminar variante">×</button>
+            `;
+
+            row.querySelector(".commerce-catalog__variant-remove")?.addEventListener("click", () => row.remove());
+            variantsContainer.appendChild(row);
+        };
+
+        addVariantButton?.addEventListener("click", () => addVariant());
+
+        const setField = (name, value) => {
+            const field = form.elements.namedItem(name);
+
+            if (!field) {
+                return;
+            }
+
+            if (field.type === "checkbox") {
+                field.checked = Boolean(value);
+                return;
+            }
+
+            field.value = value ?? "";
+        };
+
+        const clearDynamic = () => {
+            variantsContainer && (variantsContainer.innerHTML = "");
+            variantIndex = 0;
+
+            if (imagePreview) {
+                imagePreview.removeAttribute("src");
+                imagePreview.hidden = true;
+            }
+        };
+
+        const resetForm = () => {
+            form.reset();
+            form.action = form.dataset.storeAction;
+            methodInput && (methodInput.value = "POST");
+            submitButton && (submitButton.textContent = "Guardar producto");
+            resetButton && (resetButton.hidden = true);
+            clearDynamic();
+            calculateMargin();
+        };
+
+        resetButton?.addEventListener("click", resetForm);
+
+        document.querySelectorAll("[data-catalog-edit-product]").forEach((button) => {
+            button.addEventListener("click", () => {
+                let product = {};
+
+                try {
+                    product = JSON.parse(button.dataset.product || "{}");
+                } catch (error) {
+                    product = {};
+                }
+
+                form.action = button.dataset.updateAction || form.dataset.storeAction;
+                methodInput && (methodInput.value = "PUT");
+
+                [
+                    "item_type",
+                    "name",
+                    "sku",
+                    "barcode",
+                    "category_id",
+                    "brand_id",
+                    "supplier_name",
+                    "short_description",
+                    "description",
+                    "price",
+                    "cost",
+                    "sale_price",
+                    "sale_starts_at",
+                    "sale_ends_at",
+                    "unit",
+                    "status",
+                    "tags",
+                    "weight",
+                    "length",
+                    "width",
+                    "height",
+                ].forEach((name) => setField(name, product[name]));
+
+                setField("track_stock", product.track_stock);
+                setField("is_visible", product.is_visible);
+
+                clearDynamic();
+                (product.variants || []).forEach((variant) => addVariant(variant));
+
+                Object.entries(product.stocks || {}).forEach(([branchId, stock]) => {
+                    setField(`branch_stock[${branchId}]`, stock.stock);
+                    setField(`branch_reserved_stock[${branchId}]`, stock.reserved_stock);
+                    setField(`branch_minimum_stock[${branchId}]`, stock.minimum_stock);
+                    setField(`branch_available[${branchId}]`, stock.is_available);
+                });
+
+                calculateMargin();
+                submitButton && (submitButton.textContent = "Actualizar producto");
+                resetButton && (resetButton.hidden = false);
+
+                const section = document.querySelector('[data-catalog-section="productForm"]');
+                section?.classList.add("is-open");
+                section?.scrollIntoView({ behavior: "smooth", block: "start" });
+            });
+        });
+
+        calculateMargin();
+    };
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init, { once: true });
+    } else {
+        init();
+    }
+})();

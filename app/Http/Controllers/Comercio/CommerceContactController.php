@@ -145,12 +145,12 @@ class CommerceContactController extends Controller
             'state' => ['nullable', 'string', Rule::in($this->stateKeys())],
 
             'phone' => ['nullable', 'regex:/^[0-9]{10}$/'],
-            'email' => ['nullable', 'email:rfc,dns', 'max:191'],
+            'email' => ['nullable', 'email:rfc', 'max:191'],
         ], [
             'first_name.required' => 'Ingresa el nombre del contacto.',
-            'phone.regex' => 'El teléfono debe tener 10 dígitos.',
-            'email.email' => 'Ingresa un correo electrónico válido.',
-            'state.in' => 'Selecciona un estado válido.',
+            'phone.regex' => 'El telÃ©fono debe tener 10 dÃ­gitos.',
+            'email.email' => 'Ingresa un correo electrÃ³nico vÃ¡lido.',
+            'state.in' => 'Selecciona un estado vÃ¡lido.',
         ]);
     }
 
@@ -234,3 +234,4 @@ class CommerceContactController extends Controller
         ];
     }
 }
+

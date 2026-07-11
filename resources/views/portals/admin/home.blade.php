@@ -421,10 +421,10 @@
             </div>
 
             <div class="petpay-admin-metrics">
-                <a href="{{ route('admin.providers.pending') }}" class="petpay-admin-metric">
+                <a href="{{ route('admin.commerces.pending') }}" class="petpay-admin-metric">
                     <div class="petpay-admin-metric-top">
                         <div>
-                            <strong>{{ number_format($metrics['providers_pending'] ?? 0) }}</strong>
+                            <strong>{{ number_format($metrics['commerces_pending'] ?? 0) }}</strong>
                             <span>Comercios pendientes</span>
                         </div>
 
@@ -457,7 +457,7 @@
                 <div class="petpay-admin-metric">
                     <div class="petpay-admin-metric-top">
                         <div>
-                            <strong>{{ number_format($metrics['providers_approved'] ?? 0) }}</strong>
+                            <strong>{{ number_format($metrics['commerces_approved'] ?? 0) }}</strong>
                             <span>Comercios aprobados</span>
                         </div>
 
@@ -508,6 +508,17 @@
                         <span class="petpay-admin-metric-icon">📍</span>
                     </div>
                 </div>
+            
+                <a href="{{ route('admin.branding.pending') }}" class="petpay-admin-metric">
+                    <div class="petpay-admin-metric-top">
+                        <div>
+                            <strong>{{ number_format($metrics['branding_pending'] ?? 0) }}</strong>
+                            <span>Imágenes Branding pendientes</span>
+                        </div>
+
+                        <span class="petpay-admin-metric-icon">🖼️</span>
+                    </div>
+                </a>
             </div>
 
             <div class="petpay-admin-section">
@@ -527,7 +538,7 @@
                 </div>
 
                 <div class="petpay-admin-actions">
-                    <a href="{{ route('admin.providers.pending') }}" class="petpay-admin-action">
+                    <a href="{{ route('admin.commerces.pending') }}" class="petpay-admin-action">
                         <div>
                             <span class="petpay-admin-action-icon">🏪</span>
 
@@ -552,6 +563,19 @@
 
                         <span class="petpay-admin-action-arrow">›</span>
                     </a>
+                    <a href="{{ route('admin.branding.pending') }}" class="petpay-admin-action">
+                        <div>
+                            <span class="petpay-admin-action-icon">🖼️</span>
+
+                            <div style="margin-top: 14px;">
+                                <strong>Branding</strong>
+                                <span>Revisar imágenes enviadas por los comercios.</span>
+                            </div>
+                        </div>
+
+                        <span class="petpay-admin-action-arrow">›</span>
+                    </a>
+
 
                     <a href="#" class="petpay-admin-action">
                         <div>
