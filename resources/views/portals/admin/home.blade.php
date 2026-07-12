@@ -509,6 +509,16 @@
                     </div>
                 </div>
             
+                <a href="{{ route('admin.identities.index') }}" class="petpay-admin-metric">
+                    <div class="petpay-admin-metric-top">
+                        <div>
+                            <strong>{{ number_format($metrics['identities_pending'] ?? 0) }}</strong>
+                            <span>Identidades pendientes</span>
+                        </div>
+                        <span class="petpay-admin-metric-icon">🪪</span>
+                    </div>
+                </a>
+
                 <a href="{{ route('admin.branding.pending') }}" class="petpay-admin-metric">
                     <div class="petpay-admin-metric-top">
                         <div>
@@ -563,6 +573,17 @@
 
                         <span class="petpay-admin-action-arrow">›</span>
                     </a>
+                    <a href="{{ route('admin.identities.index') }}" class="petpay-admin-action">
+                        <div>
+                            <span class="petpay-admin-action-icon">🪪</span>
+                            <div style="margin-top: 14px;">
+                                <strong>Identidad y firma</strong>
+                                <span>Validar INE, domicilio, representación legal y expediente del firmante.</span>
+                            </div>
+                        </div>
+                        <span class="petpay-admin-action-arrow">›</span>
+                    </a>
+
                     <a href="{{ route('admin.branding.pending') }}" class="petpay-admin-action">
                         <div>
                             <span class="petpay-admin-action-icon">🖼️</span>

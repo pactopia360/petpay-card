@@ -1741,6 +1741,10 @@
         rel="stylesheet"
         href="{{ asset('assets/petpay-card/css/portals/comercio-finanzas.css') }}?v=20260711-03"
     >
+    <link
+        rel="stylesheet"
+        href="{{ asset('assets/petpay-card/css/portals/comercio-growth-contracts.css') }}?v=20260711-02"
+    >
 @endpush
 
 @section('content')
@@ -1802,11 +1806,21 @@
                 Finanzas
             </button>
 
-            <button type="button" class="commerce-admin__tab" disabled>
+            <button
+                type="button"
+                class="commerce-admin__tab {{ ($activeTab ?? 'usuarios') === 'monetizar' ? 'is-active' : '' }}"
+                data-commerce-tab-button="monetizar"
+                aria-pressed="{{ ($activeTab ?? 'usuarios') === 'monetizar' ? 'true' : 'false' }}"
+            >
                 Monetizar
             </button>
 
-            <button type="button" class="commerce-admin__tab" disabled>
+            <button
+                type="button"
+                class="commerce-admin__tab {{ ($activeTab ?? 'usuarios') === 'contratos' ? 'is-active' : '' }}"
+                data-commerce-tab-button="contratos"
+                aria-pressed="{{ ($activeTab ?? 'usuarios') === 'contratos' ? 'true' : 'false' }}"
+            >
                 Contratos
             </button>
         </nav>
@@ -3629,6 +3643,10 @@
 
 
         @include('comercio.partials.finance')
+
+@include('comercio.partials.monetization')
+
+@include('comercio.partials.contracts')
 
 <div
             class="commerce-tab-panel {{ ($activeTab ?? 'usuarios') === 'branding' ? 'is-active' : '' }}"
@@ -5982,6 +6000,7 @@
     <script src="{{ asset('assets/petpay-card/js/portals/comercio-branding.js') }}?v=20260711-04"></script>
     <script src="{{ asset('assets/petpay-card/js/portals/comercio-catalogos.js') }}?v=20260712-04"></script>
     <script src="{{ asset('assets/petpay-card/js/portals/comercio-finanzas.js') }}?v=20260711-03"></script>
+    <script src="{{ asset('assets/petpay-card/js/portals/comercio-growth-contracts.js') }}?v=20260711-02"></script>
 @endpush
 
 

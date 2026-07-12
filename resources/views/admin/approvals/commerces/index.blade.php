@@ -620,6 +620,11 @@
                             + Registro comercial
                             <span>Abre el formulario público para dar de alta un comercio vendedor.</span>
                         </a>
+
+                        <a href="{{ route('admin.identities.index') }}" class="commerce-admin-side-link">
+                            🪪 Identidad y representación legal
+                            <span>Revisa INE, domicilio, acta, poderes y habilitación de firma.</span>
+                        </a>
                     </div>
                 </aside>
             </div>

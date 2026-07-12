@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Cliente\CustomerUser;
 use App\Models\Comercio\CommerceBranding;
+use App\Models\Comercio\CommerceIdentityProfile;
 use App\Models\Comercio\CommerceUser;
 use App\Models\Proveedor\ProviderUser;
 use App\Models\Repartidor\DriverUser;
@@ -35,6 +36,10 @@ class DashboardController extends Controller
                 ->count(),
 
             'branding_pending' => $brandingPending,
+
+            'identities_pending' => CommerceIdentityProfile::query()
+                ->whereIn('status', ['submitted', 'under_review'])
+                ->count(),
 
             'providers_pending' => ProviderUser::query()
                 ->where('approval_status', 'pending')

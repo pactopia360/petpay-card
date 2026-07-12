@@ -153,6 +153,11 @@ class CommerceUser extends Authenticatable
         );
     }
 
+    public function identityProfiles(): HasMany
+    {
+        return $this->hasMany(CommerceIdentityProfile::class, 'commerce_user_id');
+    }
+
     public function catalogProducts(): HasMany
     {
         return $this->hasMany(

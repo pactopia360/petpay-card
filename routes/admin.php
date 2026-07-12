@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\DriverApprovalController;
 use App\Http\Controllers\Admin\ProviderApprovalController;
 use App\Http\Controllers\Admin\CommerceApprovalController;
 use App\Http\Controllers\Admin\CommerceBrandingReviewController;
+use App\Http\Controllers\Admin\CommerceIdentityReviewController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -42,6 +43,27 @@ Route::middleware(['auth:admin', 'role:admin,admin'])->group(function () {
 
     Route::post('/comercios/{commerceUser}/rechazar', [CommerceApprovalController::class, 'reject'])
         ->name('commerces.reject');
+
+    Route::get('/identidades', [CommerceIdentityReviewController::class, 'index'])
+        ->name('identities.index');
+
+    Route::post('/identidades/{profile}/iniciar', [CommerceIdentityReviewController::class, 'startReview'])
+        ->name('identities.start');
+
+    Route::post('/identidades/{profile}/documentos/{document}/revisar', [CommerceIdentityReviewController::class, 'reviewDocument'])
+        ->name('identities.documents.review');
+
+    Route::get('/identidades/documentos/{document}', [CommerceIdentityReviewController::class, 'document'])
+        ->name('identities.documents.show');
+
+    Route::post('/identidades/{profile}/aprobar', [CommerceIdentityReviewController::class, 'approve'])
+        ->name('identities.approve');
+
+    Route::post('/identidades/{profile}/correcciones', [CommerceIdentityReviewController::class, 'corrections'])
+        ->name('identities.corrections');
+
+    Route::post('/identidades/{profile}/rechazar', [CommerceIdentityReviewController::class, 'reject'])
+        ->name('identities.reject');
 
     Route::get('/branding/pendientes', [CommerceBrandingReviewController::class, 'index'])
         ->name('branding.pending');
