@@ -1,0 +1,336 @@
+(() => {
+    'use strict';
+
+    const registerHero = document.querySelector(
+        '[data-driver-register-hero]'
+    );
+
+    if (registerHero) {
+        const backgroundImage =
+            registerHero.dataset.backgroundImage || '';
+
+        if (backgroundImage !== '') {
+            registerHero.style.backgroundImage =
+                `url("${backgroundImage}")`;
+        }
+    }
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[data-password-toggle]').forEach((button) => {
+        button.addEventListener('click', () => {
+            const input = document.getElementById(button.dataset.passwordToggle);
+            if (!input) return;
+            const show = input.type === 'password';
+            input.type = show ? 'text' : 'password';
+            button.textContent = show ? 'Ocultar' : 'Ver';
+        });
+    });
+
+    const vehicle = document.querySelector('[data-driver-vehicle]');
+    const motorFields = document.querySelectorAll('[data-driver-motor-field]');
+    const vehicleFields = document.querySelectorAll('[data-driver-vehicle-field]');
+
+    const syncVehicleFields = () => {
+        const type = vehicle?.value || '';
+        const motor = type === 'motorcycle' || type === 'car';
+        const needsVehicleData = type !== '' && type !== 'walking';
+
+        motorFields.forEach((field) => {
+            field.hidden = !motor;
+            const input = field.querySelector('input');
+            if (input) input.required = motor;
+        });
+
+        vehicleFields.forEach((field) => {
+            field.hidden = !needsVehicleData;
+        });
+    };
+
+    syncVehicleFields();
+
+
+    const vehicleMake = document.querySelector('[data-driver-vehicle-make]');
+    const vehicleModel = document.querySelector('[data-driver-vehicle-model]');
+
+    const vehicleCatalog = {
+        motorcycle: {
+            'Honda': ['Cargo 150', 'CB125F', 'CB160F', 'GL150 DS', 'Navi', 'XR150L'],
+            'Yamaha': ['FZ-S', 'YBR125', 'XMAX 300', 'NMAX', 'Crypton 110', 'Ray ZR'],
+            'Italika': ['FT125', 'FT150', 'FT200', 'DM150', 'DM200', 'WS150', 'WS175', 'D125'],
+            'Suzuki': ['GN125', 'Gixxer 150', 'Address 115', 'Burgman Street', 'V-Strom 250'],
+            'Bajaj': ['Boxer 150', 'Pulsar NS125', 'Pulsar NS160', 'Pulsar N250', 'Dominar 250'],
+            'Vento': ['Rocketman 150', 'Storm 150', 'Lithium 150', 'Crossmax 200', 'Tornado 250'],
+            'TVS': ['HLX 150', 'Raider 125', 'Apache RTR 160', 'NTorq 125'],
+            'Kawasaki': ['Z125', 'Z400', 'Ninja 400', 'Versys-X 300'],
+            'KTM': ['Duke 200', 'Duke 250', 'Adventure 250', 'RC 200'],
+            'BMW': ['G 310 R', 'G 310 GS', 'C 400 X'],
+            'Otra': ['Otro modelo']
+        },
+        car: {
+            'Nissan': ['March', 'Versa', 'V-Drive', 'Sentra', 'Kicks', 'NP300'],
+            'Chevrolet': ['Aveo', 'Onix', 'Spark', 'Tracker', 'Groove', 'Tornado Van'],
+            'Volkswagen': ['Polo', 'Virtus', 'Vento', 'Jetta', 'Taos', 'Saveiro'],
+            'Toyota': ['Yaris', 'Corolla', 'Avanza', 'Raize', 'Hilux'],
+            'Kia': ['Rio', 'K3', 'Forte', 'Soul', 'Seltos'],
+            'Hyundai': ['Grand i10', 'HB20', 'Accent', 'Creta'],
+            'Renault': ['Kwid', 'Logan', 'Stepway', 'Duster', 'Kangoo'],
+            'Ford': ['Figo', 'Focus', 'Escape', 'Ranger', 'Transit'],
+            'Mazda': ['Mazda 2', 'Mazda 3', 'CX-3', 'CX-30'],
+            'Honda': ['City', 'Civic', 'HR-V', 'BR-V'],
+            'Suzuki': ['Ignis', 'Swift', 'Ciaz', 'Ertiga', 'S-Cross'],
+            'MG': ['MG3', 'MG5', 'ZS', 'GT'],
+            'Otra': ['Otro modelo']
+        },
+        bicycle: {
+            'Benotto': ['Montaña', 'Urbana', 'Ruta', 'Eléctrica'],
+            'Mercurio': ['Montaña', 'Urbana', 'Plegable', 'Eléctrica'],
+            'Trek': ['Marlin 5', 'Marlin 6', 'FX 1', 'Verve 1'],
+            'Specialized': ['Rockhopper', 'Sirrus', 'Turbo Vado'],
+            'Giant': ['Talon', 'Escape', 'Roam', 'Explore E+'],
+            'Scott': ['Aspect', 'Sub Cross', 'Scale'],
+            'Otra': ['Otro modelo']
+        }
+    };
+
+    const fillSelect = (select, values, placeholder, selectedValue = '') => {
+        if (!select) return;
+
+        select.innerHTML = '';
+
+        const emptyOption = document.createElement('option');
+        emptyOption.value = '';
+        emptyOption.textContent = placeholder;
+        select.appendChild(emptyOption);
+
+        values.forEach((value) => {
+            const option = document.createElement('option');
+            option.value = value;
+            option.textContent = value;
+            option.selected = value === selectedValue;
+            select.appendChild(option);
+        });
+    };
+
+    const syncVehicleMakes = () => {
+        if (!vehicleMake || !vehicleModel) return;
+
+        const type = vehicle?.value || '';
+        const catalog = vehicleCatalog[type] || {};
+        const previousMake = vehicleMake.dataset.oldValue || vehicleMake.value || '';
+        const makes = Object.keys(catalog);
+
+        fillSelect(vehicleMake, makes, 'Selecciona una marca', previousMake);
+
+        if (makes.includes(previousMake)) {
+            syncVehicleModels();
+        } else {
+            fillSelect(vehicleModel, [], 'Selecciona primero una marca');
+        }
+
+        const requiresVehicleCatalog = ['motorcycle', 'car', 'bicycle'].includes(type);
+
+        vehicleMake.required = requiresVehicleCatalog;
+        vehicleModel.required = requiresVehicleCatalog;
+    };
+
+    const syncVehicleModels = () => {
+        if (!vehicleMake || !vehicleModel) return;
+
+        const type = vehicle?.value || '';
+        const make = vehicleMake.value || '';
+        const models = vehicleCatalog[type]?.[make] || [];
+        const previousModel = vehicleModel.dataset.oldValue || vehicleModel.value || '';
+
+        fillSelect(vehicleModel, models, 'Selecciona un modelo', previousModel);
+
+        vehicleMake.dataset.oldValue = '';
+        vehicleModel.dataset.oldValue = '';
+    };
+
+    vehicle?.addEventListener('change', () => {
+        syncVehicleFields();
+        syncVehicleMakes();
+    });
+
+    vehicleMake?.addEventListener('change', syncVehicleModels);
+
+    syncVehicleMakes();
+
+    const stateCities = {
+        'Ciudad de México': [
+            'Álvaro Obregón','Azcapotzalco','Benito Juárez','Coyoacán',
+            'Cuajimalpa de Morelos','Cuauhtémoc','Gustavo A. Madero',
+            'Iztacalco','Iztapalapa','Magdalena Contreras','Miguel Hidalgo',
+            'Milpa Alta','Tláhuac','Tlalpan','Venustiano Carranza','Xochimilco'
+        ],
+        'Estado de México': [
+            'Atizapán de Zaragoza','Chalco','Chimalhuacán','Coacalco','Cuautitlán',
+            'Cuautitlán Izcalli','Ecatepec','Huixquilucan','Ixtapaluca','Metepec',
+            'Naucalpan','Nezahualcóyotl','Nicolás Romero','Tecámac','Tlalnepantla','Toluca'
+        ],
+        'Jalisco': ['Guadalajara','Zapopan','Tlaquepaque','Tonalá','Tlajomulco de Zúñiga'],
+        'Nuevo León': ['Monterrey','San Nicolás de los Garza','Guadalupe','Apodaca','Santa Catarina','San Pedro Garza García'],
+        'Puebla': ['Puebla','San Andrés Cholula','San Pedro Cholula','Atlixco','Tehuacán'],
+        'Querétaro': ['Querétaro','Corregidora','El Marqués','San Juan del Río'],
+        'Yucatán': ['Mérida','Kanasín','Progreso','Valladolid']
+    };
+
+    const state = document.querySelector('[data-driver-state]');
+    const city = document.querySelector('[data-driver-city]');
+    const zone = document.querySelector('[data-driver-zone]');
+    const cityOptions = document.querySelector('[data-driver-city-options]');
+
+    const latitude = document.querySelector('[data-driver-latitude]');
+    const longitude = document.querySelector('[data-driver-longitude]');
+    const accuracy = document.querySelector('[data-driver-accuracy]');
+    const source = document.querySelector('[data-driver-location-source]');
+    const address = document.querySelector('[data-driver-address-detected]');
+    const capturedAt = document.querySelector('[data-driver-location-captured-at]');
+
+    const useLocation = document.querySelector('[data-driver-use-location]');
+    const status = document.querySelector('[data-driver-location-status]');
+    const message = document.querySelector('[data-driver-location-message]');
+    const consent = document.querySelector('input[name="location_consent"]');
+    const terms = document.querySelector('input[name="terms"]');
+    const submit = document.querySelector('[data-driver-submit]');
+
+    const updateCities = () => {
+        if (!cityOptions || !state) return;
+        cityOptions.innerHTML = '';
+        (stateCities[state.value] || []).forEach((name) => {
+            const option = document.createElement('option');
+            option.value = name;
+            cityOptions.appendChild(option);
+        });
+    };
+
+    const updateSubmit = () => {
+        const hasLocation = Boolean(
+            latitude?.value &&
+            longitude?.value &&
+            accuracy?.value &&
+            source?.value &&
+            capturedAt?.value
+        );
+
+        if (submit) {
+            submit.disabled = !(hasLocation && consent?.checked && terms?.checked);
+        }
+    };
+
+    const setState = (type, text) => {
+        if (status) {
+            status.textContent = type === 'success'
+                ? 'Ubicación confirmada'
+                : type === 'loading'
+                    ? 'Localizando'
+                    : 'Requiere atención';
+            status.className = `driver-register__location-status is-${type}`;
+        }
+
+        if (message) {
+            message.textContent = text;
+            message.className = `driver-register__location-message is-${type}`;
+        }
+    };
+
+    const normalizeState = (value) => {
+        if (!value) return '';
+        if (value.includes('Ciudad de México') || value.includes('Mexico City')) return 'Ciudad de México';
+        if (value.includes('Estado de México') || value === 'México' || value.includes('Mexico State')) return 'Estado de México';
+        return value;
+    };
+
+    const reverseGeocode = async (lat, lon) => {
+        try {
+            const response = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&accept-language=es`
+            );
+
+            if (!response.ok) return;
+
+            const data = await response.json();
+            const addr = data.address || {};
+            const detectedState = normalizeState(addr.state || addr.region || addr.state_district || '');
+            const detectedCity = addr.city || addr.town || addr.municipality || addr.county || addr.city_district || '';
+            const detectedZone = addr.suburb || addr.neighbourhood || addr.quarter || addr.village || detectedCity;
+
+            if (state && detectedState) {
+                const exists = Array.from(state.options).some((option) => option.value === detectedState);
+                if (exists) {
+                    state.value = detectedState;
+                    updateCities();
+                }
+            }
+
+            if (city && detectedCity) city.value = detectedCity;
+            if (zone && detectedZone) zone.value = detectedZone;
+            if (address) address.value = data.display_name || '';
+        } catch (error) {
+            console.warn('No se pudo prellenar la dirección.', error);
+        }
+    };
+
+    const captureLocation = () => {
+        if (!navigator.geolocation) {
+            setState('error', 'Tu navegador no permite geolocalización.');
+            return;
+        }
+
+        if (!consent?.checked) {
+            setState('error', 'Primero autoriza el uso de tu ubicación.');
+            consent?.focus();
+            return;
+        }
+
+        setState('loading', 'Estamos obteniendo tu ubicación y preparando tus datos.');
+        useLocation.disabled = true;
+
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                latitude.value = String(position.coords.latitude);
+                longitude.value = String(position.coords.longitude);
+                accuracy.value = String(position.coords.accuracy);
+                source.value = 'browser';
+                capturedAt.value = new Date().toISOString();
+
+                await reverseGeocode(position.coords.latitude, position.coords.longitude);
+
+                setState(
+                    'success',
+                    `Ubicación confirmada con precisión aproximada de ${Math.round(position.coords.accuracy)} metros. Revisa y corrige los campos si es necesario.`
+                );
+
+                useLocation.textContent = 'Actualizar mi ubicación';
+                useLocation.disabled = false;
+                updateSubmit();
+            },
+            (error) => {
+                const messages = {
+                    1: 'El permiso de ubicación fue rechazado. Actívalo en el navegador para continuar.',
+                    2: 'No fue posible determinar tu ubicación. Verifica GPS, señal o conexión.',
+                    3: 'La ubicación tardó demasiado. Intenta nuevamente.'
+                };
+
+                setState('error', messages[error.code] || 'No pudimos obtener tu ubicación.');
+                useLocation.disabled = false;
+                updateSubmit();
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 15000,
+                maximumAge: 0
+            }
+        );
+    };
+
+    state?.addEventListener('change', updateCities);
+    useLocation?.addEventListener('click', captureLocation);
+    consent?.addEventListener('change', updateSubmit);
+    terms?.addEventListener('change', updateSubmit);
+
+    updateCities();
+    updateSubmit();
+});
+
+})();

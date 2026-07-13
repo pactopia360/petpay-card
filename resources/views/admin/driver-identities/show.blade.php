@@ -1,0 +1,551 @@
+@php($portal = 'admin')
+
+@extends('layouts.app')
+
+@section('title', 'Revisión de expediente | PETPAY-CARD')
+
+@push('styles')
+    <link
+        rel="stylesheet"
+        href="{{ asset('assets/petpay-card/css/admin/driver-identities.css') }}?v=20260713-2"
+    >
+@endpush
+
+@section('content')
+<?php
+    $missingApprovedDocuments =
+        $profile->missingApprovedDocumentTypes();
+
+    $canApproveComplete =
+        count($missingApprovedDocuments) === 0;
+?>
+<section class="petpay-dashboard driver-identities-shell">
+    @include('partials.sidebars.admin')
+
+    <div class="petpay-content-panel driver-identities-content">
+<section
+    class="driver-review driver-review--detail"
+    data-driver-identity-review
+>
+    <header class="driver-review__hero">
+        <div>
+            <span class="driver-review__kicker">
+                🛵 Expediente #{{ $profile->id }}
+            </span>
+
+            <h1>{{ $driver?->name ?: 'Repartidor' }}</h1>
+
+            <p>
+                {{ $driver?->email }}
+                ·
+                {{ $driver?->phone }}
+                ·
+                Estado: {{ str_replace('_', ' ', $profile->status) }}
+            </p>
+        </div>
+
+        <div class="driver-review__hero-actions">
+            <a
+                href="{{ route('admin.driver-identities.index') }}"
+                class="driver-review-btn driver-review-btn--light"
+            >
+                ← Expedientes
+            </a>
+
+            @if ($profile->status === 'submitted')
+                <form
+                    method="POST"
+                    action="{{ route('admin.driver-identities.start', $profile) }}"
+                >
+                    @csrf
+
+                    <button
+                        type="submit"
+                        class="driver-review-btn driver-review-btn--dark"
+                    >
+                        Iniciar revisión
+                    </button>
+                </form>
+            @endif
+        </div>
+    </header>
+
+    @if (session('status'))
+        <div class="driver-review-alert driver-review-alert--success">
+            {{ session('status') }}
+        </div>
+    @endif
+
+    @if ($errors->any())
+        <div class="driver-review-alert driver-review-alert--error">
+            <strong>Revisa la operación:</strong>
+
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    <div class="driver-review-detail__grid">
+        <aside class="driver-review-detail__sidebar">
+            <article class="driver-review-panel">
+                <header>
+                    <div>
+                        <span>Información registrada</span>
+                        <h2>Datos personales</h2>
+                    </div>
+
+                    <b class="driver-review-status is-{{ $profile->status }}">
+                        {{ str_replace('_', ' ', $profile->status) }}
+                    </b>
+                </header>
+
+                <dl class="driver-review-data">
+                    <div>
+                        <dt>Nombre</dt>
+                        <dd>{{ $driver?->name ?: 'Sin dato' }}</dd>
+                    </div>
+
+                    <div>
+                        <dt>CURP</dt>
+                        <dd>{{ $profile->curp ?: 'Sin dato' }}</dd>
+                    </div>
+
+                    <div>
+                        <dt>Correo</dt>
+                        <dd>{{ $profile->contact_email ?: $driver?->email }}</dd>
+                    </div>
+
+                    <div>
+                        <dt>Celular</dt>
+                        <dd>{{ $profile->mobile_phone ?: $driver?->phone }}</dd>
+                    </div>
+
+                    <div>
+                        <dt>Teléfono verificado</dt>
+                        <dd>{{ $profile->phone_verified ? 'Sí' : 'No' }}</dd>
+                    </div>
+
+                    <div>
+                        <dt>Zona de operación</dt>
+                        <dd>{{ $driver?->operation_zone ?: 'Sin dato' }}</dd>
+                    </div>
+
+                    <div>
+                        <dt>Vehículo</dt>
+                        <dd>
+                            {{ $driver?->vehicle_type ?: 'Sin dato' }}
+                            ·
+                            {{ $driver?->vehicle_plate ?: 'Sin placa' }}
+                        </dd>
+                    </div>
+                </dl>
+            </article>
+
+            <article class="driver-review-panel">
+                <header>
+                    <div>
+                        <span>Ubicación</span>
+                        <h2>Dirección principal</h2>
+                    </div>
+                </header>
+
+                @if ($driver?->primaryAddress)
+                    <p class="driver-review-address">
+                        {{ $driver->primaryAddress->street }}
+                        {{ $driver->primaryAddress->exterior_number }}
+                        {{ $driver->primaryAddress->interior_number ? 'Int. '.$driver->primaryAddress->interior_number : '' }},
+                        {{ $driver->primaryAddress->neighborhood }},
+                        {{ $driver->primaryAddress->municipality }},
+                        {{ $driver->primaryAddress->state }},
+                        C.P. {{ $driver->primaryAddress->postal_code }}
+                    </p>
+                @else
+                    <p class="driver-review-address">Sin dirección registrada.</p>
+                @endif
+            </article>
+
+            <article class="driver-review-panel">
+                <header>
+                    <div>
+                        <span>Validaciones</span>
+                        <h2>Resumen del expediente</h2>
+                    </div>
+                </header>
+
+                <div class="driver-review-checks">
+                    <span class="{{ $driver?->emergencyContacts->count() >= 2 ? 'is-ok' : 'is-missing' }}">
+                        Contactos de emergencia:
+                        {{ $driver?->emergencyContacts->count() ?? 0 }}
+                    </span>
+
+                    <span class="{{ $driver?->personalReferences->count() >= 2 ? 'is-ok' : 'is-missing' }}">
+                        Referencias personales:
+                        {{ $driver?->personalReferences->count() ?? 0 }}
+                    </span>
+
+                    <span class="{{ $profile->data_processing_consent ? 'is-ok' : 'is-missing' }}">
+                        Tratamiento de datos
+                    </span>
+
+                    <span class="{{ $profile->truth_declaration ? 'is-ok' : 'is-missing' }}">
+                        Declaración de veracidad
+                    </span>
+                </div>
+            </article>
+        </aside>
+
+        <main class="driver-review-detail__main">
+            <article class="driver-review-panel">
+                <header>
+                    <div>
+                        <span>Validación documental</span>
+                        <h2>Documentos del repartidor</h2>
+                    </div>
+
+                    <small>
+                        La IA auxilia la revisión; la decisión final siempre es de Admin.
+                    </small>
+                </header>
+
+                <?php
+                    $documentLabels = [
+                        'ine_front' => 'INE frente',
+                        'ine_back' => 'INE reverso',
+                        'curp' => 'CURP',
+                        'proof_address' => 'Comprobante de domicilio',
+                        'selfie' => 'Selfie',
+                        'driver_license' => 'Licencia de conducir',
+                    ];
+                ?>
+
+                <div class="driver-review-documents">
+                    <?php foreach ($documentLabels as $documentType => $documentLabel): ?>
+                        <?php
+                            $document = $currentDocuments->get($documentType);
+
+                            $statusLabel = match ($document?->status) {
+                                'approved' => 'Aprobado',
+                                'rejected' => 'Rechazado',
+                                'pending' => 'Pendiente',
+                                default => 'No cargado',
+                            };
+
+                            $analysisLabel = match ($document?->analysis_status) {
+                                'completed' => 'Analizado',
+                                'manual_review' => 'Revisión manual',
+                                'processing' => 'Procesando',
+                                'failed' => 'Error',
+                                default => 'Sin analizar',
+                            };
+
+                            $documentUrl = $document
+                                ? route(
+                                    'admin.driver-identities.documents.show',
+                                    [$profile, $document]
+                                )
+                                : null;
+
+                            $analyzeUrl = $document
+                                ? route(
+                                    'admin.driver-identities.documents.analyze',
+                                    [$profile, $document]
+                                )
+                                : null;
+                        ?>
+
+                        <section
+                            class="driver-review-document"
+                            data-admin-document-card
+                            data-document-id="{{ $document?->id }}"
+                        >
+                            <header>
+                                <div>
+                                    <h3>{{ $documentLabel }}</h3>
+
+                                    <span>
+                                        {{ $document?->original_name ?: 'Sin archivo' }}
+                                    </span>
+                                </div>
+
+                                <div>
+                                    <b class="driver-review-status is-{{ $document?->status ?: 'missing' }}">
+                                        {{ $statusLabel }}
+                                    </b>
+
+                                    @if ($document)
+                                        <b
+                                            class="driver-review-ai-status is-{{ $document->analysis_status ?: 'pending' }}"
+                                            data-admin-analysis-status
+                                        >
+                                            {{ $analysisLabel }}
+                                        </b>
+                                    @endif
+                                </div>
+                            </header>
+
+                            @if ($document)
+                                <div class="driver-review-document__body">
+                                    <div class="driver-review-document__preview">
+                                        @if (str_starts_with((string) $document->mime_type, 'image/'))
+                                            <img
+                                                src="{{ $documentUrl }}"
+                                                alt="{{ $documentLabel }}"
+                                                loading="lazy"
+                                            >
+                                        @elseif ($document->mime_type === 'application/pdf')
+                                            <iframe
+                                                src="{{ $documentUrl }}"
+                                                title="{{ $documentLabel }}"
+                                                loading="lazy"
+                                            ></iframe>
+                                        @else
+                                            <a
+                                                href="{{ $documentUrl }}"
+                                                target="_blank"
+                                                rel="noopener"
+                                            >
+                                                Abrir documento
+                                            </a>
+                                        @endif
+                                    </div>
+
+                                    <div class="driver-review-document__tools">
+                                        <div class="driver-review-document__buttons">
+                                            <a
+                                                href="{{ $documentUrl }}"
+                                                target="_blank"
+                                                rel="noopener"
+                                                class="driver-review-btn driver-review-btn--light"
+                                            >
+                                                Ver archivo
+                                            </a>
+
+                                            <button
+                                                type="button"
+                                                class="driver-review-btn driver-review-btn--dark"
+                                                data-admin-analyze-document
+                                                data-analyze-url="{{ $analyzeUrl }}"
+                                            >
+                                                Analizar con IA
+                                            </button>
+                                        </div>
+
+                                        <section
+                                            class="driver-review-ai"
+                                            data-admin-analysis-panel
+                                        >
+                                            <header>
+                                                <strong>Resultado de IA</strong>
+
+                                                <span data-admin-analysis-message>
+                                                    {{ $document->analysis_error
+                                                        ?: 'Ejecuta el análisis para validar legibilidad y datos.' }}
+                                                </span>
+                                            </header>
+
+                                            <div class="driver-review-ai__scores">
+                                                <span>
+                                                    Confianza
+                                                    <b data-admin-analysis-confidence>
+                                                        {{ $document->analysis_confidence !== null
+                                                            ? number_format((float) $document->analysis_confidence, 1).' %'
+                                                            : '—' }}
+                                                    </b>
+                                                </span>
+
+                                                <span>
+                                                    Calidad
+                                                    <b data-admin-analysis-quality>
+                                                        {{ $document->quality_score !== null
+                                                            ? number_format((float) $document->quality_score, 1).' %'
+                                                            : '—' }}
+                                                    </b>
+                                                </span>
+                                            </div>
+
+                                            <div
+                                                class="driver-review-ai__data"
+                                                data-admin-analysis-data
+                                            >
+                                                @foreach (($document->extracted_data ?? []) as $key => $value)
+                                                    @if (is_scalar($value) && filled($value))
+                                                        <span>
+                                                            <small>{{ str_replace('_', ' ', $key) }}</small>
+                                                            <strong>{{ $value }}</strong>
+                                                        </span>
+                                                    @endif
+                                                @endforeach
+                                            </div>
+                                        </section>
+
+                                        <form
+                                            method="POST"
+                                            action="{{ route(
+                                                'admin.driver-identities.documents.review',
+                                                [$profile, $document]
+                                            ) }}"
+                                            class="driver-review-decision"
+                                        >
+                                            @csrf
+
+                                            <label>
+                                                <span>Observaciones</span>
+
+                                                <textarea
+                                                    name="review_notes"
+                                                    rows="3"
+                                                    placeholder="Motivo de rechazo o corrección"
+                                                >{{ $document->review_notes }}</textarea>
+                                            </label>
+
+                                            <div>
+                                                <button
+                                                    type="submit"
+                                                    name="decision"
+                                                    value="approved"
+                                                    class="driver-review-btn driver-review-btn--approve"
+                                                >
+                                                    Aprobar
+                                                </button>
+
+                                                <button
+                                                    type="submit"
+                                                    name="decision"
+                                                    value="pending"
+                                                    class="driver-review-btn driver-review-btn--warning"
+                                                >
+                                                    Solicitar corrección
+                                                </button>
+
+                                                <button
+                                                    type="submit"
+                                                    name="decision"
+                                                    value="rejected"
+                                                    class="driver-review-btn driver-review-btn--reject"
+                                                >
+                                                    Rechazar
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            @else
+                                <div class="driver-review-document__missing">
+                                    Documento todavía no cargado.
+                                </div>
+                            @endif
+                        </section>
+                    <?php endforeach; ?>
+                </div>
+            </article>
+
+            <article class="driver-review-panel driver-review-final">
+                <header>
+                    <div>
+                        <span>Resolución</span>
+                        <h2>Decisión del expediente</h2>
+                    </div>
+                </header>
+
+                <div class="driver-review-final__forms">
+
+                    <form
+                        method="POST"
+                        action="{{ route('admin.driver-identities.approve', $profile) }}"
+                    >
+                        @csrf
+
+                        <button
+                            type="submit"
+                            class="driver-review-btn driver-review-btn--approve"
+                            @disabled(! $canApproveComplete)
+                            title="{{ $canApproveComplete
+                                ? 'Aprobar expediente completo'
+                                : 'Primero aprueba todos los documentos obligatorios' }}"
+                        >
+                            {{ $canApproveComplete
+                                ? 'Aprobar expediente completo'
+                                : 'Faltan '.count($missingApprovedDocuments).' documentos' }}
+                        </button>
+
+                        @unless ($canApproveComplete)
+                            <small class="driver-review-final__missing">
+                                Pendientes:
+                                {{ collect($missingApprovedDocuments)
+                                    ->map(fn ($type) => match ($type) {
+                                        'ine_front' => 'INE frente',
+                                        'ine_back' => 'INE reverso',
+                                        'curp' => 'CURP',
+                                        'proof_address' => 'Comprobante de domicilio',
+                                        'selfie' => 'Selfie',
+                                        'driver_license' => 'Licencia',
+                                        default => $type,
+                                    })
+                                    ->implode(', ') }}
+                            </small>
+                        @endunless
+                    </form>
+
+                    <form
+                        method="POST"
+                        action="{{ route('admin.driver-identities.corrections', $profile) }}"
+                    >
+                        @csrf
+
+                        <textarea
+                            name="review_notes"
+                            rows="3"
+                            placeholder="Describe las correcciones requeridas"
+                            required
+                        ></textarea>
+
+                        <button
+                            type="submit"
+                            class="driver-review-btn driver-review-btn--warning"
+                        >
+                            Solicitar correcciones
+                        </button>
+                    </form>
+
+                    <form
+                        method="POST"
+                        action="{{ route('admin.driver-identities.reject', $profile) }}"
+                    >
+                        @csrf
+
+                        <textarea
+                            name="review_notes"
+                            rows="3"
+                            placeholder="Motivo del rechazo"
+                            required
+                        ></textarea>
+
+                        <button
+                            type="submit"
+                            class="driver-review-btn driver-review-btn--reject"
+                        >
+                            Rechazar expediente
+                        </button>
+                    </form>
+                </div>
+            </article>
+        </main>
+    </div>
+</section>
+    </div>
+</section>
+@endsection
+
+@push('scripts')
+    <script
+        src="{{ asset('assets/petpay-card/js/admin/driver-identities.js') }}?v=20260713-1"
+    ></script>
+@endpush
+
+
+
+
+

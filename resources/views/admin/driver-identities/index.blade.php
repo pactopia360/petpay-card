@@ -1,0 +1,249 @@
+@php($portal = 'admin')
+
+@extends('layouts.app')
+
+@section('title', 'Expedientes de repartidores | PETPAY-CARD')
+
+@push('styles')
+    <link
+        rel="stylesheet"
+        href="{{ asset('assets/petpay-card/css/admin/driver-identities.css') }}?v=20260713-1"
+    >
+@endpush
+
+@section('content')
+<section class="petpay-dashboard driver-identities-shell">
+    @include('partials.sidebars.admin')
+
+    <div class="petpay-content-panel driver-identities-content">
+<section class="driver-review" data-driver-review-index>
+    <header class="driver-review__hero">
+        <div>
+            <span class="driver-review__kicker">
+                🛵 Admin / Repartidores / Expedientes
+            </span>
+
+            <h1>Expedientes de identidad</h1>
+
+            <p>
+                Revisa información y documentos enviados después de la
+                aprobación inicial de acceso.
+            </p>
+        </div>
+
+        <div class="driver-review__hero-actions">
+            <a
+                href="{{ route('admin.drivers.pending') }}"
+                class="driver-review-btn driver-review-btn--light"
+            >
+                Solicitudes de acceso
+            </a>
+
+            <a
+                href="{{ route('admin.dashboard') }}"
+                class="driver-review-btn driver-review-btn--dark"
+            >
+                Dashboard
+            </a>
+        </div>
+    </header>
+
+    @if (session('status'))
+        <div class="driver-review-alert driver-review-alert--success">
+            {{ session('status') }}
+        </div>
+    @endif
+
+    @if ($errors->any())
+        <div class="driver-review-alert driver-review-alert--error">
+            <strong>Revisa la operación:</strong>
+
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    <form
+        method="GET"
+        action="{{ route('admin.driver-identities.index') }}"
+        class="driver-review__filters"
+    >
+        <label class="driver-review__search">
+            <span>Buscar repartidor</span>
+
+            <input
+                type="search"
+                name="search"
+                value="{{ $search }}"
+                placeholder="Nombre, correo o teléfono"
+            >
+        </label>
+
+        <label>
+            <span>Estado del expediente</span>
+
+            <select name="status">
+                <option value="">Todos</option>
+                <option value="submitted" @selected($statusFilter === 'submitted')>
+                    Enviado
+                </option>
+                <option value="under_review" @selected($statusFilter === 'under_review')>
+                    En revisión
+                </option>
+                <option value="corrections_required" @selected($statusFilter === 'corrections_required')>
+                    Correcciones solicitadas
+                </option>
+                <option value="approved" @selected($statusFilter === 'approved')>
+                    Aprobado
+                </option>
+                <option value="rejected" @selected($statusFilter === 'rejected')>
+                    Rechazado
+                </option>
+            </select>
+        </label>
+
+        <button
+            type="submit"
+            class="driver-review-btn driver-review-btn--primary"
+        >
+            Buscar
+        </button>
+
+        <a
+            href="{{ route('admin.driver-identities.index') }}"
+            class="driver-review-btn driver-review-btn--light"
+        >
+            Limpiar
+        </a>
+    </form>
+
+    <div class="driver-review__summary">
+        <div>
+            <strong>{{ number_format($profiles->total()) }}</strong>
+            <span>Expedientes encontrados</span>
+        </div>
+
+        <p>
+            La aprobación del expediente es independiente del permiso
+            inicial para iniciar sesión.
+        </p>
+    </div>
+
+    <div class="driver-review__list">
+        <?php foreach ($profiles as $profile): ?>
+            <?php
+                $driver = $profile->driver;
+
+                $statusLabel = match ($profile->status) {
+                    'submitted' => 'Enviado',
+                    'under_review' => 'En revisión',
+                    'corrections_required' => 'Correcciones',
+                    'approved' => 'Aprobado',
+                    'rejected' => 'Rechazado',
+                    default => 'Borrador',
+                };
+
+                $currentDocuments = $profile->documents
+                    ->groupBy('document_type')
+                    ->map(fn ($documents) => $documents->sortByDesc('id')->first());
+
+                $approvedDocuments = $currentDocuments
+                    ->where('status', 'approved')
+                    ->count();
+
+                $pendingDocuments = $currentDocuments
+                    ->where('status', 'pending')
+                    ->count();
+
+                $rejectedDocuments = $currentDocuments
+                    ->where('status', 'rejected')
+                    ->count();
+            ?>
+
+            <article class="driver-review-card">
+                <div class="driver-review-card__identity">
+                    <span class="driver-review-card__avatar">
+                        {{ mb_strtoupper(mb_substr($driver?->name ?: 'R', 0, 1)) }}
+                    </span>
+
+                    <div>
+                        <strong>{{ $driver?->name ?: 'Repartidor sin nombre' }}</strong>
+
+                        <span>
+                            {{ $driver?->email ?: 'Sin correo' }}
+                            ·
+                            {{ $driver?->phone ?: 'Sin teléfono' }}
+                        </span>
+
+                        <small>
+                            Expediente #{{ $profile->id }}
+                            · Enviado:
+                            {{ $profile->submitted_at?->format('d/m/Y H:i') ?: 'Sin fecha' }}
+                        </small>
+                    </div>
+                </div>
+
+                <div class="driver-review-card__metrics">
+                    <span title="Documentos cargados">
+                        <b>{{ $currentDocuments->count() }}</b>
+                        Cargados
+                    </span>
+
+                    <span class="is-approved" title="Documentos aprobados">
+                        <b>{{ $approvedDocuments }}</b>
+                        Aprobados
+                    </span>
+
+                    <span class="is-pending" title="Documentos pendientes">
+                        <b>{{ $pendingDocuments }}</b>
+                        Pendientes
+                    </span>
+
+                    <span class="is-rejected" title="Documentos rechazados">
+                        <b>{{ $rejectedDocuments }}</b>
+                        Rechazados
+                    </span>
+                </div>
+
+                <div class="driver-review-card__actions">
+                    <span class="driver-review-status is-{{ $profile->status }}">
+                        {{ $statusLabel }}
+                    </span>
+
+                    <a
+                        href="{{ route('admin.driver-identities.show', $profile) }}"
+                        class="driver-review-btn driver-review-btn--primary"
+                    >
+                        Revisar expediente
+                    </a>
+                </div>
+            </article>
+        <?php endforeach; ?>
+
+        <?php if ($profiles->isEmpty()): ?>
+            <div class="driver-review-empty">
+                <span>🛵</span>
+                <strong>No hay expedientes con estos filtros</strong>
+                <p>
+                    Los expedientes aparecerán cuando los repartidores
+                    envíen su información a revisión.
+                </p>
+            </div>
+        <?php endif; ?>
+    </div>
+
+    @if ($profiles->hasPages())
+        <div class="driver-review__pagination">
+            {{ $profiles->links() }}
+        </div>
+    @endif
+</section>
+    </div>
+</section>
+@endsection
+
+
+

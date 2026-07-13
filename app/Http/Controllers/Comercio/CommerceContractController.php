@@ -260,9 +260,17 @@ class CommerceContractController extends Controller
             default => null,
         };
 
-        abort_unless($path && Storage::disk('local')->exists($path), 404);
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+        $disk = Storage::disk('local');
 
-        return Storage::disk('local')->response($path);
+        abort_unless(
+            is_string($path)
+            && $path !== ''
+            && $disk->exists($path),
+            404
+        );
+
+        return $disk->response($path);
     }
 
     public function download(CommerceContract $contract, string $type = 'original')
@@ -270,10 +278,21 @@ class CommerceContractController extends Controller
         $commerce = $this->commerce();
         $this->authorizeContract($contract, $commerce);
 
-        $path = $type === 'signed' ? $contract->signed_path : $contract->original_path;
-        abort_unless($path && Storage::disk('local')->exists($path), 404);
+        $path = $type === 'signed'
+            ? $contract->signed_path
+            : $contract->original_path;
 
-        return Storage::disk('local')->download($path);
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+        $disk = Storage::disk('local');
+
+        abort_unless(
+            is_string($path)
+            && $path !== ''
+            && $disk->exists($path),
+            404
+        );
+
+        return $disk->download($path);
     }
 
     public function downloadZip()
@@ -354,13 +373,26 @@ class CommerceContractController extends Controller
 
     private function imageAsDataUrl(?string $path): ?string
     {
-        if (! $path || ! Storage::disk('local')->exists($path)) {
+        if (! is_string($path) || $path === '') {
             return null;
         }
 
-        $mime = Storage::disk('local')->mimeType($path) ?: 'image/png';
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+        $disk = Storage::disk('local');
 
-        return 'data:'.$mime.';base64,'.base64_encode(Storage::disk('local')->get($path));
+        if (! $disk->exists($path)) {
+            return null;
+        }
+
+        $mime = $disk->mimeType($path);
+
+        if (! is_string($mime) || $mime === '') {
+            $mime = 'image/png';
+        }
+
+        return 'data:'.$mime.';base64,'.base64_encode(
+            $disk->get($path)
+        );
     }
 
     private function storeDataUrl(string $dataUrl, string $directory, string $prefix): string
@@ -415,8 +447,17 @@ class CommerceContractController extends Controller
             'No fue posible firmar criptográficamente el contrato.'
         );
 
-        $subject = $this->flattenCertificateSubject($parsed['subject'] ?? []);
-        preg_match('/[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}/u', strtoupper($subject), $rfcMatch);
+        $subjectData = $parsed['subject'] ?? [];
+
+        $subject = $this->flattenCertificateSubject(
+            is_array($subjectData) ? $subjectData : []
+        );
+
+        preg_match(
+            '/[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}/u',
+            strtoupper($subject),
+            $rfcMatch
+        );
 
         return [[
             'rfc' => $rfcMatch[0] ?? null,

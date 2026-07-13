@@ -1,0 +1,257 @@
+@extends('layouts.guest')
+
+@section('title', 'Regístrate como repartidor | Petpay')
+
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/driver-register.css') }}?v={{ filemtime(public_path('css/driver-register.css')) }}">
+@endpush
+
+@section('content')
+@php
+    $googleRegistration = $googleRegistration ?? null;
+    $isGoogleRegistration = is_array($googleRegistration)
+        && ! empty($googleRegistration['google_id'])
+        && ! empty($googleRegistration['email']);
+@endphp
+
+<main class="driver-register">
+    <header class="driver-register__header">
+        <a href="{{ url('/') }}" class="driver-register__logo" aria-label="Ir al inicio de Petpay">
+            <span class="driver-register__logo-symbol">P</span>
+            <span class="driver-register__logo-text">Petpay</span>
+        </a>
+
+        <nav class="driver-register__navigation" aria-label="Acceso de repartidores">
+            <a href="{{ route('repartidor.register') }}" class="driver-register__navigation-link driver-register__navigation-link--active">
+                Regístrate
+            </a>
+            <a href="{{ route('repartidor.login') }}" class="driver-register__navigation-link driver-register__navigation-link--dark">
+                Iniciar sesión
+            </a>
+        </nav>
+    </header>
+
+    <section
+                class="driver-register__hero"
+                style="background-image: url('{{ asset('assets/petpay-card/img/portals/repartidor/registro-hero-repartidor.png') }}');"
+            >
+        <div class="driver-register__overlay"></div>
+
+        <div class="driver-register__content">
+            <section class="driver-register__card">
+                <div class="driver-register__intro">
+                    <h1>Regístrate como repartidor</h1>
+                    <p>¿Ya tienes cuenta? <a href="{{ route('repartidor.login') }}">Ingresa ahora</a></p>
+                </div>
+
+                @if (session('status'))
+                    <div class="driver-register__google-status">{{ session('status') }}</div>
+                @endif
+
+                @if ($errors->any())
+                    <div class="driver-register__alert" role="alert">
+                        <strong>Revisa la información:</strong>
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <form method="POST" action="{{ route('repartidor.register.store') }}" class="driver-register__form" novalidate>
+                    @csrf
+
+                    <div class="driver-register__grid">
+                        <div class="driver-register__field">
+                            <label for="first_name">Nombre</label>
+                            <input id="first_name" name="first_name" value="{{ old('first_name', $googleRegistration['first_name'] ?? '') }}" required autofocus>
+                        </div>
+
+                        <div class="driver-register__field">
+                            <label for="last_name">Apellido</label>
+                            <input id="last_name" name="last_name" value="{{ old('last_name', $googleRegistration['last_name'] ?? '') }}">
+                        </div>
+
+                        <div class="driver-register__field driver-register__field--full">
+                            <label for="email">Correo electrónico</label>
+                            <input id="email" type="email" name="email" value="{{ old('email', $googleRegistration['email'] ?? '') }}" @readonly($isGoogleRegistration) required>
+                            @if ($isGoogleRegistration)
+                                <small class="driver-register__google-connected">Cuenta de Google conectada. Este correo no puede modificarse.</small>
+                            @endif
+                        </div>
+
+                        <div class="driver-register__field driver-register__field--full">
+                            <label for="phone">Número de teléfono móvil</label>
+                            <input id="phone" type="tel" name="phone" value="{{ old('phone') }}" required>
+                        </div>
+
+                        <section class="driver-register__location-card driver-register__field--full" data-driver-location-card>
+                            <div class="driver-register__location-head">
+                                <div>
+                                    <strong>Confirma tu zona de registro</strong>
+                                    <small>Usaremos tu ubicación para prellenar estado, ciudad y zona.</small>
+                                </div>
+                                <span class="driver-register__location-status" data-driver-location-status>Pendiente</span>
+                            </div>
+
+                            <button type="button" class="driver-register__location-button" data-driver-use-location>
+                                Usar mi ubicación actual
+                            </button>
+
+                            <div class="driver-register__location-message" data-driver-location-message>
+                                Tu navegador te pedirá permiso. Podrás revisar y corregir los datos antes de enviarlos.
+                            </div>
+
+                            <label class="driver-register__location-consent">
+                                <input type="checkbox" name="location_consent" value="1" @checked(old('location_consent')) required>
+                                <span>Autorizo usar mi ubicación para validar mi zona, prevenir fraude y proteger mi cuenta.</span>
+                            </label>
+
+                            <input type="hidden" name="registration_latitude" value="{{ old('registration_latitude') }}" data-driver-latitude>
+                            <input type="hidden" name="registration_longitude" value="{{ old('registration_longitude') }}" data-driver-longitude>
+                            <input type="hidden" name="registration_accuracy_meters" value="{{ old('registration_accuracy_meters') }}" data-driver-accuracy>
+                            <input type="hidden" name="registration_location_source" value="{{ old('registration_location_source') }}" data-driver-location-source>
+                            <input type="hidden" name="registration_address_detected" value="{{ old('registration_address_detected') }}" data-driver-address-detected>
+                            <input type="hidden" name="registration_location_captured_at" value="{{ old('registration_location_captured_at') }}" data-driver-location-captured-at>
+                        </section>
+
+                        <div class="driver-register__field">
+                            <label for="state">Estado</label>
+                            <select id="state" name="state" required data-driver-state>
+                                <option value="">Selecciona un estado</option>
+                                @foreach ([
+                                    'Aguascalientes','Baja California','Baja California Sur','Campeche','Chiapas','Chihuahua',
+                                    'Ciudad de México','Coahuila','Colima','Durango','Estado de México','Guanajuato',
+                                    'Guerrero','Hidalgo','Jalisco','Michoacán','Morelos','Nayarit','Nuevo León','Oaxaca',
+                                    'Puebla','Querétaro','Quintana Roo','San Luis Potosí','Sinaloa','Sonora','Tabasco',
+                                    'Tamaulipas','Tlaxcala','Veracruz','Yucatán','Zacatecas'
+                                ] as $stateOption)
+                                    <option value="{{ $stateOption }}" @selected(old('state') === $stateOption)>{{ $stateOption }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="driver-register__field">
+                            <label for="city">Ciudad o municipio</label>
+                            <input id="city" name="city" value="{{ old('city') }}" list="driver-city-options" required data-driver-city>
+                            <datalist id="driver-city-options" data-driver-city-options></datalist>
+                        </div>
+
+                        <div class="driver-register__field driver-register__field--full">
+                            <label for="operation_zone">Zona principal de operación</label>
+                            <input id="operation_zone" name="operation_zone" value="{{ old('operation_zone') }}" placeholder="Colonia, alcaldía, municipio o zona" required data-driver-zone>
+                        </div>
+
+                        <div class="driver-register__field driver-register__field--full">
+                            <label for="vehicle_type">Medio de transporte</label>
+                            <select id="vehicle_type" name="vehicle_type" required data-driver-vehicle>
+                                <option value="">Selecciona una opción</option>
+                                <option value="bicycle" @selected(old('vehicle_type') === 'bicycle')>Bicicleta</option>
+                                <option value="motorcycle" @selected(old('vehicle_type') === 'motorcycle')>Motocicleta</option>
+                                <option value="car" @selected(old('vehicle_type') === 'car')>Automóvil</option>
+                                <option value="walking" @selected(old('vehicle_type') === 'walking')>A pie</option>
+                            </select>
+                        </div>
+
+                        <div class="driver-register__field" data-driver-vehicle-field>
+                            <label for="vehicle_make">Marca <span>(opcional)</span></label>
+                            <input id="vehicle_make" name="vehicle_make" value="{{ old('vehicle_make') }}">
+                        </div>
+
+                        <div class="driver-register__field" data-driver-vehicle-field>
+                            <label for="vehicle_model">Modelo <span>(opcional)</span></label>
+                            <input id="vehicle_model" name="vehicle_model" value="{{ old('vehicle_model') }}">
+                        </div>
+
+                        <div class="driver-register__field" data-driver-motor-field>
+                            <label for="vehicle_plate">Placa</label>
+                            <input id="vehicle_plate" name="vehicle_plate" value="{{ old('vehicle_plate') }}">
+                        </div>
+
+                        <div class="driver-register__field" data-driver-motor-field>
+                            <label for="license_number">Número de licencia</label>
+                            <input id="license_number" name="license_number" value="{{ old('license_number') }}">
+                        </div>
+
+                        <div class="driver-register__field driver-register__field--full">
+                            <label for="availability_type">Disponibilidad</label>
+                            <select id="availability_type" name="availability_type" required>
+                                <option value="">Selecciona una opción</option>
+                                <option value="full_time" @selected(old('availability_type') === 'full_time')>Tiempo completo</option>
+                                <option value="part_time" @selected(old('availability_type') === 'part_time')>Medio tiempo</option>
+                                <option value="weekends" @selected(old('availability_type') === 'weekends')>Fines de semana</option>
+                                <option value="flexible" @selected(old('availability_type') === 'flexible')>Horario flexible</option>
+                            </select>
+                        </div>
+
+                        @if (! $isGoogleRegistration)
+                            <div class="driver-register__field">
+                                <label for="password">Contraseña</label>
+                                <div class="driver-register__password">
+                                    <input id="password" type="password" name="password" minlength="8" required>
+                                    <button type="button" class="driver-register__password-toggle" data-password-toggle="password">Ver</button>
+                                </div>
+                            </div>
+
+                            <div class="driver-register__field">
+                                <label for="password_confirmation">Confirmar contraseña</label>
+                                <div class="driver-register__password">
+                                    <input id="password_confirmation" type="password" name="password_confirmation" minlength="8" required>
+                                    <button type="button" class="driver-register__password-toggle" data-password-toggle="password_confirmation">Ver</button>
+                                </div>
+                            </div>
+                        @else
+                            <div class="driver-register__google-password driver-register__field--full">
+                                <strong>Acceso con Google</strong>
+                                <span>No necesitas crear una contraseña. Iniciarás sesión usando tu cuenta de Google.</span>
+                            </div>
+                        @endif
+                    </div>
+
+                    <label class="driver-register__checkbox">
+                        <input type="checkbox" name="whatsapp_enabled" value="1" @checked(old('whatsapp_enabled', true))>
+                        <span class="driver-register__checkbox-box"></span>
+                        <span class="driver-register__checkbox-text">
+                            <strong>WhatsApp</strong>
+                            Recibir avisos operativos y de entregas.
+                        </span>
+                    </label>
+
+                    <label class="driver-register__terms">
+                        <input type="checkbox" name="terms" value="1" @checked(old('terms')) required>
+                        <span>
+                            Acepto los <a href="{{ url('/terminos') }}" target="_blank">Términos y condiciones</a>
+                            y confirmo que leí el <a href="{{ url('/privacidad') }}" target="_blank">Aviso de privacidad</a>.
+                        </span>
+                    </label>
+
+                    <div class="driver-register__privacy-note">
+                        Al enviar guardaremos fecha de aceptación, IP, navegador, ubicación confirmada y versiones vigentes de términos y privacidad.
+                    </div>
+
+                    <button type="submit" class="driver-register__submit" data-driver-submit disabled>
+                        {{ $isGoogleRegistration ? 'Completar registro de repartidor' : 'Enviar solicitud de registro' }}
+                    </button>
+
+                    <div class="driver-register__social-divider"><small>o</small></div>
+
+                    <a href="{{ route('repartidor.google.redirect', ['intent' => 'register']) }}" class="driver-register__google">
+                        <svg class="driver-register__google-icon" viewBox="0 0 48 48" aria-hidden="true">
+                            <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303C33.654 32.657 29.202 36 24 36c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.27 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/>
+                            <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 16.108 19.001 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.27 4 24 4c-7.682 0-14.347 4.337-17.694 10.691z"/>
+                            <path fill="#4CAF50" d="M24 44c5.17 0 9.86-1.977 13.409-5.193l-6.19-5.238C29.143 35.091 26.715 36 24 36c-5.181 0-9.624-3.329-11.287-7.946l-6.522 5.025C9.5 39.556 16.227 44 24 44z"/>
+                            <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.793 2.24-2.231 4.166-4.084 5.569c.001-.001 6.19 5.238 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"/>
+                        </svg>
+                        <span>Registrar repartidor con Google</span>
+                    </a>
+                </form>
+            </section>
+        </div>
+    </section>
+</main>
+@endsection
+
+@push('scripts')
+    <script src="{{ asset('js/driver-register.js') }}?v={{ filemtime(public_path('js/driver-register.js')) }}" defer></script>
+@endpush

@@ -210,9 +210,15 @@ class CommerceIdentityReviewController extends Controller
 
     public function document(CommerceIdentityDocument $document)
     {
-        abort_unless(Storage::disk('local')->exists($document->path), 404);
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+        $disk = Storage::disk('local');
 
-        return Storage::disk('local')->response($document->path);
+        abort_unless($disk->exists($document->path), 404);
+
+        return $disk->response(
+            $document->path,
+            $document->original_name
+        );
     }
 
     private function event(
@@ -235,3 +241,4 @@ class CommerceIdentityReviewController extends Controller
         ]);
     }
 }
+

@@ -1,0 +1,88 @@
+<?php
+
+namespace App\Http\Controllers\Repartidor;
+
+use App\Http\Controllers\Controller;
+use App\Models\Repartidor\DriverIdentityProfile;
+use App\Models\Repartidor\DriverUser;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\View\View;
+
+class DashboardController extends Controller
+{
+    public function index(Request $request): View
+    {
+        $driver = $request->user('repartidor');
+
+        abort_unless($driver instanceof DriverUser, 403);
+
+        $tabs = [
+            'usuario',
+            'vehiculo',
+            'finanzas',
+            'contratos',
+        ];
+
+        $requestedTab = $request->string('tab')->toString();
+        $sessionTab = session('active_tab');
+
+        if (in_array($sessionTab, $tabs, true)) {
+            $activeTab = $sessionTab;
+        } elseif (in_array($requestedTab, $tabs, true)) {
+            $activeTab = $requestedTab;
+        } else {
+            $activeTab = 'usuario';
+        }
+
+        $identityProfile = DriverIdentityProfile::query()->firstOrCreate(
+            [
+                'driver_user_id' => $driver->id,
+            ],
+            [
+                'uuid' => (string) Str::uuid(),
+                'paternal_last_name' => $driver->last_name,
+                'mobile_phone' => $driver->phone,
+                'contact_email' => $driver->email,
+                'status' => 'draft',
+                'liveness_challenge' => 'Toma una selfie mostrando tu rostro y una hoja con la fecha actual y la palabra PETPAY.',
+            ]
+        );
+
+        $driver->load([
+            'addresses',
+            'primaryAddress',
+            'emergencyContact',
+            'personalReferences',
+            'identityDocuments',
+        ]);
+
+        $identityProfile->load([
+            'documents',
+            'events',
+        ]);
+
+        $currentDocuments = $identityProfile->documents
+            ->whereIn('status', [
+                'pending',
+                'approved',
+                'rejected',
+            ])
+            ->groupBy('document_type')
+            ->map(
+                fn ($documents) => $documents
+                    ->sortByDesc('id')
+                    ->first()
+            );
+
+        return view('portals.repartidor.home', [
+            'driver' => $driver,
+            'activeTab' => $activeTab,
+            'identityProfile' => $identityProfile,
+            'primaryAddress' => $driver->primaryAddress,
+            'emergencyContact' => $driver->emergencyContact,
+            'personalReferences' => $driver->personalReferences,
+            'currentDocuments' => $currentDocuments,
+        ]);
+    }
+}

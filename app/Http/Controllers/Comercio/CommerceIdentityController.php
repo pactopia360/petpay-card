@@ -225,10 +225,21 @@ class CommerceIdentityController extends Controller
     public function document(CommerceIdentityDocument $document)
     {
         $commerce = $this->commerce();
-        abort_unless((int) $document->commerce_user_id === (int) $commerce->id, 404);
-        abort_unless(Storage::disk('local')->exists($document->path), 404);
 
-        return Storage::disk('local')->response($document->path);
+        abort_unless(
+            (int) $document->commerce_user_id === (int) $commerce->id,
+            404
+        );
+
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+        $disk = Storage::disk('local');
+
+        abort_unless($disk->exists($document->path), 404);
+
+        return $disk->response(
+            $document->path,
+            $document->original_name
+        );
     }
 
     private function profile(CommerceUser $commerce): CommerceIdentityProfile
@@ -278,3 +289,4 @@ class CommerceIdentityController extends Controller
         ]);
     }
 }
+

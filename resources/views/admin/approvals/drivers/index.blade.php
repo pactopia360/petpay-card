@@ -4,6 +4,13 @@
 
 @section('title', 'Repartidores pendientes | PETPAY-CARD')
 
+@push('styles')
+    <link
+        rel="stylesheet"
+        href="{{ asset('assets/petpay-card/css/admin/driver-identities.css') }}?v=20260713-5"
+    >
+@endpush
+
 @section('content')
     <style>
         body:has(.driver-admin-white) {
@@ -399,6 +406,52 @@
                 </a>
             </div>
 
+            <nav
+                class="driver-admin-hub"
+                aria-label="Procesos administrativos de repartidores"
+            >
+                <a
+                    href="{{ route('admin.drivers.pending') }}"
+                    class="driver-admin-hub__item is-active"
+                >
+                    <span class="driver-admin-hub__icon">🛵</span>
+
+                    <span>
+                        <strong>Accesos iniciales</strong>
+                        <small>Autoriza el ingreso al portal.</small>
+                    </span>
+
+                    <b>{{ number_format($drivers->total()) }}</b>
+                </a>
+
+                <a
+                    href="{{ route('admin.driver-identities.index') }}"
+                    class="driver-admin-hub__item"
+                >
+                    <span class="driver-admin-hub__icon">🪪</span>
+
+                    <span>
+                        <strong>Expedientes y documentos</strong>
+                        <small>Revisa documentos y ejecuta validación IA.</small>
+                    </span>
+
+                    <b>{{ number_format($identityCount) }}</b>
+                </a>
+
+                <a
+                    href="{{ route('admin.driver-update-requests.index') }}"
+                    class="driver-admin-hub__item"
+                >
+                    <span class="driver-admin-hub__icon">📝</span>
+
+                    <span>
+                        <strong>Solicitudes de actualización</strong>
+                        <small>Aprueba o rechaza cambios de datos.</small>
+                    </span>
+
+                    <b>{{ number_format($updateRequestCount) }}</b>
+                </a>
+            </nav>
             @if (session('status'))
                 <div class="driver-admin-status">
                     {{ session('status') }}

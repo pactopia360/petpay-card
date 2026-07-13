@@ -1,0 +1,96 @@
+<?php
+
+namespace App\Models\Repartidor;
+
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+
+class DriverUser extends Authenticatable
+{
+    use Notifiable;
+
+    protected $connection = 'mysql_repartidor';
+
+    protected $table = 'driver_users';
+
+    protected $fillable = [
+        'first_name',
+        'last_name',
+        'name',
+        'email',
+        'phone',
+        'password',
+        'google_id',
+        'google_avatar',
+        'auth_provider',
+        'status',
+        'vehicle_type',
+        'vehicle_make',
+        'vehicle_model',
+        'vehicle_plate',
+        'license_number',
+        'operation_zone',
+        'state',
+        'city',
+        'availability_type',
+        'whatsapp_enabled',
+        'terms_accepted_at',
+        'current_latitude',
+        'current_longitude',
+        'approval_status',
+        'is_available',
+        'delivery_commission_percent',
+        'email_verified_at',
+        'last_login_at',
+    ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'current_latitude' => 'decimal:7',
+            'current_longitude' => 'decimal:7',
+            'is_available' => 'boolean',
+            'whatsapp_enabled' => 'boolean',
+            'delivery_commission_percent' => 'decimal:2',
+            'terms_accepted_at' => 'datetime',
+            'email_verified_at' => 'datetime',
+            'last_login_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+
+    public function isApproved(): bool
+    {
+        return $this->approval_status === 'approved';
+    }
+
+    public function isPendingApproval(): bool
+    {
+        return $this->approval_status === 'pending' || $this->status === 'pending';
+    }
+
+    public function isRejected(): bool
+    {
+        return $this->approval_status === 'rejected' || $this->status === 'rejected';
+    }
+
+    public function isSuspended(): bool
+    {
+        return $this->approval_status === 'suspended' || $this->status === 'suspended';
+    }
+
+    public function isActive(): bool
+    {
+        return $this->status === 'active' && $this->isApproved();
+    }
+
+    public function canAccessPortal(): bool
+    {
+        return $this->isActive();
+    }
+}

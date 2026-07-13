@@ -1,0 +1,1626 @@
+@php
+    $portal = 'repartidor';
+    $vehicleLabel = match ($driver->vehicle_type ?? null) {
+        'motorcycle' => 'Motocicleta',
+        'car' => 'Automóvil',
+        'bicycle' => 'Bicicleta',
+        'walking' => 'A pie',
+        default => 'Sin definir',
+    };
+    $statusLabel = match ($driver->approval_status ?? $driver->status ?? 'pending') {
+        'approved', 'active' => 'Aprobado',
+        'rejected' => 'Rechazado',
+        'suspended' => 'Suspendido',
+        default => 'Pendiente de revisión',
+    };
+@endphp
+
+@extends('layouts.app')
+
+@section('title', 'PETPAY-CARD | Portal Repartidor')
+
+@push('styles')
+<link rel="stylesheet" href="{{ asset('assets/petpay-card/css/portals/repartidor-dashboard-v2.css') }}?v=20260712-16">
+@endpush
+
+@section('content')
+    <style id="petpay-driver-admin-only-ai">
+        /*
+         * El análisis y sus resultados pertenecen exclusivamente
+         * al flujo administrativo.
+         */
+        .driver-ai-badge,
+        .driver-document-ai-actions,
+        .driver-analysis-panel,
+        [data-driver-analysis-badge],
+        [data-driver-analyze-document],
+        [data-driver-analysis-panel],
+        [data-driver-analysis-message],
+        [data-driver-analysis-confidence],
+        [data-driver-analysis-quality],
+        [data-driver-analysis-data],
+        [data-driver-analysis-warnings] {
+            display: none !important;
+        }
+    </style>
+
+<section class="driver-admin" data-driver-dashboard>
+    <figure class="driver-admin__hero">
+        <img src="{{ asset('assets/petpay-card/img/portals/repartidor/panel-administracion-repartidor.png') }}" alt="Repartidor Petpay">
+    </figure>
+    <header class="driver-admin__title">
+        <div>
+            <h1>Panel de administración.</h1>
+            <p>Registro, administración y operación de reparto.</p>
+        </div>
+
+        <div class="driver-admin__welcome">
+            <strong>¡Hola {{ $driver->first_name ?: 'Repartidor' }}!</strong>
+            <span>Bienvenido a tu panel de administración.</span>
+        </div>
+    </header>
+
+    @if (session('status'))
+        <div class="driver-alert driver-alert--success">
+            {{ session('status') }}
+        </div>
+    @endif
+
+    @if ($errors->any())
+        <div class="driver-alert driver-alert--error">
+            <strong>Revisa la información capturada:</strong>
+
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+    <nav class="driver-admin__tabs">
+        @foreach ([
+            'usuario' => 'Usuario',
+            'vehiculo' => 'Vehículo',
+            'finanzas' => 'Finanzas',
+            'contratos' => 'Contratos',
+        ] as $key => $label)
+            <button
+                type="button"
+                class="driver-admin__tab {{ $activeTab === $key ? 'is-active' : '' }}"
+                data-driver-tab-button="{{ $key }}"
+            >
+                {{ $label }}
+            </button>
+        @endforeach
+    </nav>
+    <div
+        class="driver-tab-panel {{ $activeTab === 'usuario' ? 'is-active' : '' }}"
+        data-driver-tab-panel="usuario"
+    >
+        
+        <section class="driver-preregister">
+            <div class="driver-preregister__header">
+                <div>
+                    <span class="driver-preregister__eyebrow">
+                        Información recuperada
+                    </span>
+
+                    <h2>Tu preregistro ya está cargado</h2>
+
+                    <p>
+                        No necesitas volver a capturar estos datos.
+                        Revisa la información y completa únicamente lo pendiente.
+                    </p>
+                </div>
+
+                <div class="driver-progress-summary">
+                    <strong>{{ $profileCompletion }}%</strong>
+                    <span>Expediente completado</span>
+                </div>
+            </div>
+
+            <div class="driver-progress">
+                <div
+                    class="driver-progress__bar"
+                    data-driver-progress="{{ max(0, min(100, (int) $profileCompletion)) }}"
+                ></div>
+            </div>
+
+            <div class="driver-preregister__grid">
+                @foreach ($preRegistration as $preLabel => $preValue)
+                    <article>
+                        <span>{{ $preLabel }}</span>
+                        <strong>{{ $preValue ?: 'Pendiente' }}</strong>
+                        <small>Preregistro</small>
+                    </article>
+                @endforeach
+            </div>
+
+            @if ($pendingItems->isNotEmpty())
+                <div class="driver-pending-summary">
+                    <strong>Información pendiente</strong>
+
+                    <div>
+                        @foreach ($pendingItems as $pendingItem)
+                            <span>{{ $pendingItem }}</span>
+                        @endforeach
+                    </div>
+                </div>
+            @else
+                <div class="driver-complete-summary">
+                    Tu expediente está completo y puede enviarse a revisión.
+                </div>
+            @endif
+        </section>
+<div class="driver-section-heading">
+            <h2>Registro de asociado de reparto</h2>
+            <p>Alta, baja o modificación de asociado de reparto.</p>
+        </div>
+
+        <form
+            method="POST"
+            action="{{ route('repartidor.identity.profile.save') }}"
+            class="driver-form driver-form-card"
+        >
+            @csrf
+
+            <div class="driver-form-grid driver-form-grid--3">
+                <label>
+                    <span>Nombre <b>*</b></span>
+                    <input
+                        type="text"
+                        name="first_name" autocomplete="given-name"
+                        value="{{ old('first_name', $driver->first_name) }}"
+                        required
+                    >
+                </label>
+
+                <label>
+                    <span>Apellido paterno <b>*</b></span>
+                    <input
+                        type="text"
+                        name="paternal_last_name" autocomplete="family-name"
+                        value="{{ old('paternal_last_name', $identityProfile->paternal_last_name) }}"
+                        required
+                    >
+                </label>
+
+                <label>
+                    <span>Apellido materno</span>
+                    <input
+                        type="text"
+                        name="maternal_last_name"
+                        value="{{ old('maternal_last_name', $identityProfile->maternal_last_name) }}"
+                    >
+                </label>
+            </div>
+
+            <div class="driver-form-grid driver-form-grid--3">
+                <label>
+                    <span>CURP <b>*</b></span>
+                    <input
+                        type="text"
+                        name="curp"
+                        maxlength="18"
+                        value="{{ old('curp', $identityProfile->curp) }}"
+                        required
+                    >
+                </label>
+
+                <label>
+                    <span>Teléfono casa</span>
+                    <input
+                        type="tel"
+                        name="home_phone" autocomplete="tel"
+                        value="{{ old('home_phone', $identityProfile->home_phone) }}"
+                    >
+                </label>
+
+                <div class="driver-phone-verification">
+                    <label>
+                        <span>Teléfono celular <b>*</b></span>
+
+                        <div class="driver-phone-verification__control">
+                            <input
+                                type="tel"
+                                name="mobile_phone" autocomplete="tel"
+                                value="{{ old('mobile_phone', $identityProfile->mobile_phone ?: $driver->phone) }}"
+                                maxlength="16"
+                                data-driver-phone-input
+                                required
+                            >
+
+                            <button
+                                type="button"
+                                class="driver-btn driver-btn--verify"
+                                data-driver-phone-request
+                                data-request-url="{{ route('repartidor.phone-verification.request') }}"
+                            >
+                                {{ $identityProfile->phone_verified ? 'Verificado' : 'Verificar teléfono' }}
+                            </button>
+                        </div>
+
+                        <small
+                            class="driver-phone-verification__status {{ $identityProfile->phone_verified ? 'is-verified' : '' }}"
+                            data-driver-phone-status
+                        >
+                            @if ($identityProfile->phone_verified)
+                                Teléfono confirmado el
+                                {{ $identityProfile->phone_verified_at?->format('d/m/Y H:i') }}.
+                            @else
+                                Pendiente de confirmar por llamada o código.
+                            @endif
+                        </small>
+                    </label>
+                </div>
+            </div>
+
+            <div class="driver-form-grid driver-form-grid--2">
+                <label>
+                    <span>Correo electrónico de acceso <b>*</b></span>
+                    <small class="driver-field-note">Dato del preregistro. No puede modificarse aquí.</small>
+                    <input
+                        type="email"
+                        name="contact_email" autocomplete="email"
+                        readonly
+                        value="{{ old('contact_email', $identityProfile->contact_email ?: $driver->email) }}"
+                        required
+                    >
+                </label>
+
+                <div class="driver-form-checks">
+                    <label class="driver-check">
+                        <input
+                            type="checkbox"
+                            name="data_processing_consent"
+                            value="1"
+                            {{ old('data_processing_consent', $identityProfile->data_processing_consent) ? 'checked' : '' }}
+                        >
+                        <span>Acepto el tratamiento de datos personales.</span>
+                    </label>
+
+                    <label class="driver-check">
+                        <input
+                            type="checkbox"
+                            name="truth_declaration"
+                            value="1"
+                            {{ old('truth_declaration', $identityProfile->truth_declaration) ? 'checked' : '' }}
+                        >
+                        <span>Declaro que la información es verdadera.</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="driver-form-actions">
+                <button type="submit" class="driver-btn driver-btn--primary">
+                    Guardar propietario
+                </button>
+            </div>
+        </form>
+
+        <div class="driver-section-heading driver-section-heading--spaced">
+            <h2>Dirección de contacto</h2>
+            <p>Registra la ubicación principal del asociado.</p>
+        </div>
+
+        <form
+            method="POST"
+            action="{{ route('repartidor.identity.address.save') }}"
+            class="driver-form driver-form-card"
+        >
+            @csrf
+
+            <div class="driver-form-grid driver-form-grid--4">
+                <label>
+                    <span>País <b>*</b></span>
+
+                    <select name="country" required>
+                        <option value="México" selected>México</option>
+                    </select>
+
+                    <small class="driver-field-note">
+                        Por el momento el servicio está disponible en México.
+                    </small>
+                </label>
+
+                <label>
+                    <span>Código postal <b>*</b></span>
+
+                    <input
+                        type="text"
+                        name="postal_code"
+                        maxlength="5"
+                        inputmode="numeric"
+                        autocomplete="postal-code"
+                        value="{{ old('postal_code', $primaryAddress->postal_code ?? '') }}"
+                        data-driver-postal-code
+                        required
+                    >
+
+                    <small class="driver-field-note" data-driver-postal-message>
+                        Captura los 5 dígitos.
+                    </small>
+                </label>
+
+                <label>
+                    <span>Municipio / Alcaldía <b>*</b></span>
+
+                    <input
+                        type="text"
+                        name="municipality"
+                        list="driver-municipality-options"
+                        autocomplete="address-level2"
+                        value="{{ old('municipality', $primaryAddress->municipality ?? '') }}"
+                        data-driver-municipality
+                        required
+                    >
+
+                    <datalist id="driver-municipality-options" data-driver-municipality-options></datalist>
+                </label>
+
+                <label>
+                    <span>Estado <b>*</b></span>
+
+                    @php
+                        $selectedAddressState = old(
+                            'state',
+                            $primaryAddress->state ?? $driver->state
+                        );
+                    @endphp
+
+                    <select
+                        name="state"
+                        autocomplete="address-level1"
+                        data-driver-address-state
+                        required
+                    >
+                        <option value="">Selecciona un estado</option>
+
+                        @foreach ([
+                            'Aguascalientes',
+                            'Baja California',
+                            'Baja California Sur',
+                            'Campeche',
+                            'Chiapas',
+                            'Chihuahua',
+                            'Ciudad de México',
+                            'Coahuila',
+                            'Colima',
+                            'Durango',
+                            'Estado de México',
+                            'Guanajuato',
+                            'Guerrero',
+                            'Hidalgo',
+                            'Jalisco',
+                            'Michoacán',
+                            'Morelos',
+                            'Nayarit',
+                            'Nuevo León',
+                            'Oaxaca',
+                            'Puebla',
+                            'Querétaro',
+                            'Quintana Roo',
+                            'San Luis Potosí',
+                            'Sinaloa',
+                            'Sonora',
+                            'Tabasco',
+                            'Tamaulipas',
+                            'Tlaxcala',
+                            'Veracruz',
+                            'Yucatán',
+                            'Zacatecas',
+                        ] as $stateOption)
+                            <option
+                                value="{{ $stateOption }}"
+                                @selected($selectedAddressState === $stateOption)
+                            >
+                                {{ $stateOption }}
+                            </option>
+                        @endforeach
+                    </select>
+                </label>
+            </div>
+
+            <div class="driver-form-grid driver-form-grid--4">
+                <label>
+                    <span>Ciudad <b>*</b></span>
+
+                    <input
+                        type="text"
+                        name="city"
+                        list="driver-city-address-options"
+                        autocomplete="address-level2"
+                        value="{{ old('city', $primaryAddress->city ?? $driver->city) }}"
+                        data-driver-address-city
+                        required
+                    >
+
+                    <datalist id="driver-city-address-options" data-driver-city-address-options></datalist>
+                </label>
+
+                <label>
+                    <span>Colonia <b>*</b></span>
+
+                    <input
+                        type="text"
+                        name="neighborhood"
+                        list="driver-neighborhood-options"
+                        autocomplete="address-level3"
+                        value="{{ old('neighborhood', $primaryAddress->neighborhood ?? '') }}"
+                        data-driver-neighborhood
+                        required
+                    >
+
+                    <datalist id="driver-neighborhood-options" data-driver-neighborhood-options></datalist>
+
+                    <small class="driver-field-note">
+                        Selecciona una sugerencia o captura la colonia.
+                    </small>
+                </label>
+
+                <label>
+                    <span>Calle <b>*</b></span>
+                    <input
+                        type="text"
+                        name="street" autocomplete="address-line1"
+                        value="{{ old('street', $primaryAddress->street ?? '') }}"
+                        required
+                    >
+                </label>
+
+                <label>
+                    <span>Número exterior <b>*</b></span>
+                    <input
+                        type="text"
+                        name="exterior_number" autocomplete="address-line2"
+                        value="{{ old('exterior_number', $primaryAddress->exterior_number ?? '') }}"
+                        required
+                    >
+                </label>
+            </div>
+
+            <div class="driver-form-grid driver-form-grid--3">
+                <label>
+                    <span>Número interior</span>
+                    <input
+                        type="text"
+                        name="interior_number"
+                        value="{{ old('interior_number', $primaryAddress->interior_number ?? '') }}"
+                    >
+                </label>
+
+                <label class="driver-field-wide">
+                    <span>Referencias</span>
+                    <input
+                        type="text"
+                        name="address_references"
+                        value="{{ old('address_references', $primaryAddress->references ?? '') }}"
+                    >
+                </label>
+            </div>
+
+            <div class="driver-form-actions">
+                <button type="submit" class="driver-btn driver-btn--primary">
+                    Guardar dirección
+                </button>
+            </div>
+        </form>
+
+        <div class="driver-section-heading driver-section-heading--spaced">
+            <h2>Contactos de emergencia</h2>
+            <p>
+                Registra de dos a cuatro personas distintas para casos de emergencia.
+            </p>
+        </div>
+
+        <form
+            method="POST"
+            action="{{ route('repartidor.identity.emergency.save') }}"
+            class="driver-form driver-form-card"
+        >
+            @csrf
+
+            @php
+                $emergencyRelationshipOptions = [
+                    'mother' => 'Madre',
+                    'father' => 'Padre',
+                    'stepmother' => 'Madrastra',
+                    'stepfather' => 'Padrastro',
+                    'sister' => 'Hermana',
+                    'brother' => 'Hermano',
+                    'spouse' => 'Cónyuge',
+                    'partner' => 'Pareja',
+                    'daughter' => 'Hija',
+                    'son' => 'Hijo',
+                    'grandmother' => 'Abuela',
+                    'grandfather' => 'Abuelo',
+                    'aunt' => 'Tía',
+                    'uncle' => 'Tío',
+                    'cousin_female' => 'Prima',
+                    'cousin_male' => 'Primo',
+                    'friend_female' => 'Amiga',
+                    'friend_male' => 'Amigo',
+                    'neighbor_female' => 'Vecina',
+                    'neighbor_male' => 'Vecino',
+                    'coworker_female' => 'Compañera de trabajo',
+                    'coworker_male' => 'Compañero de trabajo',
+                    'other' => 'Otro',
+                ];
+            @endphp
+
+            @for ($index = 0; $index < 4; $index++)
+                @php
+                    $contact = $emergencyContacts->firstWhere(
+                        'position',
+                        $index + 1
+                    );
+
+                    $requiredContact = $index < 2;
+                @endphp
+
+                <details
+                    class="driver-emergency-card"
+                    {{ $requiredContact || $contact ? 'open' : '' }}
+                >
+                    <summary>
+                        <span>
+                            Contacto {{ $index + 1 }}
+                            @if ($requiredContact)
+                                <b>Obligatorio</b>
+                            @else
+                                <b>Opcional</b>
+                            @endif
+                        </span>
+
+                        <small>
+                            {{ $contact?->is_verified ? 'Verificado' : 'Pendiente' }}
+                        </small>
+                    </summary>
+
+                    <div class="driver-emergency-card__body">
+                        <div class="driver-form-grid driver-form-grid--3">
+                            <label>
+                                <span>Nombre completo {{ $requiredContact ? '*' : '' }}</span>
+                                <input
+                                    type="text"
+                                    name="emergency_contacts[{{ $index }}][full_name]"
+                                    value="{{ old("emergency_contacts.$index.full_name", $contact->full_name ?? '') }}"
+                                >
+                            </label>
+
+                            <label>
+                                <span>Parentesco {{ $requiredContact ? '*' : '' }}</span>
+                                <select
+                                    name="emergency_contacts[{{ $index }}][relationship_code]"
+                                >
+                                    <option value="">Selecciona una opción</option>
+
+                                    @foreach ($emergencyRelationshipOptions as $code => $label)
+                                        <option
+                                            value="{{ $code }}"
+                                            @selected(old("emergency_contacts.$index.relationship_code", $contact->relationship_code ?? '') === $code)
+                                        >
+                                            {{ $label }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </label>
+
+                            <label>
+                                <span>Teléfono {{ $requiredContact ? '*' : '' }}</span>
+                                <input
+                                    type="tel"
+                                    maxlength="16"
+                                    name="emergency_contacts[{{ $index }}][phone]"
+                                    value="{{ old("emergency_contacts.$index.phone", $contact->phone ?? '') }}"
+                                >
+                            </label>
+                        </div>
+
+                        <div class="driver-form-grid driver-form-grid--4">
+                            <label>
+                                <span>¿Vive contigo?</span>
+                                <select
+                                    name="emergency_contacts[{{ $index }}][lives_same_address]"
+                                >
+                                    <option value="">Selecciona</option>
+                                    <option
+                                        value="0"
+                                        @selected((string) old("emergency_contacts.$index.lives_same_address", isset($contact) ? (int) $contact->lives_same_address : '') === '0')
+                                    >
+                                        No
+                                    </option>
+                                    <option
+                                        value="1"
+                                        @selected((string) old("emergency_contacts.$index.lives_same_address", isset($contact) ? (int) $contact->lives_same_address : '') === '1')
+                                    >
+                                        Sí
+                                    </option>
+                                </select>
+                            </label>
+
+                            <label>
+                                <span>Horario para contactar</span>
+                                <select
+                                    name="emergency_contacts[{{ $index }}][preferred_contact_time]"
+                                >
+                                    <option value="">Selecciona</option>
+
+                                    @foreach ([
+                                        'morning' => 'Mañana',
+                                        'afternoon' => 'Tarde',
+                                        'evening' => 'Noche',
+                                        'any' => 'Cualquier horario',
+                                    ] as $timeCode => $timeLabel)
+                                        <option
+                                            value="{{ $timeCode }}"
+                                            @selected(old("emergency_contacts.$index.preferred_contact_time", $contact->preferred_contact_time ?? '') === $timeCode)
+                                        >
+                                            {{ $timeLabel }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </label>
+
+                            <label>
+                                <span>Teléfono alterno</span>
+                                <input
+                                    type="tel"
+                                    maxlength="16"
+                                    name="emergency_contacts[{{ $index }}][alternate_phone]"
+                                    value="{{ old("emergency_contacts.$index.alternate_phone", $contact->alternate_phone ?? '') }}"
+                                >
+                            </label>
+
+                            <label>
+                                <span>Correo</span>
+                                <input
+                                    type="email"
+                                    name="emergency_contacts[{{ $index }}][email]"
+                                    value="{{ old("emergency_contacts.$index.email", $contact->email ?? '') }}"
+                                >
+                            </label>
+                        </div>
+
+                        <label class="driver-check driver-emergency-consent">
+                            <input
+                                type="checkbox"
+                                name="emergency_contacts[{{ $index }}][contact_consent]"
+                                value="1"
+                                @checked(old("emergency_contacts.$index.contact_consent", $contact->contact_consent ?? false))
+                            >
+
+                            <span>
+                                Confirmo que esta persona autorizó ser registrada y contactada.
+                            </span>
+                        </label>
+                    </div>
+                </details>
+            @endfor
+
+            <div class="driver-security-note">
+                <strong>Protección contra datos duplicados</strong>
+                <span>
+                    No se permiten dos madres, dos padres, dos cónyuges,
+                    dos parejas, nombres repetidos ni teléfonos compartidos.
+                </span>
+            </div>
+
+            <div class="driver-form-actions">
+                <button type="submit" class="driver-btn driver-btn--primary">
+                    Guardar contactos
+                </button>
+            </div>
+        </form>
+        <div class="driver-section-heading driver-section-heading--spaced">
+            <h2>Referencias personales</h2>
+            <p>
+                Registra dos personas distintas. Al menos una debe vivir en otro domicilio.
+            </p>
+        </div>
+
+        <form
+            method="POST"
+            action="{{ route('repartidor.identity.references.save') }}"
+            class="driver-form driver-form-card"
+        >
+            @csrf
+
+            @php
+                $relationshipOptions = [
+                    'mother' => 'Madre',
+                    'father' => 'Padre',
+                    'stepmother' => 'Madrastra',
+                    'stepfather' => 'Padrastro',
+                    'sister' => 'Hermana',
+                    'brother' => 'Hermano',
+                    'spouse' => 'Cónyuge',
+                    'partner' => 'Pareja',
+                    'daughter' => 'Hija',
+                    'son' => 'Hijo',
+                    'grandmother' => 'Abuela',
+                    'grandfather' => 'Abuelo',
+                    'aunt' => 'Tía',
+                    'uncle' => 'Tío',
+                    'cousin_female' => 'Prima',
+                    'cousin_male' => 'Primo',
+                    'friend_female' => 'Amiga',
+                    'friend_male' => 'Amigo',
+                    'neighbor_female' => 'Vecina',
+                    'neighbor_male' => 'Vecino',
+                    'coworker_female' => 'Compañera de trabajo',
+                    'coworker_male' => 'Compañero de trabajo',
+                    'boss_female' => 'Jefa',
+                    'boss_male' => 'Jefe',
+                    'client_female' => 'Clienta',
+                    'client_male' => 'Cliente',
+                    'other' => 'Otro',
+                ];
+            @endphp
+
+            @for ($index = 0; $index < 2; $index++)
+                @php
+                    $reference = $personalReferences->firstWhere(
+                        'position',
+                        $index + 1
+                    );
+
+                    $verificationLabel = match (
+                        $reference->verification_status ?? 'pending'
+                    ) {
+                        'verified' => 'Verificada',
+                        'sent' => 'Validación enviada',
+                        'failed' => 'Validación fallida',
+                        'declined' => 'No confirmó',
+                        'blocked' => 'Bloqueada',
+                        'manual_review' => 'Revisión manual',
+                        default => 'Pendiente de validar',
+                    };
+                @endphp
+
+                <div
+                    class="driver-reference-block"
+                    data-driver-reference="{{ $index }}"
+                >
+                    <div class="driver-reference-block__header">
+                        <div>
+                            <h3>Referencia {{ $index + 1 }}</h3>
+                            <span>{{ $verificationLabel }}</span>
+                        </div>
+                    </div>
+
+                    <div class="driver-form-grid driver-form-grid--3">
+                        <label>
+                            <span>Nombre completo <b>*</b></span>
+                            <input
+                                type="text"
+                                name="references[{{ $index }}][full_name]"
+                                value="{{ old("references.$index.full_name", $reference->full_name ?? '') }}"
+                                required
+                            >
+                        </label>
+
+                        <label>
+                            <span>Tipo de referencia <b>*</b></span>
+                            <select
+                                name="references[{{ $index }}][reference_type]"
+                                data-reference-type
+                                required
+                            >
+                                <option value="">Selecciona una opción</option>
+                                <option
+                                    value="family"
+                                    @selected(old("references.$index.reference_type", $reference->reference_type ?? '') === 'family')
+                                >
+                                    Familiar
+                                </option>
+                                <option
+                                    value="non_family"
+                                    @selected(old("references.$index.reference_type", $reference->reference_type ?? '') === 'non_family')
+                                >
+                                    No familiar
+                                </option>
+                            </select>
+                        </label>
+
+                        <label>
+                            <span>Relación <b>*</b></span>
+                            <select
+                                name="references[{{ $index }}][relationship_code]"
+                                data-reference-relationship
+                                required
+                            >
+                                <option value="">Selecciona una opción</option>
+
+                                @foreach ($relationshipOptions as $code => $label)
+                                    <option
+                                        value="{{ $code }}"
+                                        @selected(old("references.$index.relationship_code", $reference->relationship_code ?? '') === $code)
+                                    >
+                                        {{ $label }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </label>
+                    </div>
+
+                    <div class="driver-form-grid driver-form-grid--4">
+                        <label>
+                            <span>Años de conocerlo(a) <b>*</b></span>
+                            <select
+                                name="references[{{ $index }}][years_known]"
+                                required
+                            >
+                                <option value="">Selecciona</option>
+                                @for ($year = 1; $year <= 50; $year++)
+                                    <option
+                                        value="{{ $year }}"
+                                        @selected((int) old("references.$index.years_known", $reference->years_known ?? 0) === $year)
+                                    >
+                                        {{ $year }} {{ $year === 1 ? 'año' : 'años' }}
+                                    </option>
+                                @endfor
+                            </select>
+                        </label>
+
+                        <label>
+                            <span>¿Vive en tu domicilio? <b>*</b></span>
+                            <select
+                                name="references[{{ $index }}][lives_same_address]"
+                                required
+                            >
+                                <option value="">Selecciona</option>
+                                <option
+                                    value="0"
+                                    @selected((string) old("references.$index.lives_same_address", isset($reference) ? (int) $reference->lives_same_address : '') === '0')
+                                >
+                                    No
+                                </option>
+                                <option
+                                    value="1"
+                                    @selected((string) old("references.$index.lives_same_address", isset($reference) ? (int) $reference->lives_same_address : '') === '1')
+                                >
+                                    Sí
+                                </option>
+                            </select>
+                        </label>
+
+                        <label>
+                            <span>Horario para contactar <b>*</b></span>
+                            <select
+                                name="references[{{ $index }}][preferred_contact_time]"
+                                required
+                            >
+                                <option value="">Selecciona</option>
+                                @foreach ([
+                                    'morning' => 'Mañana',
+                                    'afternoon' => 'Tarde',
+                                    'evening' => 'Noche',
+                                    'any' => 'Cualquier horario',
+                                ] as $timeCode => $timeLabel)
+                                    <option
+                                        value="{{ $timeCode }}"
+                                        @selected(old("references.$index.preferred_contact_time", $reference->preferred_contact_time ?? '') === $timeCode)
+                                    >
+                                        {{ $timeLabel }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </label>
+
+                        <label>
+                            <span>Teléfono <b>*</b></span>
+                            <input
+                                type="tel"
+                                maxlength="16"
+                                name="references[{{ $index }}][phone]"
+                                value="{{ old("references.$index.phone", $reference->phone ?? '') }}"
+                                required
+                            >
+                        </label>
+                    </div>
+
+                    <div class="driver-form-grid driver-form-grid--2">
+                        <label>
+                            <span>Teléfono alterno</span>
+                            <input
+                                type="tel"
+                                maxlength="16"
+                                name="references[{{ $index }}][alternate_phone]"
+                                value="{{ old("references.$index.alternate_phone", $reference->alternate_phone ?? '') }}"
+                            >
+                        </label>
+
+                        <label>
+                            <span>Correo</span>
+                            <input
+                                type="email"
+                                name="references[{{ $index }}][email]"
+                                value="{{ old("references.$index.email", $reference->email ?? '') }}"
+                            >
+                        </label>
+                    </div>
+
+                    <label class="driver-check driver-reference-consent">
+                        <input
+                            type="checkbox"
+                            name="references[{{ $index }}][contact_consent]"
+                            value="1"
+                            @checked(old("references.$index.contact_consent", $reference->contact_consent ?? false))
+                            required
+                        >
+                        <span>
+                            Confirmo que esta persona autorizó ser registrada y contactada como referencia.
+                        </span>
+                    </label>
+                </div>
+            @endfor
+
+            <div class="driver-security-note">
+                <strong>Validaciones de seguridad</strong>
+                <span>
+                    No se permiten referencias duplicadas, teléfonos compartidos,
+                    dos madres, dos padres, dos cónyuges ni datos iguales al repartidor.
+                </span>
+            </div>
+
+            <div class="driver-form-actions">
+                <button type="submit" class="driver-btn driver-btn--primary">
+                    Guardar referencias
+                </button>
+            </div>
+        </form>
+        <div class="driver-section-heading driver-section-heading--spaced">
+            <h2>Documentación personal</h2>
+            <p>INE, CURP, domicilio, selfie y licencia.</p>
+        </div>
+
+        @php
+            $documentLabels = [
+                'ine_front' => 'INE frente',
+                'ine_back' => 'INE reverso',
+                'curp' => 'CURP',
+                'proof_address' => 'Comprobante de domicilio',
+                'selfie' => 'Selfie',
+                'driver_license' => 'Licencia de conducir',
+            ];
+        @endphp
+
+        <div class="driver-doc-list" data-driver-document-list>
+            @foreach ($documentLabels as $documentType => $documentLabel)
+                @php
+                    $document = $currentDocuments->get($documentType);
+
+                    $documentStatusLabel = match ($document?->status) {
+                        'approved' => 'Aprobado',
+                        'rejected' => 'Rechazado',
+                        'pending' => 'En revisión',
+                        default => 'Pendiente',
+                    };
+
+                    $documentStatusClass = $document?->status ?: 'missing';
+
+                    $analysisStatus = $document?->analysis_status ?: 'pending';
+
+                    $analysisStatusLabel = match ($analysisStatus) {
+                        'processing' => 'Analizando',
+                        'completed' => 'Analizado',
+                        'manual_review' => 'Revisión manual',
+                        'failed' => 'Error de análisis',
+                        default => 'Sin analizar',
+                    };
+
+                    $analysisStatusClass = match ($analysisStatus) {
+                        'completed' => 'completed',
+                        'manual_review' => 'manual-review',
+                        'failed' => 'failed',
+                        'processing' => 'processing',
+                        default => 'pending',
+                    };
+
+                    $documentMime = strtolower(
+                        (string) ($document?->mime_type ?: '')
+                    );
+
+                    $documentIsImage = str_starts_with(
+                        $documentMime,
+                        'image/'
+                    );
+
+                    $documentIsPdf = $documentMime === 'application/pdf';
+
+                    $documentUrl = $document
+                        ? route(
+                            'repartidor.identity.documents.show',
+                            $document
+                        )
+                        : null;
+                    $analyzeUrl = null;
+                    $resultUrl = null;
+
+                    $cameraFacingMode = $documentType === 'selfie'
+                        ? 'user'
+                        : 'environment';
+
+                    $extractedData = is_array(
+                        $document?->extracted_data
+                    )
+                        ? $document->extracted_data
+                        : [];
+
+                    $analysisWarnings = is_array(
+                        $document?->analysis_warnings
+                    )
+                        ? $document->analysis_warnings
+                        : [];
+
+                    $storedAnalysisError = strtolower(
+                        trim(
+                            (string) (
+                                $document?->analysis_error
+                                ?: ''
+                            )
+                        )
+                    );
+
+                    $friendlyAnalysisError = match (true) {
+                        str_contains($storedAnalysisError, 'quota'),
+                        str_contains($storedAnalysisError, 'billing'),
+                        str_contains($storedAnalysisError, '429') =>
+                            'El servicio de análisis no tiene saldo disponible. Revisa la facturación de la API e intenta nuevamente.',
+
+                        str_contains($storedAnalysisError, '401'),
+                        str_contains($storedAnalysisError, '403'),
+                        str_contains($storedAnalysisError, 'auth') =>
+                            'No fue posible autenticar el servicio de análisis.',
+
+                        str_contains($storedAnalysisError, 'timeout'),
+                        str_contains($storedAnalysisError, 'timed out') =>
+                            'El servicio tardó demasiado en responder. Intenta nuevamente.',
+
+                        filled($storedAnalysisError) =>
+                            'No fue posible analizar el documento. Intenta nuevamente.',
+
+                        default =>
+                            'No fue posible analizar el documento.',
+                    };
+                @endphp
+
+                <article
+                    class="driver-doc-item"
+                    data-driver-document-card
+                    data-document-type="{{ $documentType }}"
+                    data-document-id="{{ $document?->id }}"
+                    data-has-document="{{ $document ? '1' : '0' }}"
+                    data-analysis-status="{{ $analysisStatus }}"
+                    data-result-url="{{ $resultUrl }}"
+                >
+                    <div class="driver-doc-item__head">
+                        <div>
+                            <strong>{{ $documentLabel }}</strong>
+
+                            <span class="driver-badge driver-badge--{{ $documentStatusClass }}">
+                                {{ $documentStatusLabel }}
+                            </span>
+
+                            @if ($document)
+                                <span
+                                    class="driver-ai-badge driver-ai-badge--{{ $analysisStatusClass }}"
+                                    data-driver-analysis-badge
+                                >
+                                    {{ $analysisStatusLabel }}
+                                </span>
+                            @endif
+                        </div>
+
+                        @if ($document)
+                            <button
+                                type="button"
+                                class="driver-doc-link"
+                                data-driver-preview-open
+                                data-preview-url="{{ $documentUrl }}"
+                                data-preview-mime="{{ $documentMime }}"
+                                data-preview-title="{{ $documentLabel }}"
+                            >
+                                Ver archivo
+                            </button>
+                        @endif
+                    </div>
+
+                    <div class="driver-document-workspace">
+                        <div
+                            class="driver-document-preview {{ $document ? 'has-document' : '' }}"
+                            data-driver-document-preview
+                        >
+                            @if ($document && $documentIsImage)
+                                <button
+                                    type="button"
+                                    class="driver-document-preview__button"
+                                    data-driver-preview-open
+                                    data-preview-url="{{ $documentUrl }}"
+                                    data-preview-mime="{{ $documentMime }}"
+                                    data-preview-title="{{ $documentLabel }}"
+                                >
+                                    <img
+                                        src="{{ $documentUrl }}"
+                                        alt="Vista previa de {{ $documentLabel }}"
+                                        loading="lazy"
+                                    >
+                                </button>
+                            @elseif ($document && $documentIsPdf)
+                                <button
+                                    type="button"
+                                    class="driver-document-preview__pdf"
+                                    data-driver-preview-open
+                                    data-preview-url="{{ $documentUrl }}"
+                                    data-preview-mime="{{ $documentMime }}"
+                                    data-preview-title="{{ $documentLabel }}"
+                                >
+                                    <span>PDF</span>
+                                    <strong>{{ $document->original_name }}</strong>
+                                    <small>Abrir documento</small>
+                                </button>
+                            @elseif ($document)
+                                <button
+                                    type="button"
+                                    class="driver-document-preview__pdf"
+                                    data-driver-preview-open
+                                    data-preview-url="{{ $documentUrl }}"
+                                    data-preview-mime="{{ $documentMime }}"
+                                    data-preview-title="{{ $documentLabel }}"
+                                >
+                                    <span>DOC</span>
+                                    <strong>{{ $document->original_name }}</strong>
+                                    <small>Abrir documento</small>
+                                </button>
+                            @else
+                                <div class="driver-document-preview__empty">
+                                    <span aria-hidden="true">▧</span>
+                                    <strong>Sin documento</strong>
+                                    <small>
+                                        Selecciona un archivo o usa la cámara.
+                                    </small>
+                                </div>
+                            @endif
+                        </div>
+
+                        <div class="driver-document-controls">
+                            <form
+                                method="POST"
+                                action="{{ route('repartidor.identity.documents.upload') }}"
+                                enctype="multipart/form-data"
+                                class="driver-upload-form"
+                                data-driver-document-upload
+                            >
+                                @csrf
+
+                                <input
+                                    type="hidden"
+                                    name="document_type"
+                                    value="{{ $documentType }}"
+                                >
+
+                                <label class="driver-file-picker">
+                                    <input
+                                        type="file"
+                                        name="document"
+                                        accept=".pdf,.jpg,.jpeg,.png,.webp"
+                                        data-driver-document-input
+                                        required
+                                    >
+
+                                    <span>Seleccionar archivo</span>
+                                </label>
+
+                                <button
+                                    type="button"
+                                    class="driver-btn driver-btn--camera"
+                                    data-driver-camera-open
+                                    data-facing-mode="{{ $cameraFacingMode }}"
+                                    data-document-label="{{ $documentLabel }}"
+                                >
+                                    Usar cámara
+                                </button>
+
+                                <button
+                                    type="submit"
+                                    class="driver-btn driver-btn--secondary"
+                                >
+                                    {{ $document ? 'Reemplazar documento' : 'Guardar documento' }}
+                                </button>
+
+                                <span
+                                    class="driver-upload-selected-name"
+                                    data-driver-selected-file
+                                >
+                                    @if ($document)
+                                        {{ $document->original_name }}
+                                    @else
+                                        Sin archivo seleccionado
+                                    @endif
+                                </span>
+                            </form>
+
+                            @if ($document)
+                                <div class="driver-document-ai-actions">
+                                    <button
+                                        type="button"
+                                        class="driver-btn driver-btn--ai"
+                                        data-driver-analyze-document
+                                        data-analyze-url="{{ $analyzeUrl }}"
+                                    >
+                                        {{ in_array($analysisStatus, ['completed', 'manual_review'], true)
+                                            ? 'Analizar nuevamente'
+                                            : 'Analizar con IA' }}
+                                    </button>
+
+                                    <small>
+                                        La IA revisa legibilidad y extrae datos.
+                                        La aprobación final sigue siendo manual.
+                                    </small>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    @if ($document)
+                        <section
+                            class="driver-analysis-panel driver-analysis-panel--{{ $analysisStatusClass }}"
+                            data-driver-analysis-panel
+                        >
+                            <header>
+                                <div>
+                                    <strong>Resultado del análisis</strong>
+
+                                    <span data-driver-analysis-message>
+                                        {{ match ($analysisStatus) {
+                                            'completed' => 'Documento procesado correctamente.',
+                                            'manual_review' => 'El documento requiere revisión manual.',
+                                            'failed' => $friendlyAnalysisError,
+                                            'processing' => 'El análisis está en proceso.',
+                                            default => 'Presiona “Analizar con IA” para revisar este documento.',
+                                        } }}
+                                    </span>
+                                </div>
+
+                                <div class="driver-analysis-scores">
+                                    <span>
+                                        Confianza
+                                        <b data-driver-confidence>
+                                            {{ $document->analysis_confidence !== null
+                                                ? number_format((float) $document->analysis_confidence, 0).' %'
+                                                : '—' }}
+                                        </b>
+                                    </span>
+
+                                    <span>
+                                        Calidad
+                                        <b data-driver-quality>
+                                            {{ $document->quality_score !== null
+                                                ? number_format((float) $document->quality_score, 0).' %'
+                                                : '—' }}
+                                        </b>
+                                    </span>
+                                </div>
+                            </header>
+
+                            <div
+                                class="driver-analysis-data"
+                                data-driver-analysis-data
+                                @if ($extractedData === []) hidden @endif
+                            >
+                                @foreach ([
+                                    'full_name' => 'Nombre',
+                                    'curp' => 'CURP',
+                                    'date_of_birth' => 'Fecha de nacimiento',
+                                    'address' => 'Domicilio',
+                                    'postal_code' => 'Código postal',
+                                    'document_number' => 'Número de documento',
+                                    'license_number' => 'Número de licencia',
+                                    'issue_date' => 'Fecha de emisión',
+                                    'expiration_date' => 'Vigencia',
+                                    'issuer' => 'Emisor',
+                                ] as $field => $fieldLabel)
+                                    @if (filled($extractedData[$field] ?? null))
+                                        <div>
+                                            <span>{{ $fieldLabel }}</span>
+                                            <strong>
+                                                {{ $extractedData[$field] }}
+                                            </strong>
+                                        </div>
+                                    @endif
+                                @endforeach
+                            </div>
+
+                            <div
+                                class="driver-analysis-warnings"
+                                data-driver-analysis-warnings
+                                @if ($analysisWarnings === []) hidden @endif
+                            >
+                                @foreach ($analysisWarnings as $warning)
+                                    <span>{{ $warning }}</span>
+                                @endforeach
+                            </div>
+                        </section>
+                    @endif
+
+                    @if ($document?->review_notes)
+                        <p class="driver-doc-note">
+                            {{ $document->review_notes }}
+                        </p>
+                    @endif
+                </article>
+            @endforeach
+        </div>
+        <div class="driver-submit-box">
+            <div>
+                <strong>
+                    Estado del expediente:
+                    {{ ucfirst(str_replace('_', ' ', $identityProfile->status)) }}
+                </strong>
+
+                <span>
+                    Completa los datos y documentos para enviarlo a revisión.
+                </span>
+            </div>
+
+            <form
+                method="POST"
+                action="{{ route('repartidor.identity.submit') }}"
+            >
+                @csrf
+
+                <button type="submit" class="driver-btn driver-btn--primary">
+                    Enviar a revisión
+                </button>
+            </form>
+        </div>
+    </div>
+<div class="driver-tab-panel {{ $activeTab === 'vehiculo' ? 'is-active' : '' }}" data-driver-tab-panel="vehiculo">
+        <article class="driver-card">
+            <header><div><h2>Vehículo de reparto</h2><p>Información registrada.</p></div><b>{{ $vehicleLabel }}</b></header>
+            <div class="driver-data">
+                <div><span>Tipo</span><strong>{{ $vehicleLabel }}</strong></div>
+                <div><span>Marca</span><strong>{{ $driver->vehicle_make ?: 'Pendiente' }}</strong></div>
+                <div><span>Modelo</span><strong>{{ $driver->vehicle_model ?: 'Pendiente' }}</strong></div>
+                <div><span>Placa</span><strong>{{ $driver->vehicle_plate ?: 'No aplica' }}</strong></div>
+                <div><span>Licencia</span><strong>{{ $driver->license_number ?: 'Pendiente' }}</strong></div>
+                <div><span>Disponibilidad</span><strong>{{ $driver->availability_type ?: 'Pendiente' }}</strong></div>
+            </div>
+        </article>
+        <article class="driver-card"><header><div><h2>Documentación del vehículo</h2><p>Tarjeta, licencia, fotografías y seguro.</p></div></header><div class="driver-docs">@foreach (['Tarjeta de circulación','Licencia','Fotografía frontal','Fotografía lateral','Seguro'] as $doc)<div><span>{{ $doc }}</span><b>Pendiente</b></div>@endforeach</div></article>
+    </div>
+
+    <div class="driver-tab-panel {{ $activeTab === 'finanzas' ? 'is-active' : '' }}" data-driver-tab-panel="finanzas">
+        <div class="driver-kpis"><article><span>Hoy</span><strong>$0.00</strong></article><article><span>Semana</span><strong>$0.00</strong></article><article><span>Propinas</span><strong>$0.00</strong></article><article><span>Próximo depósito</span><strong>Pendiente</strong></article></div>
+        <article class="driver-card"><header><div><h2>Cuenta bancaria</h2><p>Registra una cuenta para recibir pagos.</p></div><b>Pendiente</b></header><div class="driver-empty"><strong>Sin cuenta bancaria</strong><p>Se habilitará al aprobar tu expediente.</p></div></article>
+    </div>
+
+    <div class="driver-tab-panel {{ $activeTab === 'contratos' ? 'is-active' : '' }}" data-driver-tab-panel="contratos">
+        <article class="driver-card"><header><div><h2>Contratos</h2><p>Documentos y aceptación legal.</p></div><b>Pendiente</b></header><dl class="driver-list"><div><dt>Contrato principal</dt><dd>Pendiente</dd></div><div><dt>Aviso de privacidad</dt><dd>Aceptado</dd></div><div><dt>Términos</dt><dd>Aceptados</dd></div></dl></article>
+    </div>
+</section>
+
+    <div
+        class="driver-document-modal"
+        data-driver-document-modal
+        hidden
+    >
+        <div
+            class="driver-document-modal__backdrop"
+            data-driver-document-modal-close
+        ></div>
+
+        <section
+            class="driver-document-modal__dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="driver-document-modal-title"
+        >
+            <header>
+                <div>
+                    <span>Documento del expediente</span>
+                    <h2 id="driver-document-modal-title" data-driver-document-modal-title>
+                        Vista previa
+                    </h2>
+                </div>
+
+                <button
+                    type="button"
+                    data-driver-document-modal-close
+                    aria-label="Cerrar"
+                >
+                    ×
+                </button>
+            </header>
+
+            <div
+                class="driver-document-modal__viewer"
+                data-driver-document-viewer
+            ></div>
+        </section>
+    </div>
+
+    <div
+        class="driver-camera-modal"
+        data-driver-camera-modal
+        hidden
+    >
+        <div
+            class="driver-camera-modal__backdrop"
+            data-driver-camera-close
+        ></div>
+
+        <section
+            class="driver-camera-modal__dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="driver-camera-modal-title"
+        >
+            <header>
+                <div>
+                    <span>Captura segura</span>
+                    <h2 id="driver-camera-modal-title" data-driver-camera-title>
+                        Tomar fotografía
+                    </h2>
+                </div>
+
+                <button
+                    type="button"
+                    data-driver-camera-close
+                    aria-label="Cerrar"
+                >
+                    ×
+                </button>
+            </header>
+
+            <div class="driver-camera-modal__stage">
+                <video
+                    autoplay
+                    muted
+                    playsinline
+                    data-driver-camera-video
+                ></video>
+
+                <canvas
+                    data-driver-camera-canvas
+                    hidden
+                ></canvas>
+
+                <div class="driver-camera-modal__guide">
+                    <span></span>
+                </div>
+            </div>
+
+            <p data-driver-camera-message>
+                Centra el documento, evita reflejos y mantén la cámara firme.
+            </p>
+
+            <div class="driver-camera-modal__actions">
+                <button
+                    type="button"
+                    class="driver-btn driver-btn--secondary"
+                    data-driver-camera-close
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="driver-btn driver-btn--primary"
+                    data-driver-camera-capture
+                >
+                    Capturar fotografía
+                </button>
+            </div>
+        </section>
+    </div>
+    <div
+        class="driver-verification-modal"
+        data-driver-phone-modal
+        hidden
+    >
+        <div
+            class="driver-verification-modal__backdrop"
+            data-driver-phone-close
+        ></div>
+
+        <section
+            class="driver-verification-modal__dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="driver-phone-modal-title"
+        >
+            <button
+                type="button"
+                class="driver-verification-modal__close"
+                data-driver-phone-close
+                aria-label="Cerrar"
+            >
+                ×
+            </button>
+
+            <span class="driver-verification-modal__eyebrow">
+                Validación de seguridad
+            </span>
+
+            <h2 id="driver-phone-modal-title">
+                Confirma tu teléfono
+            </h2>
+
+            <p data-driver-phone-modal-message>
+                Generaremos un código para confirmar que controlas este número.
+            </p>
+
+            <div class="driver-verification-modal__number">
+                <span>Número</span>
+                <strong data-driver-phone-masked>Sin confirmar</strong>
+            </div>
+
+            <label class="driver-verification-modal__code">
+                <span>Código de 6 dígitos</span>
+
+                <input
+                    type="text"
+                    inputmode="numeric"
+                    maxlength="6"
+                    autocomplete="one-time-code"
+                    placeholder="123456"
+                    data-driver-phone-code
+                >
+            </label>
+
+            <div
+                class="driver-verification-modal__feedback"
+                data-driver-phone-feedback
+                hidden
+            ></div>
+
+            <div class="driver-verification-modal__actions">
+                <button
+                    type="button"
+                    class="driver-btn driver-btn--secondary"
+                    data-driver-phone-close
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="driver-btn driver-btn--primary"
+                    data-driver-phone-confirm
+                >
+                    Confirmar código
+                </button>
+            </div>
+
+            @if (app()->environment(['local', 'testing']))
+                <small class="driver-verification-modal__local">
+                    Código local de prueba: <strong>123456</strong>
+                </small>
+            @endif
+        </section>
+    </div>
+@endsection
+
+@push('scripts')
+<script src="{{ asset('assets/petpay-card/js/portals/repartidor-dashboard-v2.js') }}?v=20260712-14"></script>
+@endpush
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,2084 @@
+(() => {
+    'use strict';
+
+    const root = document.querySelector('[data-driver-dashboard]');
+
+    if (!root) {
+        return;
+    }
+
+    const csrfToken = document
+        .querySelector('meta[name="csrf-token"]')
+        ?.getAttribute('content');
+
+    root.querySelectorAll('[data-driver-progress]').forEach((bar) => {
+        const rawValue = Number.parseInt(
+            bar.dataset.driverProgress || '0',
+            10
+        );
+
+        const percentage = Number.isFinite(rawValue)
+            ? Math.max(0, Math.min(100, rawValue))
+            : 0;
+
+        bar.style.width = `${percentage}%`;
+    });
+
+    const buttons = Array.from(
+        root.querySelectorAll('[data-driver-tab-button]')
+    );
+
+    const panels = Array.from(
+        root.querySelectorAll('[data-driver-tab-panel]')
+    );
+
+    const activateTab = (tab) => {
+        buttons.forEach((button) => {
+            button.classList.toggle(
+                'is-active',
+                button.dataset.driverTabButton === tab
+            );
+        });
+
+        panels.forEach((panel) => {
+            panel.classList.toggle(
+                'is-active',
+                panel.dataset.driverTabPanel === tab
+            );
+        });
+
+        const url = new URL(window.location.href);
+
+        url.searchParams.set('tab', tab);
+
+        window.history.replaceState({}, '', url);
+    };
+
+    buttons.forEach((button) => {
+        button.addEventListener('click', () => {
+            activateTab(button.dataset.driverTabButton);
+        });
+    });
+
+    root.querySelectorAll('input[name="curp"]').forEach((input) => {
+        input.addEventListener('input', () => {
+            input.value = input.value
+                .toUpperCase()
+                .replace(/[^A-Z0-9]/g, '')
+                .slice(0, 18);
+        });
+    });
+
+    root.querySelectorAll('input[type="tel"]').forEach((input) => {
+        input.addEventListener('input', () => {
+            input.value = input.value
+                .replace(/[^\d+\-\s()]/g, '')
+                .slice(0, 16);
+        });
+    });
+
+    root.querySelectorAll('input[name="postal_code"]').forEach((input) => {
+        input.addEventListener('input', () => {
+            input.value = input.value
+                .replace(/\D/g, '')
+                .slice(0, 5);
+        });
+    });
+
+    const phoneInput = root.querySelector('[data-driver-phone-input]');
+    const requestButton = root.querySelector('[data-driver-phone-request]');
+    const phoneStatus = root.querySelector('[data-driver-phone-status]');
+
+    const modal = document.querySelector('[data-driver-phone-modal]');
+    const modalMessage = modal?.querySelector(
+        '[data-driver-phone-modal-message]'
+    );
+    const maskedPhone = modal?.querySelector(
+        '[data-driver-phone-masked]'
+    );
+    const codeInput = modal?.querySelector(
+        '[data-driver-phone-code]'
+    );
+    const feedback = modal?.querySelector(
+        '[data-driver-phone-feedback]'
+    );
+    const confirmButton = modal?.querySelector(
+        '[data-driver-phone-confirm]'
+    );
+
+    let verificationId = null;
+
+    const showFeedback = (message, type = 'info') => {
+        if (!feedback) {
+            return;
+        }
+
+        feedback.hidden = false;
+        feedback.textContent = message;
+        feedback.dataset.type = type;
+    };
+
+    const clearFeedback = () => {
+        if (!feedback) {
+            return;
+        }
+
+        feedback.hidden = true;
+        feedback.textContent = '';
+        feedback.dataset.type = '';
+    };
+
+    const openModal = () => {
+        if (!modal) {
+            return;
+        }
+
+        modal.hidden = false;
+        document.body.classList.add('driver-modal-open');
+
+        window.setTimeout(() => {
+            codeInput?.focus();
+        }, 50);
+    };
+
+    const closeModal = () => {
+        if (!modal) {
+            return;
+        }
+
+        modal.hidden = true;
+        document.body.classList.remove('driver-modal-open');
+        clearFeedback();
+
+        if (codeInput) {
+            codeInput.value = '';
+        }
+    };
+
+    modal
+        ?.querySelectorAll('[data-driver-phone-close]')
+        .forEach((button) => {
+            button.addEventListener('click', closeModal);
+        });
+
+    requestButton?.addEventListener('click', async () => {
+        const phone = phoneInput?.value.trim() || '';
+
+        if (!/^(?:\+?52)?\d{10}$/.test(phone.replace(/\D/g, ''))) {
+            window.alert(
+                'Captura un teléfono válido de 10 dígitos.'
+            );
+            phoneInput?.focus();
+            return;
+        }
+
+        requestButton.disabled = true;
+        requestButton.textContent = 'Generando...';
+
+        try {
+            const response = await fetch(
+                requestButton.dataset.requestUrl,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken || '',
+                    },
+                    body: JSON.stringify({
+                        phone,
+                    }),
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok || !data.ok) {
+                throw new Error(
+                    data.message ||
+                    'No se pudo generar la verificación.'
+                );
+            }
+
+            verificationId = data.verification_id;
+
+            if (maskedPhone) {
+                maskedPhone.textContent =
+                    data.phone_masked || phone;
+            }
+
+            if (modalMessage) {
+                modalMessage.textContent = data.message;
+            }
+
+            openModal();
+        } catch (error) {
+            window.alert(
+                error.message ||
+                'Ocurrió un error al solicitar el código.'
+            );
+        } finally {
+            requestButton.disabled = false;
+            requestButton.textContent = 'Verificar teléfono';
+        }
+    });
+
+    codeInput?.addEventListener('input', () => {
+        codeInput.value = codeInput.value
+            .replace(/\D/g, '')
+            .slice(0, 6);
+    });
+
+    confirmButton?.addEventListener('click', async () => {
+        const code = codeInput?.value.trim() || '';
+
+        if (!verificationId) {
+            showFeedback(
+                'Primero solicita un código.',
+                'error'
+            );
+            return;
+        }
+
+        if (!/^\d{6}$/.test(code)) {
+            showFeedback(
+                'Captura el código completo de 6 dígitos.',
+                'error'
+            );
+            codeInput?.focus();
+            return;
+        }
+
+        confirmButton.disabled = true;
+        confirmButton.textContent = 'Validando...';
+        clearFeedback();
+
+        const verifyUrl = requestButton.dataset.requestUrl
+            .replace(
+                '/solicitar',
+                `/${verificationId}/confirmar`
+            );
+
+        try {
+            const response = await fetch(
+                verifyUrl,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken || '',
+                    },
+                    body: JSON.stringify({
+                        code,
+                    }),
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok || !data.ok) {
+                throw new Error(
+                    data.message ||
+                    'No se pudo confirmar el código.'
+                );
+            }
+
+            showFeedback(
+                data.message,
+                'success'
+            );
+
+            if (phoneStatus) {
+                phoneStatus.textContent =
+                    'Teléfono verificado correctamente.';
+                phoneStatus.classList.add('is-verified');
+            }
+
+            requestButton.textContent = 'Verificado';
+            requestButton.classList.add('is-verified');
+
+            window.setTimeout(() => {
+                closeModal();
+            }, 900);
+        } catch (error) {
+            showFeedback(
+                error.message ||
+                'Código incorrecto.',
+                'error'
+            );
+        } finally {
+            confirmButton.disabled = false;
+            confirmButton.textContent = 'Confirmar código';
+        }
+    });
+
+
+    const addressCatalogs = {
+        'Ciudad de México': [
+            'Álvaro Obregón',
+            'Azcapotzalco',
+            'Benito Juárez',
+            'Coyoacán',
+            'Cuajimalpa de Morelos',
+            'Cuauhtémoc',
+            'Gustavo A. Madero',
+            'Iztacalco',
+            'Iztapalapa',
+            'La Magdalena Contreras',
+            'Miguel Hidalgo',
+            'Milpa Alta',
+            'Tláhuac',
+            'Tlalpan',
+            'Venustiano Carranza',
+            'Xochimilco'
+        ],
+        'Estado de México': [
+            'Atizapán de Zaragoza',
+            'Chalco',
+            'Chimalhuacán',
+            'Coacalco de Berriozábal',
+            'Cuautitlán',
+            'Cuautitlán Izcalli',
+            'Ecatepec de Morelos',
+            'Huixquilucan',
+            'Ixtapaluca',
+            'La Paz',
+            'Metepec',
+            'Naucalpan de Juárez',
+            'Nezahualcóyotl',
+            'Nicolás Romero',
+            'Tecámac',
+            'Texcoco',
+            'Tlalnepantla de Baz',
+            'Toluca',
+            'Tultitlán',
+            'Valle de Chalco Solidaridad'
+        ],
+        'Jalisco': [
+            'Guadalajara',
+            'Puerto Vallarta',
+            'San Pedro Tlaquepaque',
+            'Tlajomulco de Zúñiga',
+            'Tonalá',
+            'Zapopan'
+        ],
+        'Nuevo León': [
+            'Apodaca',
+            'García',
+            'General Escobedo',
+            'Guadalupe',
+            'Juárez',
+            'Monterrey',
+            'San Nicolás de los Garza',
+            'San Pedro Garza García',
+            'Santa Catarina'
+        ],
+        'Puebla': [
+            'Atlixco',
+            'Cholula',
+            'Puebla',
+            'San Andrés Cholula',
+            'San Martín Texmelucan',
+            'Tehuacán'
+        ],
+        'Querétaro': [
+            'Corregidora',
+            'El Marqués',
+            'Querétaro',
+            'San Juan del Río'
+        ],
+        'Veracruz': [
+            'Boca del Río',
+            'Coatzacoalcos',
+            'Córdoba',
+            'Orizaba',
+            'Veracruz',
+            'Xalapa'
+        ],
+        'Yucatán': [
+            'Kanasín',
+            'Mérida',
+            'Progreso',
+            'Umán'
+        ]
+    };
+
+    const neighborhoodCatalogs = {
+        'Ecatepec de Morelos': [
+            'La Propiedad',
+            'San Cristóbal Centro',
+            'Ciudad Azteca',
+            'Jardines de Morelos',
+            'Las Américas',
+            'Valle de Aragón',
+            'Santa María Tulpetlac',
+            'San Pedro Xalostoc'
+        ],
+        'Cuauhtémoc': [
+            'Centro',
+            'Condesa',
+            'Hipódromo',
+            'Juárez',
+            'Roma Norte',
+            'Roma Sur',
+            'San Rafael',
+            'Santa María la Ribera'
+        ],
+        'Benito Juárez': [
+            'Del Valle Centro',
+            'Del Valle Norte',
+            'Del Valle Sur',
+            'Narvarte',
+            'Nápoles',
+            'Portales',
+            'San Pedro de los Pinos'
+        ],
+        'Guadalajara': [
+            'Americana',
+            'Arcos Vallarta',
+            'Centro',
+            'Chapalita',
+            'Ladrón de Guevara',
+            'Providencia'
+        ],
+        'Monterrey': [
+            'Centro',
+            'Cumbres',
+            'Mitras Centro',
+            'Obispado',
+            'San Jerónimo',
+            'Tecnológico'
+        ]
+    };
+
+    const addressState = root.querySelector(
+        '[data-driver-address-state]'
+    );
+
+    const municipalityInput = root.querySelector(
+        '[data-driver-municipality]'
+    );
+
+    const cityInput = root.querySelector(
+        '[data-driver-address-city]'
+    );
+
+    const neighborhoodInput = root.querySelector(
+        '[data-driver-neighborhood]'
+    );
+
+    const municipalityOptions = root.querySelector(
+        '[data-driver-municipality-options]'
+    );
+
+    const cityOptions = root.querySelector(
+        '[data-driver-city-address-options]'
+    );
+
+    const neighborhoodOptions = root.querySelector(
+        '[data-driver-neighborhood-options]'
+    );
+
+    const fillDatalist = (datalist, values) => {
+        if (!datalist) {
+            return;
+        }
+
+        datalist.innerHTML = '';
+
+        values.forEach((value) => {
+            const option = document.createElement('option');
+            option.value = value;
+            datalist.appendChild(option);
+        });
+    };
+
+    const refreshAddressCatalogs = () => {
+        const selectedState = addressState?.value || '';
+        const municipalities = addressCatalogs[selectedState] || [];
+
+        fillDatalist(municipalityOptions, municipalities);
+        fillDatalist(cityOptions, municipalities);
+    };
+
+    const refreshNeighborhoodCatalog = () => {
+        const municipality =
+            municipalityInput?.value.trim() ||
+            cityInput?.value.trim() ||
+            '';
+
+        fillDatalist(
+            neighborhoodOptions,
+            neighborhoodCatalogs[municipality] || []
+        );
+    };
+
+    addressState?.addEventListener('change', () => {
+        refreshAddressCatalogs();
+
+        if (municipalityInput) {
+            municipalityInput.value = '';
+        }
+
+        if (cityInput) {
+            cityInput.value = '';
+        }
+
+        if (neighborhoodInput) {
+            neighborhoodInput.value = '';
+        }
+
+        refreshNeighborhoodCatalog();
+    });
+
+    municipalityInput?.addEventListener(
+        'change',
+        refreshNeighborhoodCatalog
+    );
+
+    municipalityInput?.addEventListener(
+        'input',
+        refreshNeighborhoodCatalog
+    );
+
+    cityInput?.addEventListener(
+        'change',
+        refreshNeighborhoodCatalog
+    );
+
+    cityInput?.addEventListener(
+        'input',
+        refreshNeighborhoodCatalog
+    );
+
+    refreshAddressCatalogs();
+    refreshNeighborhoodCatalog();
+
+    const postalCodeInput = root.querySelector(
+        '[data-driver-postal-code]'
+    );
+
+    const postalCodeMessage = root.querySelector(
+        '[data-driver-postal-message]'
+    );
+
+    postalCodeInput?.addEventListener('input', () => {
+        postalCodeInput.value = postalCodeInput.value
+            .replace(/\D/g, '')
+            .slice(0, 5);
+
+        if (!postalCodeMessage) {
+            return;
+        }
+
+        if (postalCodeInput.value.length === 5) {
+            postalCodeMessage.textContent =
+                'Código postal listo para validar.';
+            postalCodeMessage.classList.add('is-valid');
+        } else {
+            postalCodeMessage.textContent =
+                'Captura los 5 dígitos.';
+            postalCodeMessage.classList.remove('is-valid');
+        }
+    });
+
+
+    /*
+     * ========================================================
+     * REFERENCIAS PERSONALES:
+     * SINCRONIZAR TIPO Y RELACION
+     * ========================================================
+     */
+
+    const familyRelationshipCodes = new Set([
+        'mother',
+        'father',
+        'stepmother',
+        'stepfather',
+        'sister',
+        'brother',
+        'spouse',
+        'partner',
+        'daughter',
+        'son',
+        'grandmother',
+        'grandfather',
+        'aunt',
+        'uncle',
+        'cousin_female',
+        'cousin_male'
+    ]);
+
+    const nonFamilyRelationshipCodes = new Set([
+        'friend_female',
+        'friend_male',
+        'neighbor_female',
+        'neighbor_male',
+        'coworker_female',
+        'coworker_male',
+        'boss_female',
+        'boss_male',
+        'client_female',
+        'client_male'
+    ]);
+
+    const relationshipTypeForCode = (relationshipCode) => {
+        if (familyRelationshipCodes.has(relationshipCode)) {
+            return 'family';
+        }
+
+        if (nonFamilyRelationshipCodes.has(relationshipCode)) {
+            return 'non_family';
+        }
+
+        return '';
+    };
+
+    const configureReferenceBlock = (referenceBlock) => {
+        const typeSelect = referenceBlock.querySelector(
+            '[data-reference-type]'
+        );
+
+        const relationshipSelect = referenceBlock.querySelector(
+            '[data-reference-relationship]'
+        );
+
+        if (!typeSelect || !relationshipSelect) {
+            return;
+        }
+
+        const allOptions = Array.from(
+            relationshipSelect.options
+        );
+
+        const filterRelationshipOptions = ({
+            clearIncompatible = false
+        } = {}) => {
+            const selectedType = typeSelect.value;
+            const selectedRelationship = relationshipSelect.value;
+
+            allOptions.forEach((option) => {
+                if (!option.value) {
+                    option.hidden = false;
+                    option.disabled = false;
+                    return;
+                }
+
+                const optionType = relationshipTypeForCode(
+                    option.value
+                );
+
+                const isCompatible =
+                    !selectedType
+                    || option.value === 'other'
+                    || optionType === selectedType;
+
+                option.hidden = !isCompatible;
+                option.disabled = !isCompatible;
+            });
+
+            if (
+                clearIncompatible
+                && selectedRelationship
+                && selectedRelationship !== 'other'
+                && relationshipTypeForCode(selectedRelationship)
+                    !== selectedType
+            ) {
+                relationshipSelect.value = '';
+            }
+        };
+
+        const synchronizeTypeFromRelationship = () => {
+            const relationshipCode = relationshipSelect.value;
+
+            if (!relationshipCode) {
+                filterRelationshipOptions();
+                return;
+            }
+
+            if (relationshipCode === 'other') {
+                filterRelationshipOptions();
+                return;
+            }
+
+            const expectedType = relationshipTypeForCode(
+                relationshipCode
+            );
+
+            if (expectedType) {
+                typeSelect.value = expectedType;
+            }
+
+            filterRelationshipOptions();
+        };
+
+        typeSelect.addEventListener('change', () => {
+            filterRelationshipOptions({
+                clearIncompatible: true
+            });
+
+            relationshipSelect.focus();
+        });
+
+        relationshipSelect.addEventListener(
+            'change',
+            synchronizeTypeFromRelationship
+        );
+
+        /*
+         * Si ya existe una relación guardada o recuperada con old(),
+         * la relación es la fuente principal y corrige el tipo.
+         */
+        if (
+            relationshipSelect.value
+            && relationshipSelect.value !== 'other'
+        ) {
+            synchronizeTypeFromRelationship();
+        } else {
+            filterRelationshipOptions({
+                clearIncompatible: true
+            });
+        }
+    };
+
+    root
+        .querySelectorAll('[data-driver-reference]')
+        .forEach(configureReferenceBlock);
+
+
+    /*
+     * ========================================================
+     * DISEÑO DEL SOCIO:
+     * REORGANIZAR EXPEDIENTE Y DOCUMENTACION
+     * ========================================================
+     */
+
+    const userPanel = root.querySelector(
+        '[data-driver-tab-panel="usuario"]'
+    );
+
+    const normalizedText = (value) => {
+        return String(value || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .trim()
+            .toLowerCase();
+    };
+
+    const findHeading = (title) => {
+        const normalizedTitle = normalizedText(title);
+
+        return Array.from(
+            userPanel?.querySelectorAll(
+                '.driver-section-heading'
+            ) || []
+        ).find((heading) => {
+            return normalizedText(
+                heading.querySelector('h2')?.textContent
+            ) === normalizedTitle;
+        });
+    };
+
+    const createModule = ({
+        title,
+        subtitle,
+        icon,
+        state = 'Pendiente',
+        open = false,
+        modifier = ''
+    }) => {
+        const details = document.createElement('details');
+
+        details.className =
+            `driver-partner-module ${modifier}`.trim();
+
+        details.open = open;
+
+        const summary = document.createElement('summary');
+
+        summary.className = 'driver-partner-module__summary';
+
+        const identity = document.createElement('div');
+
+        identity.className = 'driver-partner-module__identity';
+
+        const iconElement = document.createElement('span');
+
+        iconElement.className = 'driver-partner-module__icon';
+        iconElement.setAttribute('aria-hidden', 'true');
+        iconElement.textContent = icon;
+
+        const text = document.createElement('div');
+
+        text.className = 'driver-partner-module__text';
+
+        const strong = document.createElement('strong');
+
+        strong.textContent = title;
+
+        const small = document.createElement('small');
+
+        small.textContent = subtitle || '';
+
+        text.append(strong);
+
+        if (subtitle) {
+            text.append(small);
+        }
+
+        identity.append(iconElement, text);
+
+        const actions = document.createElement('div');
+
+        actions.className = 'driver-partner-module__actions';
+
+        const badge = document.createElement('span');
+
+        badge.className = 'driver-partner-module__state';
+        badge.textContent = state;
+
+        const arrow = document.createElement('span');
+
+        arrow.className = 'driver-partner-module__arrow';
+        arrow.setAttribute('aria-hidden', 'true');
+        arrow.textContent = '⌃';
+
+        actions.append(badge, arrow);
+        summary.append(identity, actions);
+
+        const body = document.createElement('div');
+
+        body.className = 'driver-partner-module__body';
+
+        details.append(summary, body);
+
+        return {
+            details,
+            body,
+            badge
+        };
+    };
+
+    const hasFilledFormValues = (container) => {
+        if (!container) {
+            return false;
+        }
+
+        return Array.from(
+            container.querySelectorAll(
+                'input:not([type="hidden"]):not([type="checkbox"]), select'
+            )
+        ).some((field) => {
+            return String(field.value || '').trim() !== '';
+        });
+    };
+
+    /*
+     * Resumen del preregistro en acordeón compacto.
+     */
+    const preregistration = userPanel?.querySelector(
+        '.driver-preregister'
+    );
+
+    if (
+        preregistration
+        && !preregistration.closest(
+            '.driver-preregister-shell'
+        )
+    ) {
+        const preregistrationShell =
+            document.createElement('details');
+
+        preregistrationShell.className =
+            'driver-preregister-shell';
+
+        const preregistrationSummary =
+            document.createElement('summary');
+
+        preregistrationSummary.innerHTML = `
+            <span class="driver-preregister-shell__icon">✓</span>
+            <span>
+                <strong>Resumen de tu expediente</strong>
+                <small>
+                    Información recuperada del preregistro y avance actual.
+                </small>
+            </span>
+            <b>
+                ${
+                    preregistration
+                        .querySelector(
+                            '.driver-progress-summary strong'
+                        )
+                        ?.textContent
+                        ?.trim() || '0%'
+                }
+            </b>
+        `;
+
+        preregistration.parentNode.insertBefore(
+            preregistrationShell,
+            preregistration
+        );
+
+        preregistrationShell.append(
+            preregistrationSummary,
+            preregistration
+        );
+    }
+
+    /*
+     * Localizar las secciones actuales antes de moverlas.
+     */
+    const emergencyHeading = findHeading(
+        'Contactos de emergencia'
+    );
+
+    const referencesHeading = findHeading(
+        'Referencias personales'
+    );
+
+    const documentsHeading = findHeading(
+        'Documentación personal'
+    );
+
+    const emergencyForm =
+        emergencyHeading?.nextElementSibling?.matches('form')
+            ? emergencyHeading.nextElementSibling
+            : null;
+
+    const referencesForm =
+        referencesHeading?.nextElementSibling?.matches('form')
+            ? referencesHeading.nextElementSibling
+            : null;
+
+    const documentList =
+        documentsHeading?.nextElementSibling?.matches(
+            '.driver-doc-list'
+        )
+            ? documentsHeading.nextElementSibling
+            : null;
+
+    const submitBox =
+        documentList?.nextElementSibling?.matches(
+            '.driver-submit-box'
+        )
+            ? documentList.nextElementSibling
+            : null;
+
+    if (
+        documentsHeading
+        && documentList
+        && !userPanel.querySelector(
+            '.driver-partner-documentation'
+        )
+    ) {
+        const documentation = document.createElement(
+            'section'
+        );
+
+        documentation.className =
+            'driver-partner-documentation';
+
+        documentation.innerHTML = `
+            <div class="driver-partner-documentation__heading">
+                <h2>Documentación personal</h2>
+                <p>
+                    Completa, revisa y actualiza cada apartado de tu expediente.
+                </p>
+            </div>
+        `;
+
+        documentsHeading.parentNode.insertBefore(
+            documentation,
+            documentsHeading
+        );
+
+        documentsHeading.remove();
+
+        const modules = document.createElement('div');
+
+        modules.className =
+            'driver-partner-documentation__modules';
+
+        documentation.append(modules);
+
+        const documentItems = Array.from(
+            documentList.querySelectorAll(
+                '.driver-doc-item'
+            )
+        );
+
+        /*
+         * Agrupar INE frente y reverso.
+         */
+        const ineItems = documentItems.filter((item) => {
+            const title = normalizedText(
+                item.querySelector(
+                    '.driver-doc-item__head strong'
+                )?.textContent
+            );
+
+            return title.includes('ine frente')
+                || title.includes('ine reverso');
+        });
+
+        if (ineItems.length > 0) {
+            const approved = ineItems.every((item) => {
+                return Boolean(
+                    item.querySelector(
+                        '.driver-badge--approved'
+                    )
+                );
+            });
+
+            const loaded = ineItems.every((item) => {
+                return item.dataset.hasDocument === '1';
+            });
+
+            const hasError = ineItems.some((item) => {
+                return item.dataset.analysisStatus === 'failed';
+            });
+
+            const needsReview = ineItems.some((item) => {
+                return item.dataset.analysisStatus === 'manual_review';
+            });
+
+            const module = createModule({
+                title: 'INE',
+                subtitle:
+                    'Identificación oficial por ambos lados.',
+                icon: '▣',
+                state: approved
+                    ? 'Aprobado'
+                    : hasError
+                        ? 'Error IA'
+                        : needsReview
+                            ? 'Revisar'
+                            : loaded
+                                ? 'Cargado'
+                                : 'Pendiente',
+                open: true,
+                modifier: approved
+                    ? 'is-complete'
+                    : hasError
+                        ? 'is-error'
+                        : needsReview
+                            ? 'is-review'
+                            : loaded
+                                ? 'is-captured'
+                                : ''
+            });
+
+            const ineGrid = document.createElement('div');
+
+            ineGrid.className =
+                'driver-partner-document-grid driver-partner-document-grid--2';
+
+            ineItems.forEach((item) => {
+                item.classList.add(
+                    'driver-doc-item--embedded'
+                );
+
+                ineGrid.append(item);
+            });
+
+            module.body.append(ineGrid);
+            modules.append(module.details);
+        }
+
+        /*
+         * Convertir el resto de documentos a módulos.
+         */
+        documentItems
+            .filter((item) => !ineItems.includes(item))
+            .forEach((item, index) => {
+                const title =
+                    item.querySelector(
+                        '.driver-doc-item__head strong'
+                    )?.textContent
+                    ?.trim() || 'Documento';
+
+                const approved = Boolean(
+                    item.querySelector(
+                        '.driver-badge--approved'
+                    )
+                );
+
+                const rejected = Boolean(
+                    item.querySelector(
+                        '.driver-badge--rejected'
+                    )
+                );
+
+                const loaded =
+                    item.dataset.hasDocument === '1';
+
+                const analysisStatus =
+                    item.dataset.analysisStatus || 'pending';
+
+                const hasError =
+                    analysisStatus === 'failed';
+
+                const needsReview =
+                    analysisStatus === 'manual_review';
+
+                let icon = '▤';
+
+                if (
+                    normalizedText(title).includes(
+                        'domicilio'
+                    )
+                ) {
+                    icon = '⌂';
+                } else if (
+                    normalizedText(title).includes(
+                        'licencia'
+                    )
+                ) {
+                    icon = '▥';
+                } else if (
+                    normalizedText(title).includes('curp')
+                ) {
+                    icon = '▧';
+                } else if (
+                    normalizedText(title).includes(
+                        'selfie'
+                    )
+                ) {
+                    icon = '◉';
+                }
+
+                const module = createModule({
+                    title,
+                    subtitle: loaded
+                        ? 'Documento almacenado en tu expediente.'
+                        : 'Carga PDF, JPG, PNG o WEBP.',
+                    icon,
+                    state: approved
+                        ? 'Aprobado'
+                        : rejected
+                            ? 'Corregir'
+                            : hasError
+                                ? 'Error IA'
+                                : needsReview
+                                    ? 'Revisar'
+                                    : loaded
+                                        ? 'Cargado'
+                                        : 'Pendiente',
+                    open: index === 0,
+                    modifier: approved
+                        ? 'is-complete'
+                        : rejected
+                            ? 'is-rejected'
+                            : hasError
+                                ? 'is-error'
+                                : needsReview
+                                    ? 'is-review'
+                                    : loaded
+                                        ? 'is-captured'
+                                        : ''
+                });
+
+                item.classList.add(
+                    'driver-doc-item--embedded'
+                );
+
+                module.body.append(item);
+                modules.append(module.details);
+            });
+
+        /*
+         * Contactos de emergencia dentro de documentación.
+         */
+        if (emergencyHeading && emergencyForm) {
+            const completedContacts =
+                hasFilledFormValues(emergencyForm);
+
+            const module = createModule({
+                title: 'Contactos de emergencia',
+                subtitle:
+                    'Registra de dos a cuatro personas.',
+                icon: '☎',
+                state: completedContacts
+                    ? 'Capturado'
+                    : 'Pendiente',
+                open: false,
+                modifier: completedContacts
+                    ? 'is-captured'
+                    : ''
+            });
+
+            emergencyHeading.classList.add(
+                'driver-section-heading--inside-module'
+            );
+
+            module.body.append(
+                emergencyHeading,
+                emergencyForm
+            );
+
+            modules.append(module.details);
+        }
+
+        /*
+         * Referencias personales dentro de documentación.
+         */
+        if (referencesHeading && referencesForm) {
+            const completedReferences =
+                hasFilledFormValues(referencesForm);
+
+            const module = createModule({
+                title: 'Referencias personales',
+                subtitle:
+                    'Referencias familiares y no familiares.',
+                icon: '♧',
+                state: completedReferences
+                    ? 'Capturado'
+                    : 'Pendiente',
+                open: false,
+                modifier: completedReferences
+                    ? 'is-captured'
+                    : ''
+            });
+
+            referencesHeading.classList.add(
+                'driver-section-heading--inside-module'
+            );
+
+            module.body.append(
+                referencesHeading,
+                referencesForm
+            );
+
+            modules.append(module.details);
+        }
+
+        documentList.remove();
+
+        if (submitBox) {
+            documentation.append(submitBox);
+        }
+    }
+
+    /*
+     * Mostrar nombre del archivo seleccionado.
+     */
+    root
+        .querySelectorAll(
+            '.driver-upload-form input[type="file"]'
+        )
+        .forEach((input) => {
+            input.addEventListener('change', () => {
+                const form = input.closest(
+                    '.driver-upload-form'
+                );
+
+                let selectedName = form?.querySelector(
+                    '.driver-upload-selected-name'
+                );
+
+                if (!selectedName && form) {
+                    selectedName =
+                        document.createElement('span');
+
+                    selectedName.className =
+                        'driver-upload-selected-name';
+
+                    form.append(selectedName);
+                }
+
+                if (selectedName) {
+                    selectedName.textContent =
+                        input.files?.[0]?.name
+                        || 'Sin archivo seleccionado';
+                }
+            });
+        });
+
+    root.querySelectorAll('.driver-upload-form').forEach((form) => {
+        const input = form.querySelector('input[type="file"]');
+        const button = form.querySelector('button[type="submit"]');
+
+        form.addEventListener('submit', (event) => {
+            if (!input || !input.files || input.files.length === 0) {
+                event.preventDefault();
+                window.alert(
+                    'Selecciona un archivo antes de continuar.'
+                );
+                return;
+            }
+
+            if (button) {
+                button.disabled = true;
+                button.textContent = 'Cargando...';
+            }
+        });
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            closeModal();
+
+            document
+                .querySelectorAll('[data-driver-account-menu][open]')
+                .forEach((menu) => {
+                    menu.open = false;
+                });
+        }
+    });
+
+    /*
+     * ========================================================
+     * PETPAY DOCUMENTOS IA Y CAMARA
+     * ========================================================
+     */
+
+    const documentModal = document.querySelector(
+        '[data-driver-document-modal]'
+    );
+
+    const documentModalTitle = documentModal?.querySelector(
+        '[data-driver-document-modal-title]'
+    );
+
+    const documentViewer = documentModal?.querySelector(
+        '[data-driver-document-viewer]'
+    );
+
+    const cameraModal = document.querySelector(
+        '[data-driver-camera-modal]'
+    );
+
+    const cameraTitle = cameraModal?.querySelector(
+        '[data-driver-camera-title]'
+    );
+
+    const cameraVideo = cameraModal?.querySelector(
+        '[data-driver-camera-video]'
+    );
+
+    const cameraCanvas = cameraModal?.querySelector(
+        '[data-driver-camera-canvas]'
+    );
+
+    const cameraMessage = cameraModal?.querySelector(
+        '[data-driver-camera-message]'
+    );
+
+    const cameraCapture = cameraModal?.querySelector(
+        '[data-driver-camera-capture]'
+    );
+
+    let activeCameraInput = null;
+    let activeCameraStream = null;
+
+    const escapeHtml = (value) => {
+        const element = document.createElement('div');
+        element.textContent = String(value ?? '');
+        return element.innerHTML;
+    };
+
+    const humanFileSize = (bytes) => {
+        if (!Number.isFinite(bytes) || bytes <= 0) {
+            return '0 KB';
+        }
+
+        const units = ['B', 'KB', 'MB', 'GB'];
+        const index = Math.min(
+            Math.floor(Math.log(bytes) / Math.log(1024)),
+            units.length - 1
+        );
+
+        return `${(bytes / Math.pow(1024, index)).toFixed(
+            index === 0 ? 0 : 1
+        )} ${units[index]}`;
+    };
+
+    const closeDocumentModal = () => {
+        if (!documentModal) {
+            return;
+        }
+
+        documentModal.hidden = true;
+
+        if (documentViewer) {
+            documentViewer.innerHTML = '';
+        }
+
+        document.body.classList.remove('driver-modal-open');
+    };
+
+    const openDocumentModal = ({
+        url,
+        mime,
+        title
+    }) => {
+        if (!documentModal || !documentViewer || !url) {
+            return;
+        }
+
+        documentViewer.innerHTML = '';
+
+        if (documentModalTitle) {
+            documentModalTitle.textContent =
+                title || 'Vista previa';
+        }
+
+        if (String(mime).startsWith('image/')) {
+            const image = document.createElement('img');
+            image.src = url;
+            image.alt = title || 'Documento';
+            documentViewer.append(image);
+        } else {
+            const frame = document.createElement('iframe');
+            frame.src = url;
+            frame.title = title || 'Documento';
+            documentViewer.append(frame);
+        }
+
+        documentModal.hidden = false;
+        document.body.classList.add('driver-modal-open');
+    };
+
+    root
+        .querySelectorAll('[data-driver-preview-open]')
+        .forEach((button) => {
+            button.addEventListener('click', () => {
+                openDocumentModal({
+                    url: button.dataset.previewUrl,
+                    mime: button.dataset.previewMime,
+                    title: button.dataset.previewTitle
+                });
+            });
+        });
+
+    documentModal
+        ?.querySelectorAll('[data-driver-document-modal-close]')
+        .forEach((button) => {
+            button.addEventListener(
+                'click',
+                closeDocumentModal
+            );
+        });
+
+    const stopCamera = () => {
+        if (activeCameraStream) {
+            activeCameraStream
+                .getTracks()
+                .forEach((track) => track.stop());
+        }
+
+        activeCameraStream = null;
+
+        if (cameraVideo) {
+            cameraVideo.srcObject = null;
+        }
+    };
+
+    const closeCameraModal = () => {
+        stopCamera();
+
+        if (cameraModal) {
+            cameraModal.hidden = true;
+        }
+
+        activeCameraInput = null;
+        document.body.classList.remove('driver-modal-open');
+    };
+
+    cameraModal
+        ?.querySelectorAll('[data-driver-camera-close]')
+        .forEach((button) => {
+            button.addEventListener(
+                'click',
+                closeCameraModal
+            );
+        });
+
+    root
+        .querySelectorAll('[data-driver-camera-open]')
+        .forEach((button) => {
+            button.addEventListener('click', async () => {
+                const form = button.closest(
+                    '[data-driver-document-upload]'
+                );
+
+                const input = form?.querySelector(
+                    '[data-driver-document-input]'
+                );
+
+                if (!input) {
+                    return;
+                }
+
+                if (
+                    !navigator.mediaDevices
+                    || !navigator.mediaDevices.getUserMedia
+                ) {
+                    window.alert(
+                        'Este navegador no permite abrir la cámara. Usa Seleccionar archivo.'
+                    );
+                    return;
+                }
+
+                activeCameraInput = input;
+
+                if (cameraTitle) {
+                    cameraTitle.textContent =
+                        button.dataset.documentLabel
+                        || 'Tomar fotografía';
+                }
+
+                if (cameraMessage) {
+                    cameraMessage.textContent =
+                        button.dataset.facingMode === 'user'
+                            ? 'Centra tu rostro, mira al frente y procura tener buena iluminación.'
+                            : 'Centra el documento completo, evita reflejos y mantén la cámara firme.';
+                }
+
+                try {
+                    activeCameraStream =
+                        await navigator.mediaDevices.getUserMedia({
+                            video: {
+                                facingMode: {
+                                    ideal:
+                                        button.dataset.facingMode
+                                        || 'environment'
+                                },
+                                width: {
+                                    ideal: 1920
+                                },
+                                height: {
+                                    ideal: 1080
+                                }
+                            },
+                            audio: false
+                        });
+
+                    if (cameraVideo) {
+                        cameraVideo.srcObject =
+                            activeCameraStream;
+                    }
+
+                    if (cameraModal) {
+                        cameraModal.hidden = false;
+                    }
+
+                    document.body.classList.add(
+                        'driver-modal-open'
+                    );
+                } catch (error) {
+                    stopCamera();
+
+                    window.alert(
+                        'No fue posible abrir la cámara. Revisa los permisos del navegador.'
+                    );
+                }
+            });
+        });
+
+    const updateLocalPreview = (input, file) => {
+        const card = input.closest(
+            '[data-driver-document-card]'
+        );
+
+        const preview = card?.querySelector(
+            '[data-driver-document-preview]'
+        );
+
+        const selectedName = card?.querySelector(
+            '[data-driver-selected-file]'
+        );
+
+        if (selectedName) {
+            selectedName.textContent =
+                `${file.name} · ${humanFileSize(file.size)}`;
+        }
+
+        if (!preview) {
+            return;
+        }
+
+        preview.innerHTML = '';
+        preview.classList.add('has-document');
+
+        const objectUrl = URL.createObjectURL(file);
+
+        if (file.type.startsWith('image/')) {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className =
+                'driver-document-preview__button';
+
+            const image = document.createElement('img');
+            image.src = objectUrl;
+            image.alt = file.name;
+
+            button.append(image);
+
+            button.addEventListener('click', () => {
+                openDocumentModal({
+                    url: objectUrl,
+                    mime: file.type,
+                    title: file.name
+                });
+            });
+
+            preview.append(button);
+            return;
+        }
+
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className =
+            'driver-document-preview__pdf';
+
+        button.innerHTML = `
+            <span>PDF</span>
+            <strong>${escapeHtml(file.name)}</strong>
+            <small>${humanFileSize(file.size)}</small>
+        `;
+
+        button.addEventListener('click', () => {
+            openDocumentModal({
+                url: objectUrl,
+                mime: file.type,
+                title: file.name
+            });
+        });
+
+        preview.append(button);
+    };
+
+    root
+        .querySelectorAll('[data-driver-document-input]')
+        .forEach((input) => {
+            input.addEventListener('change', () => {
+                const file = input.files?.[0];
+
+                if (!file) {
+                    return;
+                }
+
+                const allowedTypes = [
+                    'application/pdf',
+                    'image/jpeg',
+                    'image/png',
+                    'image/webp'
+                ];
+
+                if (!allowedTypes.includes(file.type)) {
+                    input.value = '';
+
+                    window.alert(
+                        'Formato no permitido. Usa PDF, JPG, PNG o WEBP.'
+                    );
+                    return;
+                }
+
+                if (file.size > 10 * 1024 * 1024) {
+                    input.value = '';
+
+                    window.alert(
+                        'El archivo excede el límite de 10 MB.'
+                    );
+                    return;
+                }
+
+                updateLocalPreview(input, file);
+            });
+        });
+
+    cameraCapture?.addEventListener('click', () => {
+        if (
+            !cameraVideo
+            || !cameraCanvas
+            || !activeCameraInput
+        ) {
+            return;
+        }
+
+        const width = cameraVideo.videoWidth;
+        const height = cameraVideo.videoHeight;
+
+        if (!width || !height) {
+            window.alert(
+                'La cámara todavía no está lista.'
+            );
+            return;
+        }
+
+        cameraCanvas.width = width;
+        cameraCanvas.height = height;
+
+        const context = cameraCanvas.getContext('2d');
+
+        context.drawImage(
+            cameraVideo,
+            0,
+            0,
+            width,
+            height
+        );
+
+        cameraCanvas.toBlob(
+            (blob) => {
+                if (!blob) {
+                    window.alert(
+                        'No fue posible crear la fotografía.'
+                    );
+                    return;
+                }
+
+                const documentType =
+                    activeCameraInput
+                        .closest(
+                            '[data-driver-document-card]'
+                        )
+                        ?.dataset.documentType
+                    || 'documento';
+
+                const file = new File(
+                    [blob],
+                    `${documentType}-${Date.now()}.jpg`,
+                    {
+                        type: 'image/jpeg',
+                        lastModified: Date.now()
+                    }
+                );
+
+                const transfer = new DataTransfer();
+                transfer.items.add(file);
+
+                activeCameraInput.files = transfer.files;
+
+                updateLocalPreview(
+                    activeCameraInput,
+                    file
+                );
+
+                closeCameraModal();
+            },
+            'image/jpeg',
+            0.92
+        );
+    });
+
+    const analysisFieldLabels = {
+        full_name: 'Nombre',
+        curp: 'CURP',
+        date_of_birth: 'Fecha de nacimiento',
+        address: 'Domicilio',
+        postal_code: 'Código postal',
+        document_number: 'Número de documento',
+        license_number: 'Número de licencia',
+        issue_date: 'Fecha de emisión',
+        expiration_date: 'Vigencia',
+        issuer: 'Emisor'
+    };
+
+    const renderAnalysis = (card, documentData) => {
+        const panel = card.querySelector(
+            '[data-driver-analysis-panel]'
+        );
+
+        const badge = card.querySelector(
+            '[data-driver-analysis-badge]'
+        );
+
+        const message = card.querySelector(
+            '[data-driver-analysis-message]'
+        );
+
+        const confidence = card.querySelector(
+            '[data-driver-confidence]'
+        );
+
+        const quality = card.querySelector(
+            '[data-driver-quality]'
+        );
+
+        const dataContainer = card.querySelector(
+            '[data-driver-analysis-data]'
+        );
+
+        const warningsContainer = card.querySelector(
+            '[data-driver-analysis-warnings]'
+        );
+
+        if (!panel) {
+            return;
+        }
+
+        const status =
+            documentData.analysis_status || 'pending';
+
+        panel.className =
+            `driver-analysis-panel driver-analysis-panel--${
+                status === 'manual_review'
+                    ? 'manual-review'
+                    : status
+            }`;
+
+        if (badge) {
+            badge.className =
+                `driver-ai-badge driver-ai-badge--${
+                    status === 'manual_review'
+                        ? 'manual-review'
+                        : status
+                }`;
+
+            badge.textContent = {
+                completed: 'Analizado',
+                manual_review: 'Revisión manual',
+                failed: 'Error de análisis',
+                processing: 'Analizando',
+                pending: 'Sin analizar'
+            }[status] || 'Sin analizar';
+        }
+
+        if (message) {
+            const rawError = String(
+                documentData.analysis_error || ''
+            ).toLowerCase();
+
+            let friendlyError =
+                'No fue posible analizar el documento. Intenta nuevamente.';
+
+            if (
+                rawError.includes('quota')
+                || rawError.includes('billing')
+                || rawError.includes('429')
+                || rawError.includes('saldo disponible')
+            ) {
+                friendlyError =
+                    'El servicio de análisis no tiene saldo disponible. Revisa la facturación de la API e intenta nuevamente.';
+            } else if (
+                rawError.includes('401')
+                || rawError.includes('403')
+                || rawError.includes('autenticar')
+            ) {
+                friendlyError =
+                    'No fue posible autenticar el servicio de análisis.';
+            } else if (
+                rawError.includes('timeout')
+                || rawError.includes('tardó demasiado')
+            ) {
+                friendlyError =
+                    'El servicio tardó demasiado en responder. Intenta nuevamente.';
+            }
+
+            message.textContent =
+                status === 'completed'
+                    ? 'Documento procesado correctamente.'
+                    : status === 'manual_review'
+                        ? 'El documento requiere revisión manual.'
+                        : status === 'failed'
+                            ? friendlyError
+                            : status === 'processing'
+                                ? 'El análisis está en proceso.'
+                                : 'Documento pendiente de análisis.';
+        }
+
+        if (confidence) {
+            confidence.textContent =
+                documentData.analysis_confidence !== null
+                && documentData.analysis_confidence !== undefined
+                    ? `${Math.round(
+                        Number(
+                            documentData.analysis_confidence
+                        )
+                    )} %`
+                    : '—';
+        }
+
+        if (quality) {
+            quality.textContent =
+                documentData.quality_score !== null
+                && documentData.quality_score !== undefined
+                    ? `${Math.round(
+                        Number(documentData.quality_score)
+                    )} %`
+                    : '—';
+        }
+
+        if (dataContainer) {
+            const extractedData =
+                documentData.extracted_data || {};
+
+            dataContainer.innerHTML = '';
+
+            Object.entries(analysisFieldLabels)
+                .forEach(([field, label]) => {
+                    const value = extractedData[field];
+
+                    if (
+                        value === null
+                        || value === undefined
+                        || String(value).trim() === ''
+                    ) {
+                        return;
+                    }
+
+                    const item = document.createElement('div');
+
+                    item.innerHTML = `
+                        <span>${escapeHtml(label)}</span>
+                        <strong>${escapeHtml(value)}</strong>
+                    `;
+
+                    dataContainer.append(item);
+                });
+
+            dataContainer.hidden =
+                dataContainer.children.length === 0;
+        }
+
+        if (warningsContainer) {
+            const warnings =
+                Array.isArray(documentData.warnings)
+                    ? documentData.warnings
+                    : [];
+
+            warningsContainer.innerHTML = '';
+
+            warnings.forEach((warning) => {
+                const item = document.createElement('span');
+                item.textContent = warning;
+                warningsContainer.append(item);
+            });
+
+            warningsContainer.hidden =
+                warnings.length === 0;
+        }
+    };
+
+    root
+        .querySelectorAll(
+            '[data-driver-analyze-document]'
+        )
+        .forEach((button) => {
+            button.addEventListener('click', async () => {
+                const card = button.closest(
+                    '[data-driver-document-card]'
+                );
+
+                const url = button.dataset.analyzeUrl;
+
+                if (!card || !url) {
+                    return;
+                }
+
+                const originalText =
+                    button.textContent.trim();
+
+                button.disabled = true;
+                button.textContent = 'Analizando...';
+
+                const panel = card.querySelector(
+                    '[data-driver-analysis-panel]'
+                );
+
+                const message = card.querySelector(
+                    '[data-driver-analysis-message]'
+                );
+
+                if (panel) {
+                    panel.className =
+                        'driver-analysis-panel driver-analysis-panel--processing';
+                }
+
+                if (message) {
+                    message.textContent =
+                        'Enviando el documento para lectura y validación.';
+                }
+
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken || ''
+                        }
+                    });
+
+                    const payload = await response.json();
+
+                    if (!response.ok || !payload.ok) {
+                        throw new Error(
+                            payload.message
+                            || 'No fue posible analizar el documento.'
+                        );
+                    }
+
+                    renderAnalysis(
+                        card,
+                        payload.document
+                    );
+
+                    button.textContent =
+                        'Analizar nuevamente';
+                } catch (error) {
+                    const rawError = String(
+                        error.message || ''
+                    ).toLowerCase();
+
+                    let friendlyMessage =
+                        'No fue posible analizar el documento. Intenta nuevamente.';
+
+                    if (
+                        rawError.includes('quota')
+                        || rawError.includes('billing')
+                        || rawError.includes('429')
+                        || rawError.includes('saldo disponible')
+                    ) {
+                        friendlyMessage =
+                            'El servicio de análisis no tiene saldo disponible. Revisa la facturación de la API.';
+                    } else if (
+                        rawError.includes('401')
+                        || rawError.includes('403')
+                        || rawError.includes('autenticar')
+                    ) {
+                        friendlyMessage =
+                            'No fue posible autenticar el servicio de análisis.';
+                    } else if (
+                        rawError.includes('timeout')
+                        || rawError.includes('tardó demasiado')
+                    ) {
+                        friendlyMessage =
+                            'El servicio tardó demasiado en responder. Intenta nuevamente.';
+                    }
+
+                    if (panel) {
+                        panel.className =
+                            'driver-analysis-panel driver-analysis-panel--failed';
+                    }
+
+                    if (message) {
+                        message.textContent =
+                            friendlyMessage;
+                    }
+
+                    const badge = card.querySelector(
+                        '[data-driver-analysis-badge]'
+                    );
+
+                    if (badge) {
+                        badge.className =
+                            'driver-ai-badge driver-ai-badge--failed';
+                        badge.textContent = 'Error IA';
+                    }
+
+                    card.dataset.analysisStatus = 'failed';
+
+                    button.textContent = originalText;
+                } finally {
+                    button.disabled = false;
+                }
+            });
+        });
+
+})();
+
+

@@ -6,6 +6,17 @@
     <title>PETPAY-CARD | Marketplace para mascotas</title>
 
     <link rel="stylesheet" href="{{ asset('assets/petpay-card/css/public/welcome.css') }}">
+    <style>
+        .petpay-access { position: relative; }
+        .petpay-access__trigger { appearance: none; border: 0; cursor: pointer; font: inherit; }
+        .petpay-access__panel { position: absolute; z-index: 50; top: calc(100% + 10px); right: 0; width: 250px; padding: 10px; border: 1px solid rgba(17,17,17,.1); border-radius: 18px; background: #fff; box-shadow: 0 18px 50px rgba(17,17,17,.18); }
+        .petpay-access__panel[hidden] { display: none; }
+        .petpay-access__title { margin: 2px 8px 8px; color: #686868; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+        .petpay-access__option { display: flex; align-items: center; gap: 10px; padding: 11px 12px; border-radius: 12px; color: #171717; text-decoration: none; font-weight: 700; }
+        .petpay-access__option:hover, .petpay-access__option:focus-visible { background: #fff0e6; color: #e85d04; outline: none; }
+        .petpay-access__icon { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 10px; background: #fff0e6; }
+        @media (max-width: 760px) { .petpay-public__nav { gap: 6px; } .petpay-access__panel { position: fixed; top: 76px; right: 14px; left: 14px; width: auto; } }
+    </style>
 </head>
 <body>
     <main
@@ -31,12 +42,12 @@
             } elseif (auth('cliente')->check()) {
                 $publicHeaderUser = auth('cliente')->user();
                 $publicHeaderAccountType = 'Cliente';
-                $publicHeaderHomeRoute = route('cliente.home');
+                $publicHeaderHomeRoute = route('cliente.dashboard');
                 $publicHeaderLogoutRoute = route('cliente.logout');
             } elseif (auth('repartidor')->check()) {
                 $publicHeaderUser = auth('repartidor')->user();
                 $publicHeaderAccountType = 'Repartidor';
-                $publicHeaderHomeRoute = route('repartidor.home');
+                $publicHeaderHomeRoute = route('repartidor.dashboard');
                 $publicHeaderLogoutRoute = route('repartidor.logout');
             }
 
@@ -96,17 +107,28 @@
                         </div>
                     </details>
                 @else
-                    <a href="{{ route('cliente.login') }}" class="petpay-public__nav-link petpay-public__nav-link--dark">
-                        Comprar
-                    </a>
-
-                    <a href="{{ route('comercio.login') }}" class="petpay-public__nav-link">
-                        Vender
-                    </a>
-
-                    <a href="{{ route('repartidor.login') }}" class="petpay-public__nav-link">
-                        Repartir
-                    </a>
+                    <div class="petpay-access">
+                        <button type="button" class="petpay-public__nav-link petpay-access__trigger" data-access-trigger="login" aria-expanded="false">
+                            Iniciar sesión
+                        </button>
+                        <div class="petpay-access__panel" data-access-panel="login" hidden>
+                            <p class="petpay-access__title">Ingresar como</p>
+                            <a class="petpay-access__option" href="{{ route('cliente.login') }}"><span class="petpay-access__icon">🐾</span>Usuario</a>
+                            <a class="petpay-access__option" href="{{ route('comercio.login') }}"><span class="petpay-access__icon">🏪</span>Comercio</a>
+                            <a class="petpay-access__option" href="{{ route('repartidor.login') }}"><span class="petpay-access__icon">🛵</span>Repartidor</a>
+                        </div>
+                    </div>
+                    <div class="petpay-access">
+                        <button type="button" class="petpay-public__nav-link petpay-public__nav-link--dark petpay-access__trigger" data-access-trigger="register" aria-expanded="false">
+                            Registrarse
+                        </button>
+                        <div class="petpay-access__panel" data-access-panel="register" hidden>
+                            <p class="petpay-access__title">Crear cuenta como</p>
+                            <a class="petpay-access__option" href="{{ route('cliente.register') }}"><span class="petpay-access__icon">🐾</span>Usuario</a>
+                            <a class="petpay-access__option" href="{{ route('comercio.register') }}"><span class="petpay-access__icon">🏪</span>Comercio</a>
+                            <a class="petpay-access__option" href="{{ route('repartidor.register') }}"><span class="petpay-access__icon">🛵</span>Repartidor</a>
+                        </div>
+                    </div>
                 @endif
             </nav>
         </header>
@@ -187,10 +209,10 @@
                     </button>
                 </form>
 
-                <a href="{{ route('cliente.login') }}" class="petpay-public__login">
+                <button type="button" class="petpay-public__login petpay-access__trigger" data-access-trigger="login">
                     O inicia sesión
                     <span>›</span>
-                </a>
+                </button>
 
                 <div class="petpay-public__mobile-links" aria-label="Accesos móviles">
                     <a href="{{ route('cliente.login') }}">Comprar</a>
@@ -210,6 +232,31 @@
             const statusBox = document.getElementById('petpayLocationStatus');
 
             const loginUrl = page?.dataset?.loginUrl || '/cliente/login';
+            const accessTriggers = document.querySelectorAll('[data-access-trigger]');
+            const accessPanels = document.querySelectorAll('[data-access-panel]');
+
+            function closeAccessPanels() {
+                accessPanels.forEach(panel => panel.hidden = true);
+                accessTriggers.forEach(trigger => trigger.setAttribute('aria-expanded', 'false'));
+            }
+
+            accessTriggers.forEach(function (trigger) {
+                trigger.addEventListener('click', function (event) {
+                    event.stopPropagation();
+                    const panel = document.querySelector('[data-access-panel="' + trigger.dataset.accessTrigger + '"]');
+                    const mustOpen = panel && panel.hidden;
+                    closeAccessPanels();
+                    if (mustOpen) {
+                        panel.hidden = false;
+                        document.querySelectorAll('[data-access-trigger="' + trigger.dataset.accessTrigger + '"]').forEach(item => item.setAttribute('aria-expanded', 'true'));
+                    }
+                });
+            });
+
+            document.addEventListener('click', closeAccessPanels);
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape') closeAccessPanels();
+            });
 
             function setStatus(message, type = '') {
                 if (!statusBox) {

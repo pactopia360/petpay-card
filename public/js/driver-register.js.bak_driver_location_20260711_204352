@@ -1,0 +1,40 @@
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[data-password-toggle]').forEach((button) => {
+        button.addEventListener('click', () => {
+            const input = document.getElementById(button.dataset.passwordToggle);
+
+            if (!input) {
+                return;
+            }
+
+            const show = input.type === 'password';
+            input.type = show ? 'text' : 'password';
+            button.textContent = show ? 'Ocultar' : 'Ver';
+        });
+    });
+
+    const vehicle = document.querySelector('[data-driver-vehicle]');
+    const motorFields = document.querySelectorAll('[data-driver-motor-field]');
+    const vehicleFields = document.querySelectorAll('[data-driver-vehicle-field]');
+
+    const syncVehicleFields = () => {
+        const type = vehicle?.value || '';
+        const motor = type === 'motorcycle' || type === 'car';
+        const needsVehicleData = type !== '' && type !== 'walking';
+
+        motorFields.forEach((field) => {
+            field.hidden = !motor;
+            const input = field.querySelector('input');
+            if (input) {
+                input.required = motor;
+            }
+        });
+
+        vehicleFields.forEach((field) => {
+            field.hidden = !needsVehicleData;
+        });
+    };
+
+    vehicle?.addEventListener('change', syncVehicleFields);
+    syncVehicleFields();
+});

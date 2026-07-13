@@ -40,4 +40,27 @@ return [
         'maps_api_key' => env('GOOGLE_MAPS_API_KEY', ''),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | OpenAI - análisis documental PETPAY
+    |--------------------------------------------------------------------------
+    |
+    | La clave permanece solamente en .env.
+    | Nunca debe escribirse directamente en controladores, servicios o vistas.
+    |
+    */
+
+    'openai' => [
+        'enabled' => env('OPENAI_DOCUMENT_ANALYSIS_ENABLED', false),
+        'key' => env('OPENAI_API_KEY'),
+        'model' => env('OPENAI_DOCUMENT_MODEL', 'gpt-4.1-mini'),
+        'base_url' => env('OPENAI_BASE_URL', 'https://api.openai.com/v1'),
+        'timeout' => (int) env('OPENAI_TIMEOUT', 90),
+        'connect_timeout' => (int) env('OPENAI_CONNECT_TIMEOUT', 15),
+        'max_image_bytes' => (int) env(
+            'OPENAI_DOCUMENT_MAX_IMAGE_BYTES',
+            10485760
+        ),
+    ],
+
 ];

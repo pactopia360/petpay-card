@@ -415,7 +415,8 @@ class CommerceFinanceController extends Controller
             $commerce,
             $validated,
             $series,
-            $isDefault
+            $isDefault,
+            $request
         ): void {
             if ($isDefault) {
                 DB::connection('mysql_payments')
@@ -606,3 +607,4 @@ class CommerceFinanceController extends Controller
         return $commerce;
     }
 }
+

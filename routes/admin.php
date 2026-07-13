@@ -3,6 +3,8 @@
 use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DriverApprovalController;
+use App\Http\Controllers\Admin\DriverIdentityReviewController;
+use App\Http\Controllers\Admin\DriverUpdateRequestController;
 use App\Http\Controllers\Admin\ProviderApprovalController;
 use App\Http\Controllers\Admin\CommerceApprovalController;
 use App\Http\Controllers\Admin\CommerceBrandingReviewController;
@@ -90,4 +92,76 @@ Route::middleware(['auth:admin', 'role:admin,admin'])->group(function () {
 
     Route::patch('/repartidores/{driverUser}/rechazar', [DriverApprovalController::class, 'reject'])
         ->name('drivers.reject');
+
+    /*
+     * Expedientes posteriores a la aprobación inicial de acceso.
+     * No modifica driver_users.approval_status.
+     */
+    Route::get(
+        '/repartidores/expedientes',
+        [DriverIdentityReviewController::class, 'index']
+    )->name('driver-identities.index');
+
+    Route::get(
+        '/repartidores/expedientes/{profile}',
+        [DriverIdentityReviewController::class, 'show']
+    )->name('driver-identities.show');
+
+    Route::post(
+        '/repartidores/expedientes/{profile}/iniciar',
+        [DriverIdentityReviewController::class, 'startReview']
+    )->name('driver-identities.start');
+
+    Route::post(
+        '/repartidores/expedientes/{profile}/documentos/{document}/analizar',
+        [DriverIdentityReviewController::class, 'analyze']
+    )
+        ->middleware('throttle:20,1')
+        ->name('driver-identities.documents.analyze');
+
+    Route::post(
+        '/repartidores/expedientes/{profile}/documentos/{document}/revisar',
+        [DriverIdentityReviewController::class, 'reviewDocument']
+    )->name('driver-identities.documents.review');
+
+    Route::get(
+        '/repartidores/expedientes/{profile}/documentos/{document}',
+        [DriverIdentityReviewController::class, 'document']
+    )->name('driver-identities.documents.show');
+
+    Route::post(
+        '/repartidores/expedientes/{profile}/correcciones',
+        [DriverIdentityReviewController::class, 'corrections']
+    )->name('driver-identities.corrections');
+
+    Route::post(
+        '/repartidores/expedientes/{profile}/aprobar',
+        [DriverIdentityReviewController::class, 'approve']
+    )->name('driver-identities.approve');
+
+    Route::post(
+        '/repartidores/expedientes/{profile}/rechazar',
+        [DriverIdentityReviewController::class, 'reject']
+    )->name('driver-identities.reject');
+
+    Route::get(
+        '/repartidores/solicitudes-actualizacion',
+        [DriverUpdateRequestController::class, 'index']
+    )->name('driver-update-requests.index');
+
+    Route::post(
+        '/repartidores/solicitudes-actualizacion/{updateRequest}/aprobar',
+        [DriverUpdateRequestController::class, 'approve']
+    )->name('driver-update-requests.approve');
+
+    Route::post(
+        '/repartidores/solicitudes-actualizacion/{updateRequest}/rechazar',
+        [DriverUpdateRequestController::class, 'reject']
+    )->name('driver-update-requests.reject');
+
+    Route::get(
+        '/repartidores/solicitudes-actualizacion/{updateRequest}/evidencia',
+        [DriverUpdateRequestController::class, 'evidence']
+    )->name('driver-update-requests.evidence');
 });
+

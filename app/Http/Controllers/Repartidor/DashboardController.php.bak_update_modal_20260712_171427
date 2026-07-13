@@ -1,0 +1,197 @@
+<?php
+
+namespace App\Http\Controllers\Repartidor;
+
+use App\Http\Controllers\Controller;
+use App\Models\Repartidor\DriverIdentityProfile;
+use App\Models\Repartidor\DriverUser;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\View\View;
+
+class DashboardController extends Controller
+{
+    public function index(Request $request): View
+    {
+        $driver = $request->user('repartidor');
+
+        abort_unless($driver instanceof DriverUser, 403);
+
+        $tabs = [
+            'usuario',
+            'vehiculo',
+            'finanzas',
+            'contratos',
+        ];
+
+        $requestedTab = $request->string('tab')->toString();
+        $sessionTab = session('active_tab');
+
+        if (in_array($sessionTab, $tabs, true)) {
+            $activeTab = $sessionTab;
+        } elseif (in_array($requestedTab, $tabs, true)) {
+            $activeTab = $requestedTab;
+        } else {
+            $activeTab = 'usuario';
+        }
+
+        $identityProfile = DriverIdentityProfile::query()->firstOrCreate(
+            [
+                'driver_user_id' => $driver->id,
+            ],
+            [
+                'uuid' => (string) Str::uuid(),
+                'paternal_last_name' => $driver->last_name,
+                'mobile_phone' => $driver->phone,
+                'contact_email' => $driver->email,
+                'status' => 'draft',
+                'liveness_challenge' => 'Toma una selfie mostrando tu rostro y una hoja con la fecha actual y la palabra PETPAY.',
+            ]
+        );
+
+        $driver->load([
+            'addresses',
+            'primaryAddress',
+            'emergencyContact',
+            'emergencyContacts',
+            'personalReferences',
+            'identityDocuments',
+        ]);
+
+        $identityProfile->load([
+            'documents',
+            'events',
+        ]);
+
+        $currentDocuments = $identityProfile->documents
+            ->whereIn('status', [
+                'pending',
+                'approved',
+                'rejected',
+            ])
+            ->groupBy('document_type')
+            ->map(
+                fn ($documents) => $documents
+                    ->sortByDesc('id')
+                    ->first()
+            );
+
+        $preRegistration = [
+            'Nombre' => trim((string) $driver->name),
+            'Correo de acceso' => (string) $driver->email,
+            'Teléfono móvil' => (string) $driver->phone,
+            'Estado' => (string) $driver->state,
+            'Ciudad o municipio' => (string) $driver->city,
+            'Zona de operación' => (string) $driver->operation_zone,
+            'Vehículo' => $this->vehicleLabel($driver->vehicle_type),
+            'Marca' => (string) ($driver->vehicle_make ?: 'No aplica'),
+            'Modelo' => (string) ($driver->vehicle_model ?: 'No aplica'),
+            'Placa' => (string) ($driver->vehicle_plate ?: 'No aplica'),
+            'Licencia' => (string) ($driver->license_number ?: 'No aplica'),
+            'Disponibilidad' => $this->availabilityLabel(
+                $driver->availability_type
+            ),
+            'Dirección detectada' => (string) (
+                $driver->registration_address_detected
+                ?: 'Ubicación confirmada durante el registro'
+            ),
+        ];
+
+        $documentTypes = [
+            'ine_front',
+            'ine_back',
+            'curp',
+            'proof_address',
+            'selfie',
+            'driver_license',
+        ];
+
+        $completionChecklist = [
+            'Preregistro completado' => filled($driver->first_name)
+                && filled($driver->email)
+                && filled($driver->phone)
+                && filled($driver->vehicle_type)
+                && filled($driver->operation_zone)
+                && filled($driver->state)
+                && filled($driver->city)
+                && filled($driver->availability_type),
+
+            'CURP capturada' => filled($identityProfile->curp),
+
+            'Dirección completa' => $driver->primaryAddress !== null,
+
+            'Dos contactos de emergencia' => $driver->emergencyContacts->count() >= 2,
+
+            'Dos referencias personales' => $driver
+                ->personalReferences
+                ->count() >= 2,
+        ];
+
+        foreach ($documentTypes as $documentType) {
+            $label = match ($documentType) {
+                'ine_front' => 'INE frente',
+                'ine_back' => 'INE reverso',
+                'curp' => 'Documento CURP',
+                'proof_address' => 'Comprobante de domicilio',
+                'selfie' => 'Selfie',
+                'driver_license' => 'Licencia de conducir',
+            };
+
+            $completionChecklist[$label] = $currentDocuments
+                ->has($documentType);
+        }
+
+        $completedItems = collect($completionChecklist)
+            ->filter(fn (bool $completed) => $completed)
+            ->count();
+
+        $totalItems = count($completionChecklist);
+
+        $profileCompletion = $totalItems > 0
+            ? (int) round(($completedItems / $totalItems) * 100)
+            : 0;
+
+        $pendingItems = collect($completionChecklist)
+            ->filter(fn (bool $completed) => ! $completed)
+            ->keys()
+            ->values();
+
+        return view('portals.repartidor.home', [
+            'driver' => $driver,
+            'activeTab' => $activeTab,
+            'identityProfile' => $identityProfile,
+            'primaryAddress' => $driver->primaryAddress,
+            'emergencyContact' => $driver->emergencyContact,
+            'emergencyContacts' => $driver->emergencyContacts,
+            'personalReferences' => $driver->personalReferences,
+            'currentDocuments' => $currentDocuments,
+            'preRegistration' => $preRegistration,
+            'completionChecklist' => $completionChecklist,
+            'profileCompletion' => $profileCompletion,
+            'pendingItems' => $pendingItems,
+        ]);
+    }
+
+    private function vehicleLabel(?string $vehicleType): string
+    {
+        return match ($vehicleType) {
+            'motorcycle' => 'Motocicleta',
+            'car' => 'Automóvil',
+            'bicycle' => 'Bicicleta',
+            'walking' => 'A pie',
+            default => 'Sin definir',
+        };
+    }
+
+    private function availabilityLabel(?string $availability): string
+    {
+        return match ($availability) {
+            'full_time' => 'Tiempo completo',
+            'part_time' => 'Medio tiempo',
+            'weekends' => 'Fines de semana',
+            'flexible' => 'Horario flexible',
+            default => 'Sin definir',
+        };
+    }
+}
+
